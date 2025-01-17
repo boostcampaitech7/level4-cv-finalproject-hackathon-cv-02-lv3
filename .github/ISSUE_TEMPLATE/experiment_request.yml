@@ -1,0 +1,47 @@
+name: Experiment Request
+description: 새로운 실험을 제안하거나 진행 상황을 추적하기 위한 템플릿입니다.
+title: "[Experiment] 새로운 실험 혹은 테스트"
+labels: ["🌱experiment"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 실험 설명 템플릿
+        이 템플릿을 사용하여 새로운 실험을 제안하거나 실험의 진행 상황을 추적하세요.
+
+  - type: input
+    id: experiment_title
+    attributes:
+      label: Experiment Title
+      description: 실험에 대한 제목을 입력해주세요.
+      placeholder: "실험 제목을 입력하세요"
+    validations:
+      required: true
+
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: 실험의 가설이나 목표를 작성해주세요.
+      placeholder: "여기에 가설을 입력하세요"
+    validations:
+      required: true
+
+  - type: textarea
+    id: methodology
+    attributes:
+      label: Methodology
+      description: 실험의 방법론이나 접근 방식을 설명해주세요.
+      placeholder: "여기에 방법론에 대한 설명을 입력하세요"
+    validations:
+      required: true
+
+  - type: input
+    id: expected_outcome
+    attributes:
+      label: Expected Outcome
+      description: 예상되는 결과나 성공 기준을 설명해주세요.
+      placeholder: "여기에 예상 결과를 입력하세요"
+    validations:
+      required: true
