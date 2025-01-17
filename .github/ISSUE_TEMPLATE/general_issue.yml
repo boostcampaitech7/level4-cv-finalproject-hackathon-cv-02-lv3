@@ -1,0 +1,35 @@
+name: General Issue
+description: 일반적인 이슈(질문, 백업, 래픽토링)를 위한 템플릿.
+title: "[] 이슈 제목"
+labels: []
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 일반 이슈 템플릿
+        아래에 질문, 백업 또는 리팩토링 작업 대한 세부 정보를 작성해주세요.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: 이슈를 간단히 요약해주세요.
+      placeholder: "간단한 요약을 작성해주세요"
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: 이슈에 대한 상세 설명을 작성해주세요.
+      placeholder: "여기에 상세 정보를 입력해주세요"
+    validations:
+      required: true
+
+  - type: input
+    id: references
+    attributes:
+      label: References
+      description: 관련 링크나 참고 자료를 추가해주세요 (선택 사항).
+      placeholder: "e.g., https://example.com"
