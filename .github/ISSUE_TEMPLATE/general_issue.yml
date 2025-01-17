@@ -1,5 +1,5 @@
 name: General Issue
-description: 일반적인 이슈(질문, 백업, 래픽토링)를 위한 템플릿.
+description: 일반적인 이슈(질문, 백업, 리팩토링)를 위한 템플릿.
 title: "[] 이슈 제목"
 labels: []
 assignees: []
