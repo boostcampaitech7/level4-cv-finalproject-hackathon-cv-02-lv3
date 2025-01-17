@@ -32,7 +32,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: 버그가 발생한 환경을 명시해주세요 (예: 운영체제, 라이브러리 버전 등).
+      description: "버그가 발생한 환경을 명시해주세요 (예: 운영체제, 라이브러리 버전 등)."
       placeholder: "e.g., Windows 10, Python 3.8, AutoGluon 0.6.0"
     validations:
       required: true
