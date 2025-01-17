@@ -1,21 +1,21 @@
 name: Bug Report
-description: Template for reporting bugs or errors.
-title: "[Bug] Title of the Bug"
+description: 발견한 문제나 버그를 보고해주세요.
+title: "[Bug] 버그 제목을 입력해주세요"
 labels: ["🐞bug"]
 assignees: []
 body:
   - type: markdown
     attributes:
       value: |
-        ## Bug Report Template
-        Please fill out the information below to help us address the issue.
+        ### 🐞 버그 설명
+        발견한 문제에 대한 명확하고 간결한 설명을 작성해주세요.
 
   - type: input
     id: bug_summary
     attributes:
       label: Bug Summary
-      description: Briefly describe the bug.
-      placeholder: "Enter a brief summary of the bug"
+      description: 버그를 간단히 요약해주세요. (예: "데이터 인풋이 제대로 동작하지 않음")
+      placeholder: "여기에 버그에 대한 간단한 요약을 작성해주세요."
     validations:
       required: true
 
@@ -23,8 +23,8 @@ body:
     id: bug_description
     attributes:
       label: Description
-      description: Provide a detailed description of the bug, including steps to reproduce.
-      placeholder: "Enter detailed bug information here"
+      description: 버그에 대한 상세한 설명을 작성해주세요. 재현 방법도 포함해주세요.
+      placeholder: "여기에 버그에 대한 상세 정보를 입력하세요"
     validations:
       required: true
 
@@ -32,7 +32,7 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Specify the environment where the bug occurred (e.g., OS, library versions).
+      description: 버그가 발생한 환경을 명시해주세요 (예: 운영체제, 라이브러리 버전 등).
       placeholder: "e.g., Windows 10, Python 3.8, AutoGluon 0.6.0"
     validations:
       required: true
@@ -41,7 +41,7 @@ body:
     id: logs
     attributes:
       label: Logs or Error Messages
-      description: Paste any relevant logs or error messages.
-      placeholder: "Enter logs or error messages here"
+      description: 관련 로그나 에러 메시지를 붙여넣어주세요.
+      placeholder: "여기에 로그나 에러 메시지를 입력하세요"
     validations:
       required: false
