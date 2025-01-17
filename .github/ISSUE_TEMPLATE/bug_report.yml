@@ -14,7 +14,7 @@ body:
     id: bug_summary
     attributes:
       label: Bug Summary
-      description: 버그를 간단히 요약해주세요. (예: "데이터셋 전처리 중 Null 값 처리 로직이 비정상적으로 작동함")
+      description: 버그를 간단히 요약해주세요. (예: 데이터셋 전처리 중 Null 값 처리 로직이 비정상적으로 작동함)
       placeholder: "여기에 버그에 대한 간단한 요약을 작성해주세요."
     validations:
       required: true
