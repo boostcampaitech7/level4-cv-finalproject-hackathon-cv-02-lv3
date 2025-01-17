@@ -7,14 +7,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        ### 🐞 버그 설명
+        ## 🐞 버그 설명
         발견한 문제에 대한 명확하고 간결한 설명을 작성해주세요.
 
   - type: input
     id: bug_summary
     attributes:
       label: Bug Summary
-      description: 버그를 간단히 요약해주세요. (예: "데이터 인풋이 제대로 동작하지 않음")
+      description: 버그를 간단히 요약해주세요. (예: "데이터셋 전처리 중 Null 값 처리 로직이 비정상적으로 작동함")
       placeholder: "여기에 버그에 대한 간단한 요약을 작성해주세요."
     validations:
       required: true
@@ -24,7 +24,7 @@ body:
     attributes:
       label: Description
       description: 버그에 대한 상세한 설명을 작성해주세요. 재현 방법도 포함해주세요.
-      placeholder: "여기에 버그에 대한 상세 정보를 입력하세요"
+      placeholder: "여기에 버그에 대한 상세 정보를 입력하세요."
     validations:
       required: true
 
