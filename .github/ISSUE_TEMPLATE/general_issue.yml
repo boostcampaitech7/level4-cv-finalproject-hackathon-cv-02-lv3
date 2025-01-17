@@ -23,7 +23,7 @@ body:
     attributes:
       label: Details
       description: 이슈에 대한 상세 설명을 작성해주세요.
-      placeholder: "여기에 상세 정보를 입력해주세요"
+      placeholder: "여기에 상세 정보를 작성해주세요."
     validations:
       required: true
 
