@@ -1,4 +1,5 @@
 import pandas as pd
+from autoML import AutoML
 
 data_path = '/data/ephemeral/home/Dongjin/level4-cv-finalproject-hackathon-cv-02-lv3/autoML/melb_split.csv'
 drop_tables = ['Address', 'BuildingArea', 'YearBuilt',
@@ -19,13 +20,15 @@ X_train = train_data.drop(['Price', 'Split'], axis=1)
 y_test = test_data['Price']
 X_test = test_data.drop(['Price', 'Split'], axis=1)
 
-# 결과 확인
-print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+# # shape 확인
+# print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
-# na값 통계
-print("X_train, y_train, X_test, y_test null")
-print(X_train.isnull().sum())
-print(y_train.isnull().sum())
-print(X_test.isnull().sum())
-print(y_test.isnull().sum())
+# # na 통계
+# print("X_train, y_train, X_test, y_test null")
+# print(X_train.isnull().sum())
+# print(y_train.isnull().sum())
+# print(X_test.isnull().sum())
+# print(y_test.isnull().sum())
 
+autoML = AutoML(n_population=20, n_generation=1, n_parent=5, prob_mutation=0.1)
+autoML.fit(X_train, y_train, timeout=3)

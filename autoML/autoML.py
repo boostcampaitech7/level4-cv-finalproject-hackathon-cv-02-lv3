@@ -14,21 +14,13 @@ from sklearn.model_selection import train_test_split
 
 from tqdm import tqdm
 import multiprocessing
-
-from sklearn.metrics import (
-    r2_score,
-    mean_absolute_error,
-    mean_squared_error,
-    median_absolute_error,
-    mean_squared_log_error,
-    explained_variance_score
-)
+from sklearn.metrics import r2_score, mean_squared_error
 
 import random
 from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor, TimeoutError, ProcessPoolExecutor
 import math
 import signal
+import os
 
 
 preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScaler(), 
@@ -42,10 +34,11 @@ models = {'DecisionTreeRegressor': DecisionTreeRegressor(), 'RandomForestRegress
           'KNeighborsRegressor': KNeighborsRegressor()}
 
 
+choose_random_key = lambda dictionary: random.choice(list(dictionary.values()))
+
 def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
     r2 = r2_score(y_true, y_pred)
-    RMSE = math.sqrt(mean_squared_error(y_true, y_pred))
-    
+    RMSE = math.sqrt(mean_squared_error(y_true, y_pred))    
     dicts = {'r2': r2, 'RMSE': RMSE}
     return dicts
 
@@ -56,7 +49,6 @@ def build_pipeline(structure):
         _pipeline.append((k, v))
     return Pipeline(_pipeline)
 
-choose_random_key = lambda dictionary: random.choice(list(dictionary.values()))
 
 def get_random_structures(n):
     random_structures = []
@@ -82,13 +74,13 @@ def timeout_handler(signum, frame):
     
 
 def sort(structures):    
-    r2s = [structure['test_metric']['r2'] for structure in structures]
+    r2s = [structure['valid_metric']['r2'] for structure in structures]
     r2s.sort(reverse=True)
     sorted_structures = []
 
     for r2 in r2s:
         for structure in structures:
-            if r2 == structure['test_metric']['r2']:
+            if r2 == structure['valid_metric']['r2']:
                 sorted_structures.append(structure)
  
     return sorted_structures
@@ -145,6 +137,8 @@ class AutoML:
         self.n_parent = n_parent
         self.prob_mutation = prob_mutation
         self.n_child = n_population - n_parent
+        self.log_path = os.path.join(os.getcwd(), "log.txt")
+
 
     def fit_structures(self, timeout=30):
         structures = [self.structures] if isinstance(self.structures, dict) else self.structures # type conversion (List -> dict)
@@ -172,35 +166,47 @@ class AutoML:
             finally:
                 signal.alarm(0)
     
-    def fit(self, X_train, y_train, valid_size=0.2, seed=42, max_n_try=1000):
+    def log(self, message):
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_message = f"[{now}] {message}"
+
+        with open(self.log_path, 'a') as file:
+            file.write(log_message + "\n")
+            print(log_message)
+
+
+    def predict(self, X):
+        y_pred = self.best_structure['pipeline'](X)
+        return y_pred
+
+
+    def fit(self, X_train, y_train, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
             self.X_train, self.X_valid, self.y_train, self.y_valid = train_test_split(X_train, y_train, 
                                                                                       test_size=valid_size, random_state=seed)
             self.structures = get_random_structures(self.n_population)
             keys = ['preprocessor', 'feature_selection', 'model']
 
             for generation in range(self.n_generation):
-                self.fit_structures()
+                self.fit_structures(timeout)
                 self.structures = sort(self.structures) # 점수 높은 순으로 정렬
                 self.best_structure = self.structures[0]
                 self.best_score = self.best_structure['valid_metric']['r2']
                 
-                now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                print(f"{now} - {generation+1} - best R2: {self.best_score:.3f}") # 로그
-                print(" - ".join([self.best_structure[k] for k in keys])) # 구조 출력
+                self.log(f"{generation+1} - best R2: {self.best_score:.3f}") # 최적값 기록
+                self.log(" - ".join([str(self.best_structure[k]) for k in keys])) # 구조 기록
 
                 if (generation+1 == self.n_generation):
                     break
                 
                 del self.structures[self.n_parent:] # 점수가 낮은 형질 제거
-
                 n_success = 0
                 n_try = 0
 
                 while (n_success < self.n_child and n_try < max_n_try):
                     n_try += 1
                     structure1, structure2 = random.sample(self.structures, 2) # 임의로 형질 2개 고르기
-                    new_structure = crossover(structure1, structure2)
-                    new_structure = mutation(new_structure, self.prob_mutation)
+                    new_structure = crossover(structure1, structure2) # 형질 교차
+                    new_structure = mutation(new_structure, self.prob_mutation) # 형질 변형
 
                     if is_in_structures(new_structure, self.structures): # 이미 존재하는 형질이면 재생성
                         continue
