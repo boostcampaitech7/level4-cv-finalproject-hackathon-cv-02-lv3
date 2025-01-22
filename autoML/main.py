@@ -9,6 +9,7 @@ from sklearn.metrics import (
     explained_variance_score
 )
 import math
+import pickle
 
 def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
     print(f"\nEvaluation for {dataset_name}:")
@@ -54,8 +55,8 @@ print(X_test.isnull().sum())
 print(y_test.isnull().sum())
 
 
-autoML = AutoML(n_population=20, n_generation=50, n_parent=5, prob_mutation=0.1)
-autoML.fit(X_train, y_train, timeout=30)
+autoML = AutoML(n_population=10, n_generation=2, n_parent=5, prob_mutation=0.1)
+autoML.fit(X_train, y_train, timeout=3)
 
 y_train_pred = autoML.predict(X_train)
 y_test_pred = autoML.predict(X_test)
@@ -63,3 +64,6 @@ y_test_pred = autoML.predict(X_test)
 print(autoML.best_structure)
 evaluate_regression(y_train, y_train_pred)
 evaluate_regression(y_test, y_test_pred)
+
+with open("/data/ephemeral/home/Dongjin/level4-cv-finalproject-hackathon-cv-02-lv3/autoML/autoML.pkl", "wb") as file:
+    pickle.dump(autoML, file)

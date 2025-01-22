@@ -137,7 +137,7 @@ class AutoML:
         self.n_parent = n_parent
         self.prob_mutation = prob_mutation
         self.n_child = n_population - n_parent
-        self.log_path = os.path.join(os.getcwd(), "log.txt")
+        self.log_path = os.path.join("/data/ephemeral/home/Dongjin/level4-cv-finalproject-hackathon-cv-02-lv3/autoML", "log.txt")
 
 
     def fit_structures(self, timeout=30):
