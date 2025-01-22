@@ -1,6 +1,5 @@
 # 본 코드는 TPOT (Evaluation of a Tree-based Pipeline Optimization Tool
-# for Automating Data Science, GECCO '16)에서 아이디어를 
-# 얻어 구현을 수행했습니다.
+# for Automating Data Science, GECCO '16)에서 아이디어를  얻어 구현했습니다.
 
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -147,21 +146,12 @@ class AutoML:
         self.prob_mutation = prob_mutation
         self.n_child = n_population - n_parent
 
-    def fit(self, X_train, y_train, valid_size=0.2, seed=42):
-            self.X_train, self.X_valid, self.y_train, self.y_valid = train_test_split(X_train, y_train, 
-                                                                                      test_size=valid_size, random_state=seed)
-            self.structures = get_random_structures(self.n_population)
-
-            for generation in range(self.n_generation):
-                self.fit_structures(structures)
-
-    def fit_structures(self, structures, timeout=30):
-        structures = [structures] if isinstance(structures, dict) else structures # type conversion (List -> dict)
+    def fit_structures(self, timeout=30):
+        structures = [self.structures] if isinstance(self.structures, dict) else self.structures # type conversion (List -> dict)
 
         for i, structure in enumerate(structures):
             if 'train_metric' in structure: # fitting 결과가 있으면 skip
                 continue
-            
             structure['test_metric'] = {'r2': -100} # test_metric 초기화
 
             signal.signal(signal.SIGALRM, timeout_handler)
@@ -174,37 +164,50 @@ class AutoML:
                 y_valid_pred = pipeline.predict(self.X_valid)
                 structure['train_metric'] = evaluate_regression(self.y_train, y_train_pred)
                 structure['valid_metric'] = evaluate_regression(self.y_valid, y_valid_pred)
-                print(f"{i+1} structure - r2: {structure['test_metric']['r2']}") # 결과 출력
+                print(f"{i+1} structure - r2: {structure['valid_metric']['r2']}") # 결과 출력
 
             except TimeoutException as e:
                 print(e)
 
             finally:
                 signal.alarm(0)
-            
-            
+    
+    def fit(self, X_train, y_train, valid_size=0.2, seed=42, max_n_try=1000):
+            self.X_train, self.X_valid, self.y_train, self.y_valid = train_test_split(X_train, y_train, 
+                                                                                      test_size=valid_size, random_state=seed)
+            self.structures = get_random_structures(self.n_population)
+            keys = ['preprocessor', 'feature_selection', 'model']
 
+            for generation in range(self.n_generation):
+                self.fit_structures()
+                self.structures = sort(self.structures) # 점수 높은 순으로 정렬
+                self.best_structure = self.structures[0]
+                self.best_score = self.best_structure['valid_metric']['r2']
+                
+                now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                print(f"{now} - {generation+1} - best R2: {self.best_score:.3f}") # 로그
+                print(" - ".join([self.best_structure[k] for k in keys])) # 구조 출력
 
-if __name__ == "__main__":
+                if (generation+1 == self.n_generation):
+                    break
+                
+                del self.structures[self.n_parent:] # 점수가 낮은 형질 제거
 
+                n_success = 0
+                n_try = 0
 
-    for generation in range(n_generation):
-        fit_structures(structures)
-        structures = sort(structures) # 점수가 높은 순으로 정렬
+                while (n_success < self.n_child and n_try < max_n_try):
+                    n_try += 1
+                    structure1, structure2 = random.sample(self.structures, 2) # 임의로 형질 2개 고르기
+                    new_structure = crossover(structure1, structure2)
+                    new_structure = mutation(new_structure, self.prob_mutation)
 
-        print(f"{generation+1} generation - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(structures)
+                    if is_in_structures(new_structure, self.structures): # 이미 존재하는 형질이면 재생성
+                        continue
 
-        if (generation+1 == n_generation):
-            break 
+                    new_structure['pipeline'] = build_pipeline(new_structure)
+                    self.structures.append(new_structure)
+                    n_success += 1
 
-        del structures[n_parent:] # 점수가 낮은 형질 제거
-
-        for _ in range(n_child):
-            structure1, structure2 = random.sample(structures, 2)
-            new_structure = crossover(structure1, structure2)
-            new_structure = mutation(new_structure, prob_mutation)
-            new_structure['pipeline'] = build_pipeline(new_structure)
-            structures.append(new_structure)
-
-
+                if not(n_try < max_n_try):
+                    print("Warning: max_n_try <= n_try")
