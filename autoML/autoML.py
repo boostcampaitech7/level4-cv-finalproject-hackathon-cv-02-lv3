@@ -29,29 +29,6 @@ import math
 import signal
 
 
-
-
-df = pd.read_csv('/data/ephemeral/home/Dongjin/mini-autoML/melb_split.csv')
-df = df.dropna(axis=0)
-drop_tables = ['Price', 'Split', 'Address', 'BuildingArea', 'YearBuilt',
-               'Suburb', 'Address', 'Type', 'Method', 'SellerG', 'Date', 'CouncilArea', 'Regionname']
-# drop_tables = ['Price', 'Split', 'Address', 'BuildingArea', 'YearBuilt']
-
-# 데이터셋 분리
-train_data = df[df['Split'] == 'Train']
-test_data = df[df['Split'] == 'Test']
-
-# 타겟 변수와 특성 분리
-y_train = train_data['Price']
-X_train = train_data.drop(drop_tables, axis=1)
-
-y_test = test_data['Price']
-X_test = test_data.drop(drop_tables, axis=1)
-
-# 결과 확인
-X_train.shape, y_train.shape, X_test.shape, y_test.shape
-
-
 preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScaler(), 
                  'PolynomialFeatures': PolynomialFeatures(), 'PCA': PCA()}
 
@@ -183,13 +160,21 @@ def mutation(structure, prob_mutation):
                 structure[k] = choose_random_key(models)
     
     return structure
-            
+
+
+class AutoML:
+    def __init__(self, n_population=20, n_generation=50, n_parent=5, prob_mutation=0.1):
+        self.n_population = n_population
+        self.n_generation = n_generation
+        self.n_parent = n_parent
+        self.prob_mutation = prob_mutation
+        self.n_child = n_population - n_parent
+
+    def fit(self, X_train, y_train):
+            self.structures = get_random_structures(self.n_population)
+
+
 if __name__ == "__main__":
-    n_population = 20
-    n_generation = 50
-    n_parent = n_population // 4
-    n_child = n_population - n_parent
-    prob_mutation = 0.1 # 각 구조가 변활 확률
 
     structures = get_random_structures(n_population)
 
