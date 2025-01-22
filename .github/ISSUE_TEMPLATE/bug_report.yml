@@ -1,0 +1,47 @@
+name: Bug Report
+description: 발견한 문제나 버그를 보고해주세요.
+title: "[Bug] 버그 제목을 입력해주세요"
+labels: ["🐞bug"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🐞 버그 리포트 템플릿
+        발생한 버그를 해결하는 데 도움이 될 수 있도록 아래 양식을 작성해주세요.
+
+  - type: input
+    id: bug_summary
+    attributes:
+      label: Bug Summary
+      description: "버그를 간단히 요약해주세요. (예: 데이터셋 전처리 중 Null 값 처리 로직이 비정상적으로 작동함)"
+      placeholder: "여기에 버그에 대한 간단한 요약을 작성해주세요."
+    validations:
+      required: true
+
+  - type: textarea
+    id: bug_description
+    attributes:
+      label: Description
+      description: 버그에 대한 상세한 설명을 작성해주세요. 재현 방법도 포함해주세요.
+      placeholder: "여기에 버그에 대한 상세 정보를 입력하세요."
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: "버그가 발생한 환경을 명시해주세요 (예: 운영체제, 라이브러리 버전 등)."
+      placeholder: "e.g., Windows 10, Python 3.8, AutoGluon 0.6.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or Error Messages
+      description: 관련 로그나 에러 메시지를 붙여넣어주세요.
+      placeholder: "여기에 로그나 에러 메시지를 입력하세요"
+    validations:
+      required: false
