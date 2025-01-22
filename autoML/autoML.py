@@ -1,5 +1,6 @@
-# 본 코드는 TPOT (Evaluation of a Tree-based Pipeline Optimization Tool for Automating Data Science, GECCO '16)에서
-# 아이디어를 얻어 구현을 수행했습니다.
+# 본 코드는 TPOT (Evaluation of a Tree-based Pipeline Optimization Tool
+# for Automating Data Science, GECCO '16)에서 아이디어를 
+# 얻어 구현을 수행했습니다.
 
 import pandas as pd
 from sklearn.pipeline import Pipeline
@@ -10,6 +11,8 @@ from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThr
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.model_selection import train_test_split
+
 from tqdm import tqdm
 import multiprocessing
 
@@ -77,32 +80,6 @@ class TimeoutException(Exception):
 
 def timeout_handler(signum, frame):
     raise TimeoutException("Timeout: pipeline.fit did not complete in given time.")
-
-
-def fit_structures(structures, timeout=30):
-    structures = [structures] if isinstance(structures, dict) else structures
-    for i, structure in enumerate(structures):
-        if 'train_metric' in structure: # fitting 결과가 있으면 skip
-            continue
-        
-        structure['test_metric'] = {'r2': -100}
-
-        signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(timeout)  # timeout 초 후에 알람 발생
-
-        try:
-            pipeline = structure['pipeline']
-            pipeline.fit(X_train, y_train)
-            y_train_pred = pipeline.predict(X_train)
-            y_test_pred = pipeline.predict(X_test)
-            structure['train_metric'] = evaluate_regression(y_train, y_train_pred)
-            structure['test_metric'] = evaluate_regression(y_test, y_test_pred)
-        except TimeoutException as e:
-            print(e)
-        finally:
-            signal.alarm(0)
-        
-        print(f"{i+1} structure - r2: {structure['test_metric']['r2']}")
     
 
 def sort(structures):    
@@ -170,13 +147,46 @@ class AutoML:
         self.prob_mutation = prob_mutation
         self.n_child = n_population - n_parent
 
-    def fit(self, X_train, y_train):
+    def fit(self, X_train, y_train, valid_size=0.2, seed=42):
+            self.X_train, self.X_valid, self.y_train, self.y_valid = train_test_split(X_train, y_train, 
+                                                                                      test_size=valid_size, random_state=seed)
             self.structures = get_random_structures(self.n_population)
+
+            for generation in range(self.n_generation):
+                self.fit_structures(structures)
+
+    def fit_structures(self, structures, timeout=30):
+        structures = [structures] if isinstance(structures, dict) else structures # type conversion (List -> dict)
+
+        for i, structure in enumerate(structures):
+            if 'train_metric' in structure: # fitting 결과가 있으면 skip
+                continue
+            
+            structure['test_metric'] = {'r2': -100} # test_metric 초기화
+
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(timeout)  # timeout 초 후에 알람 발생
+
+            try:
+                pipeline = structure['pipeline']
+                pipeline.fit(self.X_train, self.y_train)
+                y_train_pred = pipeline.predict(self.X_train)
+                y_valid_pred = pipeline.predict(self.X_valid)
+                structure['train_metric'] = evaluate_regression(self.y_train, y_train_pred)
+                structure['valid_metric'] = evaluate_regression(self.y_valid, y_valid_pred)
+                print(f"{i+1} structure - r2: {structure['test_metric']['r2']}") # 결과 출력
+
+            except TimeoutException as e:
+                print(e)
+
+            finally:
+                signal.alarm(0)
+            
+            
 
 
 if __name__ == "__main__":
 
-    structures = get_random_structures(n_population)
 
     for generation in range(n_generation):
         fit_structures(structures)
