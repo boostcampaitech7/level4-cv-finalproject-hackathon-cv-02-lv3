@@ -1,0 +1,4 @@
+[2025-01-22 14:39:15] 1 - best R2: 0.784
+[2025-01-22 14:39:15] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-22 14:41:02] 2 - best R2: 0.784
+[2025-01-22 14:41:02] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
