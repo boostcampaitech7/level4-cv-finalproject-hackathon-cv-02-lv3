@@ -146,7 +146,7 @@ class AutoML:
         for i, structure in enumerate(structures):
             if 'train_metric' in structure: # fitting 결과가 있으면 skip
                 continue
-            structure['test_metric'] = {'r2': -100} # test_metric 초기화
+            structure['valid_metric'] = {'r2': -100} # test_metric 초기화
 
             signal.signal(signal.SIGALRM, timeout_handler)
             signal.alarm(timeout)  # timeout 초 후에 알람 발생
@@ -172,11 +172,12 @@ class AutoML:
 
         with open(self.log_path, 'a') as file:
             file.write(log_message + "\n")
+            file.flush()
             print(log_message)
 
 
     def predict(self, X):
-        y_pred = self.best_structure['pipeline'](X)
+        y_pred = self.best_structure['pipeline'].predict(X)
         return y_pred
 
 

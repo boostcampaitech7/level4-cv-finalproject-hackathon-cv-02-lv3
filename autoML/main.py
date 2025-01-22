@@ -1,5 +1,28 @@
 import pandas as pd
 from autoML import AutoML
+from sklearn.metrics import (
+    r2_score,
+    mean_absolute_error,
+    mean_squared_error,
+    median_absolute_error,
+    mean_squared_log_error,
+    explained_variance_score
+)
+import math
+
+def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
+    print(f"\nEvaluation for {dataset_name}:")
+    print(f"R2 Score: {r2_score(y_true, y_pred):.4f}")
+    print(f"Mean Absolute Error (MAE): {mean_absolute_error(y_true, y_pred):.4f}")
+    print(f"Mean Squared Error (MSE): {mean_squared_error(y_true, y_pred):.4f}")
+    print(f"Root Mean Squared Error (RMSE): {math.sqrt(mean_squared_error(y_true, y_pred)):.4f}")
+    print(f"Median Absolute Error (MedAE): {median_absolute_error(y_true, y_pred):.4f}")
+    try:
+        print(f"Mean Squared Log Error (MSLE): {mean_squared_log_error(y_true, y_pred):.4f}")
+    except ValueError:
+        print("Mean Squared Log Error (MSLE): Not defined for negative values.")
+    print(f"Explained Variance Score: {explained_variance_score(y_true, y_pred):.4f}")
+
 
 data_path = '/data/ephemeral/home/Dongjin/level4-cv-finalproject-hackathon-cv-02-lv3/autoML/melb_split.csv'
 drop_tables = ['Address', 'BuildingArea', 'YearBuilt',
@@ -20,15 +43,23 @@ X_train = train_data.drop(['Price', 'Split'], axis=1)
 y_test = test_data['Price']
 X_test = test_data.drop(['Price', 'Split'], axis=1)
 
-# # shape 확인
-# print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+# 결과 확인
+print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
-# # na 통계
-# print("X_train, y_train, X_test, y_test null")
-# print(X_train.isnull().sum())
-# print(y_train.isnull().sum())
-# print(X_test.isnull().sum())
-# print(y_test.isnull().sum())
+# na값 통계
+print("X_train, y_train, X_test, y_test null")
+print(X_train.isnull().sum())
+print(y_train.isnull().sum())
+print(X_test.isnull().sum())
+print(y_test.isnull().sum())
 
-autoML = AutoML(n_population=20, n_generation=1, n_parent=5, prob_mutation=0.1)
-autoML.fit(X_train, y_train, timeout=3)
+
+autoML = AutoML(n_population=20, n_generation=50, n_parent=5, prob_mutation=0.1)
+autoML.fit(X_train, y_train, timeout=30)
+
+y_train_pred = autoML.predict(X_train)
+y_test_pred = autoML.predict(X_test)
+
+print(autoML.best_structure)
+evaluate_regression(y_train, y_train_pred)
+evaluate_regression(y_test, y_test_pred)
