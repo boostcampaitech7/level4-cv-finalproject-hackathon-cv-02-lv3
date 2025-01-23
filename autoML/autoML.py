@@ -1,7 +1,6 @@
 # 본 코드는 TPOT (Evaluation of a Tree-based Pipeline Optimization Tool
 # for Automating Data Science, GECCO '16)에서 아이디어를  얻어 구현했습니다.
 
-import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures
 from sklearn.decomposition import PCA
@@ -11,11 +10,10 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
-
-from tqdm import tqdm
-import multiprocessing
 from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.base import clone
 
+import pandas as pd
 import random
 from datetime import datetime
 import math
@@ -27,7 +25,7 @@ preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScale
                  'PolynomialFeatures': PolynomialFeatures(), 'PCA': PCA()}
 
 feature_selections = {'SelectKBest': SelectKBest(), 'SelectPercentile': SelectPercentile(),
-                      'VarianceThreshold': VarianceThreshold()} # RFE()
+                      'VarianceThreshold': VarianceThreshold()} # RFE
 
 models = {'DecisionTreeRegressor': DecisionTreeRegressor(), 'RandomForestRegressor': RandomForestRegressor(), 
           'GradientBoostingRegressor': GradientBoostingRegressor(), 'LogisticRegression': LogisticRegression(),
@@ -46,7 +44,7 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 def build_pipeline(structure):
     _pipeline = []
     for k, v in structure.items():
-        _pipeline.append((k, v))
+        _pipeline.append((k, clone(v)))
     return Pipeline(_pipeline)
 
 
@@ -73,18 +71,8 @@ def timeout_handler(signum, frame):
     raise TimeoutException("Timeout: pipeline.fit did not complete in given time.")
     
 
-def sort(structures):    
-    r2s = [structure['valid_metric']['r2'] for structure in structures]
-    r2s.sort(reverse=True)
-    sorted_structures = []
-
-    for r2 in r2s:
-        for structure in structures:
-            if r2 == structure['valid_metric']['r2']:
-                sorted_structures.append(structure)
- 
-    return sorted_structures
-
+def sort(structures):
+    return sorted(structures, key=lambda x: x['valid_metric']['r2'], reverse=True)
 
 def is_same_structure(structure1, structure2):
     keys = ['preprocessor', 'feature_selection', 'model']
@@ -143,13 +131,11 @@ class AutoML:
 
 
     def fit_structures(self, timeout=30):
-        structures = [self.structures] if isinstance(self.structures, dict) else self.structures # type conversion (List -> dict)
-
-        for i, structure in enumerate(structures):
-            if 'train_metric' in structure: # fitting 결과가 있으면 skip
+        for i, structure in enumerate(self.structures):
+            if 'valid_metric' in structure: # fitting 결과가 있으면 skip
                 continue
+            
             structure['valid_metric'] = {'r2': -100} # test_metric 초기화
-
             signal.signal(signal.SIGALRM, timeout_handler)
             signal.alarm(timeout)  # timeout 초 후에 알람 발생
 
@@ -163,6 +149,7 @@ class AutoML:
                 print(f"{i+1} structure - r2: {structure['valid_metric']['r2']}") # 결과 출력
 
             except TimeoutException as e:
+                pipeline = []
                 print(e)
 
             finally:

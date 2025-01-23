@@ -55,9 +55,12 @@ print(y_train.isnull().sum())
 print(X_test.isnull().sum())
 print(y_test.isnull().sum())
 
+n_generation = 30 # 100
+timeout = 30 # 30
+n_population = 5
 
-autoML = AutoML(n_population=10, n_generation=100, n_parent=2, prob_mutation=0.1)
-autoML.fit(X_train, y_train, timeout=30)
+autoML = AutoML(n_population=n_population, n_generation=n_generation, n_parent=2, prob_mutation=0.1)
+autoML.fit(X_train, y_train, timeout=timeout)
 
 y_train_pred = autoML.predict(X_train)
 y_test_pred = autoML.predict(X_test)

@@ -1,6 +1,0 @@
-[2025-01-22 14:40:43] 1 - best R2: 0.743
-[2025-01-22 14:40:43] RobustScaler() - SelectKBest() - GradientBoostingRegressor()
-[2025-01-22 14:40:53] 2 - best R2: 0.784
-[2025-01-22 14:40:53] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
-[2025-01-22 14:41:06] 3 - best R2: 0.784
-[2025-01-22 14:41:06] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
