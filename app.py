@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # 페이지 레이아웃 설정
 st.set_page_config(layout="wide", page_title="AI solution", page_icon="📊")
@@ -32,7 +33,7 @@ else:
     st.title("📊 데이터 분석 결과")
 
     # 레이아웃 나누기
-    col1, col2 = st.columns([4, 3])  # 왼쪽 4: 오른쪽 3 비율 설정
+    col1, col2 = st.columns([2, 3])  # 왼쪽 4: 오른쪽 3 비율 설정
 
     try:
         # 세션 상태에서 데이터프레임 불러오기
@@ -54,12 +55,12 @@ else:
             column = st.selectbox("분석할 column을 선택하세요:", df.columns)
             # 선택된 열에 대한 분석
 
-            # int 형일때
-            if pd.api.types.is_integer_dtype(df[column]):
+            # int 형 혹은 float형 일때
+            if pd.api.types.is_integer_dtype(df[column]) or pd.api.types.is_float_dtype(df[column]):
 
                 # 데이터 기본 분석
                 st.write(f"### '{column}' 분석")
-                st.write(f'- Data type: int')
+                st.write(f'- Data type: {df[column].dtype}')
                 st.write(f"- 평균값: {df[column].mean()}")
                 st.write(f"- 최댓값: {df[column].max()}")
                 st.write(f"- 최솟값: {df[column].min()}")
@@ -68,31 +69,35 @@ else:
                 non_missing_ratio = 1 - missing_ratio
 
                 # 데이터 시각화
+                # 레이아웃 나누기
+                col_1, col_2 = st.columns([1, 1])  # 왼쪽 1: 오른쪽 1 비율 설정
+
                 # pie chart
-                st.write("### 결측치 시각화")
-                fig, ax = plt.subplots()
-                ax.pie([missing_ratio, non_missing_ratio], labels=['missing', 'non_missing'], 
-                colors=['#ff9999', '#66b3ff'], autopct='%1.1f%%', startangle=90)
-                ax.axis('equal')  # 원형 유지
-                st.pyplot(fig)
+                with col_1:
+                    st.write("### 결측치 시각화")
+                    sns.set_style("whitegrid")  # Seaborn 스타일 설정
+
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    ax.pie(
+                        [missing_ratio, non_missing_ratio],
+                        labels=['missing', 'non_missing'],
+                        colors=['#FF0000', '#66b3ff'],
+                        autopct='%1.1f%%',
+                        startangle=90,
+                        wedgeprops={'edgecolor': 'black'}
+                    )
+                    plt.legend()
+                    ax.axis('equal')  # 원형 유지
+                    st.pyplot(fig)
                 
                 # histogram
-                st.write("### 히스토그램")
-                if df[column].isna().sum() != 0:
-                    st.write("결측치 제거 후 분석!")
-                st.bar_chart(df[column].dropna())
-            
-            # float 형일때
-            elif pd.api.types.is_float_dtype(df[column]):
-                st.write(f"### '{column}' 열의 분석")
-                st.write(f"- 평균값: {df[column].mean()}")
-                st.write(f"- 최댓값: {df[column].max()}")
-                st.write(f"- 최솟값: {df[column].min()}")
-                st.write(f"- 결측치 비율: {df[column].isnull().mean() * 100:.2f}%")
-                st.write("### 히스토그램")
-                if df[column].isna():
-                    st.write("결측치 제거 후 분석!")
-                st.bar_chart(df[column].dropna())
+                with col_2:
+                    st.write("### Histogram")
+                    if df[column].isna().any():
+                        st.write("결측치 제거 후 분석!")
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    sns.histplot(df[column].dropna(), bins=20, color="blue", ax=ax)
+                    st.pyplot(fig)
             
             # bool 형일때
             elif pd.api.types.is_bool_dtype(df[column]):
