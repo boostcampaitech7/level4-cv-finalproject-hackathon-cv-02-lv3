@@ -31,16 +31,19 @@ if not st.session_state.is_authenticated:
 else:
     # 원래 화면: 데이터프레임과 분석 결과 표시
     st.title("📊 데이터 분석 결과")
-
+    st.divider()
     # 레이아웃 나누기
-    col1, col2 = st.columns([2, 3])  # 왼쪽 4: 오른쪽 3 비율 설정
+    col1, col2 = st.columns([2, 3])  # 왼쪽 2: 오른쪽 3 비율 설정
 
     try:
         # 세션 상태에서 데이터프레임 불러오기
         df = st.session_state.df
 
+
+
         # 왼쪽 열: 전체 데이터 분석
         with col1:
+            st.markdown('<div class="col1">', unsafe_allow_html=True) 
             st.header("전체 데이터 분석")
             st.write("### 데이터프레임")
             st.dataframe(df, height=400)
@@ -49,9 +52,11 @@ else:
             st.write(f"- 총 데이터 개수: {len(df)}")
             st.write(f"- 컬럼 수: {len(df.columns)}")
 
+
         # 오른쪽 열: 열별 상세 분석
         with col2:
-            st.header("개별 columns 분석")
+            st.markdown('<div class="col2">', unsafe_allow_html=True)
+            st.header("개별 column 분석")
             column = st.selectbox("분석할 column을 선택하세요:", df.columns)
             # 선택된 열에 대한 분석
 
@@ -69,12 +74,13 @@ else:
                 non_missing_ratio = 1 - missing_ratio
 
                 # 데이터 시각화
+                st.write("### Visualization")
+
                 # 레이아웃 나누기
                 col_1, col_2 = st.columns([1, 1])  # 왼쪽 1: 오른쪽 1 비율 설정
-
                 # pie chart
                 with col_1:
-                    st.write("### 결측치 시각화")
+                    st.write('missing value')
                     sns.set_style("whitegrid")  # Seaborn 스타일 설정
 
                     fig, ax = plt.subplots(figsize=(8, 4))
@@ -92,48 +98,115 @@ else:
                 
                 # histogram
                 with col_2:
-                    st.write("### Histogram")
-                    if df[column].isna().any():
-                        st.write("결측치 제거 후 분석!")
+                    st.write("Histogram")
                     fig, ax = plt.subplots(figsize=(8, 4))
                     sns.histplot(df[column].dropna(), bins=20, color="blue", ax=ax)
                     st.pyplot(fig)
+                    
             
             # bool 형일때
             elif pd.api.types.is_bool_dtype(df[column]):
-                st.write(f"### '{column}' 열의 분석")
-                st.write(f"- 평균값: {df[column].mean()}")
-                st.write(f"- 최댓값: {df[column].max()}")
-                st.write(f"- 최솟값: {df[column].min()}")
+                # 데이터 기본 분석
+                st.write(f"### '{column}' 분석")
+                st.write(f'- Data type: {df[column].dtype}')
                 st.write(f"- 결측치 비율: {df[column].isnull().mean() * 100:.2f}%")
-                st.write("### 히스토그램")
-                if df[column].isna():
-                    st.write("결측치 제거 후 분석!")
-                st.bar_chart(df[column].dropna())
+                missing_ratio = df[column].isnull().mean()
+                non_missing_ratio = 1 - missing_ratio
 
-            # object 형일때
-            elif pd.api.types.is_object_dtype(df[column]):
-                st.write(f"### '{column}' 열의 분석")
-                st.write(f"- 평균값: {df[column].mean()}")
-                st.write(f"- 최댓값: {df[column].max()}")
-                st.write(f"- 최솟값: {df[column].min()}")
-                st.write(f"- 결측치 비율: {df[column].isnull().mean() * 100:.2f}%")
-                st.write("### 히스토그램")
-                if df[column].isna():
-                    st.write("결측치 제거 후 분석!")
-                st.bar_chart(df[column].dropna())
+                # 데이터 시각화
+                st.write("### Visualization")
 
-            # category 형일때
+                # 레이아웃 나누기
+                col_1, col_2 = st.columns([1, 1])  # 왼쪽 1: 오른쪽 1 비율 설정
+                # pie chart
+                with col_1:
+                    st.write('missing value')
+                    sns.set_style("whitegrid")  # Seaborn 스타일 설정
+
+                    fig, ax = plt.subplots(figsize=(8, 4))
+                    ax.pie(
+                        [missing_ratio, non_missing_ratio],
+                        labels=['missing', 'non_missing'],
+                        colors=['#FF0000', '#66b3ff'],
+                        autopct='%1.1f%%',
+                        startangle=90,
+                        wedgeprops={'edgecolor': 'black'}
+                    )
+                    plt.legend()
+                    ax.axis('equal')  # 원형 유지
+                    st.pyplot(fig)
+                
+                # bar chart
+                with col_2:
+                    st.write("bar chart")
+                    st.bar_chart(df[column].dropna(), facecolor="#0E1117")
+
+            # object or category형 일때
             elif pd.api.types.is_string_dtype(df[column]):
-                st.write(f"### '{column}' 열의 분석")
-                st.write(f"- 평균값: {df[column].mean()}")
-                st.write(f"- 최댓값: {df[column].max()}")
-                st.write(f"- 최솟값: {df[column].min()}")
+
+                # 데이터 기본 분석
+                st.write(f"### '{column}' 분석")
+                st.write(f'- Data type: {df[column].dtype}')
+                st.write(f'- category 수: {df[column].nunique()}')
                 st.write(f"- 결측치 비율: {df[column].isnull().mean() * 100:.2f}%")
-                st.write("### 히스토그램")
-                if df[column].isna():
-                    st.write("결측치 제거 후 분석!")
-                st.bar_chart(df[column].dropna())
+                missing_ratio = df[column].isnull().mean()
+                non_missing_ratio = 1 - missing_ratio
+
+            # object or category에 뭐가 있는지 너무 많으면 상위 4개+other로 표시
+                st.write("### Categories")
+                length = len(df[column])
+                na_count = df[column].isna().sum()
+                if len(df[column].unique())>4:
+                    top_values = df[column].value_counts().head(4)
+                    other_count = df[column].value_counts()[4:].sum()
+
+                    # 상위 4개와 기타 데이터 결합
+                    data = pd.concat([top_values, pd.Series({'Other': other_count, 'NA': na_count})])
+                    
+                    # DataFrame 생성
+                    result_df = pd.DataFrame({
+                        'Category': data.index,
+                        'Count': data.values,
+                        'Percentage': (data.values / length * 100).round(2)  # 퍼센트 계산
+                    })
+                    
+                    # DataFrame 표시
+                    st.dataframe(result_df)
+
+                else:
+                    top_values = df[column].value_counts().head()
+                    
+                    # na 항목도 추가
+                    data = pd.concat([top_values, pd.Series({'NA': na_count})])
+                    # DataFrame 생성
+                    result_df = pd.DataFrame({
+                        'Category': data.index,
+                        'Count': data.values,
+                        'Percentage': (data.values / length * 100).round(2)  # 퍼센트 계산
+                    })
+
+                    # DataFrame 표시
+                    st.dataframe(result_df)
+
+
+                #  결측치 비율 파이 차트
+                st.write("### Missing Value Visualization")
+                fig, ax = plt.subplots(figsize=(2, 1))
+                ax.pie(
+                    [missing_ratio, non_missing_ratio],
+                    labels=['missing', 'non_missing'],
+                    colors=['#FF0000', '#66b3ff'],
+                    autopct='%1.1f%%',
+                    startangle=90,
+                    wedgeprops={'edgecolor': 'black'}
+                )
+                ax.legend(loc='lower right',fontsize=6)
+
+                ax.axis('equal')  # 원형 비율 유지
+                plt.tight_layout()  # 여백 최소화
+                st.pyplot(fig,bbox_inches="tight")
+
+
             
             # datetime 일때 (pd.api.types.is_datatime64_dtype)
             else:
