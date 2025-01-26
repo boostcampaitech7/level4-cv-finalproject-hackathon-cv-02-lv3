@@ -60,7 +60,7 @@ print(X_test.isnull().sum())
 print(y_test.isnull().sum())
 
 
-autoML = AutoML(n_population=5, n_generation=30, n_parent=2, prob_mutation=0.1)
+autoML = AutoML(n_population=5, n_generation=5, n_parent=2, prob_mutation=0.1)
 autoML.fit(X_train, y_train, timeout=60)
 y_test_pred = autoML.predict(X_test)
 y_train_pred = autoML.predict(X_train)
