@@ -3,3 +3,5 @@
 *.tar.gz
 *.parquet
 data_origin/
+*.zip
+data
