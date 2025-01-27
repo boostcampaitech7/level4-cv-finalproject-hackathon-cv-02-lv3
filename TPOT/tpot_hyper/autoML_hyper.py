@@ -186,6 +186,15 @@ def tune_hyperparameters(pipeline, param_grid, X_train, y_train):
     search.fit(X_train, y_train)
     return search.best_estimator_, search.best_params_, search.best_score_
 
+def tune_hyperparameters(pipeline, param_grid, X_train, y_train, n_iter=50):
+    # Randomized Search로 파라미터 튜닝
+    search = RandomizedSearchCV(
+        pipeline, param_distributions=param_grid, n_iter=n_iter, 
+        cv=3, scoring='r2', n_jobs=-1, verbose=1, random_state=42
+    )
+    search.fit(X_train, y_train)
+    return search.best_estimator_, search.best_params_, search.best_score_
+
 def get_param_grid(model_name):
     if model_name == 'DecisionTreeRegressor':
         return {
@@ -195,11 +204,11 @@ def get_param_grid(model_name):
         }
     elif model_name == 'RandomForestRegressor':
         return {
-           'n_estimators': [100],
-           'max_features': np.arange(0.05, 1.01, 0.05),
-           'min_samples_split': range(2, 21),
-           'min_samples_leaf': range(1, 21),
-           'bootstrap': [True, False]
+            'models__n_estimators': [100],
+            'models__max_features': np.arange(0.05, 1.01, 0.05),
+            'models__min_samples_split': range(2, 21),
+            'models__min_samples_leaf': range(1, 21),
+            'models__bootstrap': [True, False]
         }
     elif model_name == 'GradientBoostingRegressor':
         return{
@@ -243,7 +252,7 @@ class AutoML:
         self.n_child = n_population - n_parent
 
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
-        self.log_path = os.path.join(py_dir_path, "log_hyper_1.txt")
+        self.log_path = os.path.join(py_dir_path, "log_hyper_gs.txt")
 
 
     def fit_structures(self, timeout=30):
