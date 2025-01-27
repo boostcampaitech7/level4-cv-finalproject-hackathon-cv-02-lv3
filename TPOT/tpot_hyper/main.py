@@ -27,7 +27,8 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 
 
 data_path = '/data/ephemeral/home/Jungyeon/level4-cv-finalproject-hackathon-cv-02-lv3/TPOT/melb_split.csv'
-drop_tables = ['Address', 'BuildingArea', 'YearBuilt', 'Date']
+drop_tables = ['Address', 'BuildingArea', 'YearBuilt',
+               'Suburb', 'Address', 'Type', 'Method', 'SellerG', 'Date', 'CouncilArea', 'Regionname']
 
 # df 불러오기 및 column 제거
 df = pd.read_csv(data_path)
@@ -55,8 +56,8 @@ print(X_test.isnull().sum())
 print(y_test.isnull().sum())
 
 
-autoML = AutoML(n_population=5, n_generation=10, n_parent=2, prob_mutation=0.1)
-autoML.fit(X_train, y_train, timeout=30)
+autoML = AutoML(n_population=5, n_generation=5, n_parent=2, prob_mutation=0.1)
+autoML.fit(X_train, y_train, timeout=3)
 y_test_pred = autoML.predict(X_test)
 y_train_pred = autoML.predict(X_train)
 
@@ -65,5 +66,5 @@ evaluate_regression(y_train, y_train_pred, 'train')
 evaluate_regression(y_test, y_test_pred, 'test')
 
 py_dir_path = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(py_dir_path, "autoML_hyper_2.pkl"), "wb") as file:
+with open(os.path.join(py_dir_path, "autoML.pkl"), "wb") as file:
     pickle.dump(autoML, file)
