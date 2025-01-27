@@ -66,5 +66,5 @@ evaluate_regression(y_train, y_train_pred, 'train')
 evaluate_regression(y_test, y_test_pred, 'test')
 
 py_dir_path = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(py_dir_path, "autoML_hyper_gs.pkl"), "wb") as file:
+with open(os.path.join(py_dir_path, "autoML_hyper_rs_exp1.pkl"), "wb") as file:
     pickle.dump(autoML, file)
