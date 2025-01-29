@@ -6,7 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 import signal, time
 
-def timeout_handler():
+def timeout_handler(signum, frame):
     print("timeout")
 
 
@@ -42,12 +42,12 @@ def find_score_from_response(pattern, response):
 
     return score
 
-def get_score_from_chat(model, instruction, image_path=None, pattern = r"\d\.\d{4}", timeout=1):
+def get_score_from_chat(model, instruction, image_path=None, pattern = r"\d\.\d{4}", timeout=30):
     n_max_trial = 20 # score을 찾지 못했을 때 최대 시도 횟수
     score = -1
 
     for _ in range(n_max_trial):
-        signal(signal.SIGALRM, timeout_handler)
+        signal.signal(signal.SIGALRM, timeout_handler) # 시간 제한
         signal.alarm(timeout)
         
         try: 
