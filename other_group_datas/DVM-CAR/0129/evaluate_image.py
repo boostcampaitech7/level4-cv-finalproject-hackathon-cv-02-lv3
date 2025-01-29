@@ -93,21 +93,24 @@ if __name__ == '__main__':
         image_paths = glob.glob(image_dir_path + f'/*/{year}/*', recursive=True)
         save_path = os.path.join(save_dir_path, f'{year}.csv')
         save_instruction_path = save_path.replace('csv', 'txt')
-
+        
         df = pd.DataFrame(columns=['image_path', 'score', 'response'])
-
-        if os.path.exists(save_path): # 이미 존재하는 경로이면 무시
-            continue
-        write_file(save_path, "")
+        write_file(save_instruction_path, instruction) # instruction 저장 
 
         for image_path in tqdm(image_paths, dynamic_ncols=False):
             rel_image_path = image_path.replace(image_dir_path + '/', "")
+
+            if os.path.exists(save_path): # 이미 추론한 결과가 있는지 확인
+                df_read = pd.read_csv(save_path)
+                if (df_read['image_path'] == rel_image_path).sum():
+                    print(f'{rel_image_path}: skipped')
+                    continue
+
             score, response = get_score_from_chat(model=model, instruction=instruction, image_path=image_path)
-            df.loc[len(df)] = [rel_image_path, score, response]
+            df.loc[0] = [rel_image_path, score, response]
+            df.to_csv(save_path, index=False, mode='a')
             tqdm.write(f"{rel_image_path} - score: {score:.4f}")
 
         # 파일 저장
-        df.to_csv(save_path, index=False)
-        write_file(save_instruction_path, instruction)
         
         
