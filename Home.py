@@ -250,7 +250,7 @@ elif st.session_state.page=="analysis":
     st.markdown("---")
 
     # 레이아웃 나누기
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns((9,1))
 
     with col1:
         if st.button("다시 제출하기"):
@@ -280,7 +280,7 @@ elif st.session_state.page=="solution":
 
     # output 속성 정하기
     # 범주형 변수 안되고 수치형 변수만 선택 가능하게 하기 
-    st.write("1️⃣ output 속성을 골라주세요!")
+    st.subheader("1️⃣ output 속성을 골라주세요!")
     st.write("(단, 수치형 변수만 가능)")
     option = st.selectbox(
     "",
@@ -350,7 +350,7 @@ elif st.session_state.page=="solution":
             st.write("어떻게 처리할까요?")
             method2 = st.selectbox(
             "",
-            ("관련 행 제거하기", "관련 열 제거하기","평균으로 채우기","0으로 채우기"),
+            ("관련 행 제거하기","평균으로 채우기","0으로 채우기"),
             )
 
             st.write("You selected:", method2)
@@ -360,26 +360,73 @@ elif st.session_state.page=="solution":
          
     # 범위 설정
     with col3:
-        st.write("* output 범위 설정")
-        st.slider("", 0, 100, (25, 75))
+
+
+        purpose=["최소화하기","최대화하기","범위에 맞추기","목표값에 맞추기"]
+        method3 = st.radio("* 목표 설정",purpose)
+
+        if method3 == "범위에 맞추기":
+            st.write("* output 범위 설정")
+            st.slider("", min(df[option])-2*int(IQR), max(df[option])+2*int(IQR), (min(df[option]), max(df[option])))
+
+        elif method3 == "목표값에 맞추기":
+            st.write("* 원하는 output 목표값 설정")
+            number = st.number_input(
+            "Insert a number", value=None, placeholder="Type a number..."
+            )
+            st.write("The current number is ", number)
+
     
     st.divider()
 
     # control할 제어 속성 정하기
     # 수치형만 가능하게 할 것인가?
 
-    st.write("2️⃣ control할 제어 속성을 골라주세요!")
+    st.subheader("2️⃣ control할 제어 속성을 골라주세요!")
     option2 = st.multiselect(
     "",
     [x for x in df.columns if x != option],
     )
+    tabs=None
+    if option2:
+        tabs = st.tabs(option2)
+    control_feature={}  
+
+    if tabs:
+        for ind,i in enumerate(tabs):
+            with i:
+                if pd.api.types.is_integer_dtype(df[option2[ind]]) or pd.api.types.is_float_dtype(df[option2[ind]]):
+                    col1,col2,col3 = st.columns(3)
+
+                    with col1:
+                        purpose=["최소화하기", "최대화하기", "범위에 맞추기", "최적화하지 않기"]
+                        control_feature[option2[ind]] = [st.radio("목표 설정", purpose, key = option2[ind])]
+
+                    with col2:
+                        purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
+                        control_feature[option2[ind]].append(st.radio("결측치 설정", purpose2, key = option2[ind]+'1'))
+
+                    with col3:
+                        # 1사분위수(Q1)와 3사분위수(Q3) 계산
+                        Q1 = df[option2[ind]].dropna().quantile(0.25)
+                        Q3 = df[option2[ind]].dropna().quantile(0.75)
+                        IQR = Q3 - Q1
+
+                        st.slider("범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
+                                (min(df[option2[ind]]), max(df[option2[ind]])), key = option2[ind]+'2')
+                
+                else:
+                    purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
+                    control_feature[option2[ind]] = [st.radio("결측치 설정", purpose2, key = option2[ind]+'1')]
+                    
+
 
     st.divider()
 
 
     # 환경 속성 정하기
 
-    st.write("3️⃣ 환경 속성을 골라주세요!")
+    st.subheader("3️⃣ 환경 속성을 골라주세요!")
     option3 = st.multiselect(
     "(환경 속성이란 우리가 직접적으로 통제할 수 없는 외부 요인을 의미한다.)",
     [x for x in df.columns if x != option and x not in option2],
@@ -387,15 +434,35 @@ elif st.session_state.page=="solution":
 
     st.divider()
 
-    # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
-    if st.button("진행하기"):
-        if option or option2 or option3:
-            vote()
-        else:
-            st.session_state.page = "train"  # train page로 넘어가기
+
+
+    #레이아웃 나누기
+    col1, col2 = st.columns([14,1])
+
+    with col1:
+        if st.button("이전 페이지"):
+            st.session_state.page="analysis"
             st.rerun()
 
 
 
 
+    with col2:
+        # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
+        if st.button("진행하기"):
+            if option and option2 and option3:
+                st.session_state.page = "train"  # train page로 넘어가기
+                st.rerun()
+            else:
+                vote()
+    
+
+
+
+
+
+# page - train
 # 결과 보여주는 건 tab을 이용하자
+
+else:
+    st.title("🖥️ AI 솔루션 결과")
