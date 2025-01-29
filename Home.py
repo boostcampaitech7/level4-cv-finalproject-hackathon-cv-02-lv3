@@ -3,17 +3,28 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+@st.dialog("진행 불가")
+def vote():
+    st.write("속성을 지정하지 않아 다음 단계로 진행할 수 없습니다.")
+    st.write("반드시 지정해주세요!")
+    if st.button("다시 지정하기"):
+        st.rerun()
+
+
+
+
 # 페이지 레이아웃 설정
 st.set_page_config(layout="wide", page_title="AI solution", page_icon="📊")
 
-# 상태를 저장할 Session State 초기화
-if "is_authenticated" not in st.session_state:
-    st.session_state.is_authenticated = False
+# 상태를 저장할 page 초기화
+if "page" not in st.session_state:
+    st.session_state.page = False
     st.session_state.uploaded_file = None
     st.session_state.df = None  # 데이터프레임을 저장할 새로운 상태 변수
 
+
 # 로그인 창처럼 구현된 파일 업로드 화면
-if not st.session_state.is_authenticated:
+if not st.session_state.page:
     st.title("Prescript AI solution")
     st.write("분석하고 싶은 CSV 파일을 제출하세요.")
     
@@ -23,12 +34,18 @@ if not st.session_state.is_authenticated:
     # 파일 업로드 후 로그인 상태로 전환
     if uploaded_file is not None:
         st.session_state.uploaded_file = uploaded_file
-        st.session_state.is_authenticated = True
+        st.session_state.page = "analysis"
         # 데이터프레임을 세션 상태에 저장
         st.session_state.df = pd.read_csv(uploaded_file)
         st.success("파일 업로드 성공! 분석 화면으로 이동합니다.")
         st.rerun()  # 화면 갱신
-else:
+
+
+
+
+
+# page - 데이터 eda 화면
+elif st.session_state.page=="analysis":
     # 원래 화면: 데이터프레임과 분석 결과 표시
     st.title("📊 데이터 분석 결과")
     st.divider()
@@ -201,13 +218,11 @@ else:
                 fig, ax = plt.subplots(figsize=(4, 2))
                 ax.pie(
                     [missing_ratio, non_missing_ratio],
-                    labels=['missing', 'non_missing'],
                     colors=['#FF0000', '#66b3ff'],
-                    autopct='%1.1f%%',
                     startangle=90,
                     wedgeprops={'edgecolor': 'black'}
                 )
-                ax.legend(loc='lower right',fontsize=6)
+                ax.legend(labels=['missing', 'non_missing'],loc='lower right',fontsize=6)
 
                 ax.axis('equal')  # 원형 비율 유지
                 plt.tight_layout()  # 여백 최소화
@@ -231,18 +246,156 @@ else:
     except Exception as e:
         st.error(f"데이터 분석 중 오류가 발생했습니다: {e}")
 
-
     # "다시 제출하기" 버튼
     st.markdown("---")
-    # "다시 제출하기"와 "솔루션 시작하기" 버튼 추가
+
+    # 레이아웃 나누기
     col1, col2 = st.columns(2)
 
     with col1:
         if st.button("다시 제출하기"):
             st.session_state.uploaded_file = None
-            st.rerun()
+            st.session_state.page = False  # 인증 상태 초기화
+            st.session_state.df=None
+            st.rerun()  
 
     with col2:
         if st.button("솔루션 시작하기"):
-            # 솔루션 페이지로 이동
-            st.experimental_set_query_params(page="solution")
+            st.session_state.page="solution"
+            st.rerun()
+
+
+
+
+## page - solution
+elif st.session_state.page=="solution":
+    df=st.session_state.df
+    # 제목 정하기
+    st.title("💊AI 솔루션")
+    st.write("진행하기 전에 분석하고 싶은 feature와 목표를 설정하세요!")
+    st.divider()
+
+
+    # 분석하고 싶은 feature와 목표 정하기
+
+    # output 속성 정하기
+    # 범주형 변수 안되고 수치형 변수만 선택 가능하게 하기 
+    st.write("1️⃣ output 속성을 골라주세요!")
+    st.write("(단, 수치형 변수만 가능)")
+    option = st.selectbox(
+    "",
+    [x for x in df.columns if pd.api.types.is_integer_dtype(df[x]) or pd.api.types.is_float_dtype(df[x])],
+    )
+
+    # 레이 아웃 나누기
+    col1, col2 , col3= st.columns(3, border=True)
+
+    # 이상치 설정
+    with col1:
+        st.write("* 이상치 설정")
+        # Boxplot 생성
+        fig, ax = plt.subplots(figsize=(8,2))
+
+        # 가로형 Boxplot 생성
+        ax.boxplot(df[option].dropna(), vert=False, patch_artist=False, showmeans=False, boxprops=dict(color="black"),
+                whiskerprops=dict(color="black"), capprops=dict(color="black"), flierprops=dict(marker="o", color="red"))
+
+        # 불필요한 배경 제거
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.yaxis.set_visible(False)  # y축 숨김
+        ax.xaxis.set_ticks_position('none')  # x축 눈금 숨김
+
+        # Streamlit에 표시
+        st.pyplot(fig)
+
+
+        # 1사분위수(Q1)와 3사분위수(Q3) 계산
+        Q1 = df[option].dropna().quantile(0.25)
+        Q3 = df[option].dropna().quantile(0.75)
+        IQR = Q3 - Q1
+
+        # 이상치 기준 계산
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+
+        if (df[option].dropna()>upper_bound).any() or (df[option].dropna()<lower_bound).any:
+            st.write("IQR 기준으로 이상치가 존재합니다! 어떻게 처리할까요?")
+            method = st.selectbox(
+            "",
+            ("제거하기", "제거하지 않고 사용하기"),
+            )
+
+            st.write("You selected:", method)
+
+        else:
+            st.write("IQR 기준으로 이상치는 없고, 추가적인 설정은 필요 없어 보입니다!")
+
+
+    # 결측치 설정
+    with col2:
+        cnt=len(df[option])
+        missing_count=df[option].isnull().sum()
+        missing_ratio = df[option].isnull().mean()
+        st.write("* 결측치 설정")
+        st.write(f"정상 데이터 수 : {cnt-missing_count}")
+        st.write(f'결측치 수 : {missing_count}')
+        st.write(f'결측치 비율 : {missing_ratio}')
+        st.write("")
+        st.write("")
+
+        if missing_count:
+            st.write("어떻게 처리할까요?")
+            method2 = st.selectbox(
+            "",
+            ("관련 행 제거하기", "관련 열 제거하기","평균으로 채우기","0으로 채우기"),
+            )
+
+            st.write("You selected:", method2)
+
+        else:
+            st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
+         
+    # 범위 설정
+    with col3:
+        st.write("* output 범위 설정")
+        st.slider("", 0, 100, (25, 75))
+    
+    st.divider()
+
+    # control할 제어 속성 정하기
+    # 수치형만 가능하게 할 것인가?
+
+    st.write("2️⃣ control할 제어 속성을 골라주세요!")
+    option2 = st.multiselect(
+    "",
+    [x for x in df.columns if x != option],
+    )
+
+    st.divider()
+
+
+    # 환경 속성 정하기
+
+    st.write("3️⃣ 환경 속성을 골라주세요!")
+    option3 = st.multiselect(
+    "(환경 속성이란 우리가 직접적으로 통제할 수 없는 외부 요인을 의미한다.)",
+    [x for x in df.columns if x != option and x not in option2],
+    )
+
+    st.divider()
+
+    # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
+    if st.button("진행하기"):
+        if option or option2 or option3:
+            vote()
+        else:
+            st.session_state.page = "train"  # train page로 넘어가기
+            st.rerun()
+
+
+
+
+# 결과 보여주는 건 tab을 이용하자
