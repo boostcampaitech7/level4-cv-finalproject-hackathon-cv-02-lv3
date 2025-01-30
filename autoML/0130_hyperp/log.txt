@@ -18,3 +18,42 @@
 [2025-01-30 12:10:51] RobustScaler() - VarianceThreshold() - RandomForestRegressor()
 [2025-01-30 12:11:37] 2 - best R2: 0.737
 [2025-01-30 12:11:37] RobustScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-30 13:16:20] 1 - best R2: 0.738
+[2025-01-30 13:16:20] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7f40e58bbe20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:17:14] 1 - best R2: 0.738
+[2025-01-30 13:17:14] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7f08db3c7e20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:17:53] 1 - best R2: 0.738
+[2025-01-30 13:17:53] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7f6e0a497d90>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:18:36] 1 - best R2: 0.738
+[2025-01-30 13:18:36] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7fa0b12f7d90>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:23:31] 1 - best R2: 0.742
+[2025-01-30 13:23:31] {'class': PolynomialFeatures()} - passthrough - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:23:52] 2 - best R2: 0.742
+[2025-01-30 13:23:52] {'class': PolynomialFeatures()} - passthrough - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:25:02] 1 - best R2: 0.742
+[2025-01-30 13:25:02] {'class': PolynomialFeatures()} - passthrough - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:25:35] 2 - best R2: 0.742
+[2025-01-30 13:25:35] {'class': PolynomialFeatures()} - passthrough - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:28:18] 1 - best R2: 0.742
+[2025-01-30 13:28:18] {'class': PolynomialFeatures()} - passthrough - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:29:05] 2 - best R2: 0.742
+[2025-01-30 13:29:05] {'class': PolynomialFeatures()} - passthrough - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:30:32] 1 - best R2: 0.738
+[2025-01-30 13:30:32] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7f83de99fe20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:33:53] 1 - best R2: 0.738
+[2025-01-30 13:33:53] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7fb88ad8fe20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:37:25] 1 - best R2: 0.738
+[2025-01-30 13:37:25] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7fe5c1edfe20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:39:33] 1 - best R2: 0.738
+[2025-01-30 13:39:33] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7f5d2bd13e20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 13:40:55] 2 - best R2: 0.738
+[2025-01-30 13:40:55] {'class': StandardScaler()} - {'class': SelectKBest(score_func=<function f_regression at 0x7f5d2bd13e20>)} - {'class': <class 'xgboost.sklearn.XGBRegressor'>, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
+[2025-01-30 14:24:40] 1 - best R2: 0.738
+[2025-01-30 14:25:18] 1 - best R2: 0.738
+[2025-01-30 14:27:56] 1 - best R2: 0.738
+[2025-01-30 14:29:05] 1 - best R2: 0.738
+[2025-01-30 14:30:07] 1 - best R2: 0.738
+[2025-01-30 14:35:25] 1 - best R2: 0.738
+[2025-01-30 14:37:00] 1 - best R2: 0.738
+[2025-01-30 14:38:04] 1 - best R2: 0.738
+[2025-01-30 14:43:36] 1 - best R2: 0.738

@@ -2,7 +2,7 @@
 # for Automating Data Science, GECCO '16)에서 아이디어를 얻어 구현했습니다.
 
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures
+from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures, FunctionTransformer
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
@@ -23,18 +23,20 @@ from joblib import Parallel, delayed
 import numpy as np
 import statistics
 from collections import defaultdict
+from copy import copy
+
 
 
 
 preprocessors = {'StandardScaler': {'class': StandardScaler()},
                  'RobustScaler': {'class': RobustScaler()}, 
                  'PolynomialFeatures': {'class': PolynomialFeatures()},
-                 'passthrough': 'passthrough'}
+                 'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
 feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regression)}, 
                       'SelectPercentile': {'class': SelectPercentile(score_func=f_regression)},
                       'VarianceThreshold': {'class': VarianceThreshold()},
-                      'passthrough': 'passthrough'} 
+                      'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
 models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
           'RandomForestRegressor': {'class': RandomForestRegressor,
@@ -50,7 +52,7 @@ models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
 
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
-choose_random_key = lambda dictionary: random.choice(list(dictionary.values()))
+choose_random_key = lambda dictionary: random.choice(list(dictionary.keys()))
 
 
 class TimeoutException(Exception):
@@ -82,11 +84,11 @@ def build_pipeline(structure):
         if isinstance(v, str): # v가 str 타입
             _pipeline.append((k, v))
         elif isinstance(v, dict): # v가 dict 타입
-            class_name = v['class']
+            cl = v['class']
             if 'params' in v: # params 값이 v에 있으면 instance 생성
-                _pipeline.append((k, class_name(**v['params'])))
+                _pipeline.append((k, cl(**v['params'])))
             else:
-                _pipeline.append((k, clone(class_name))) # instance 복사
+                _pipeline.append((k, clone(cl))) # instance 복사
                                      
     return Pipeline(_pipeline)
 
@@ -103,10 +105,17 @@ def get_random_structures(n):
     """
 
     random_structures = []
+    
     for _ in range(n):
-        random_structure = {'preprocessors': choose_random_key(preprocessors),
-                            'feature_selections': choose_random_key(feature_selections),
-                            'models': choose_random_key(models)}
+        random_structure = {'preprocessors': preprocessors,
+                            'feature_selections': feature_selections,
+                            'models': models}
+        
+        for category, options in random_structure.items():
+            class_name = choose_random_key(options)
+            random_structure[category] = copy(options[class_name])
+            if isinstance(random_structure[category], dict):
+                random_structure[category]['class_name'] = class_name
         
         random_structure['pipeline'] = build_pipeline(random_structure)
         random_structures.append(random_structure)
@@ -190,7 +199,7 @@ def crossover(structure1, structure2):
     return new_structure
 
 
-def mutation(structure, prob_mutation, hyperparam_bound=[0.5, 1.5]):
+def mutation(structure, prob_mutation, hyperparam_bound=[0.5, 2.0]):
     """
     돌연변이 구조 생성
 
@@ -212,16 +221,17 @@ def mutation(structure, prob_mutation, hyperparam_bound=[0.5, 1.5]):
                 structure[k] = element
 
     # 하이퍼 파라미터 변이
-    for k, v in structure.item():
+    for k, v in structure.items():
         if 'params' not in v: # 파라미터가 없으면 continue
             continue
 
         rand = random.random()
         if rand < prob_mutation:
             params = v['params']
-            for param_name, param_value in params.item():
-                random_number = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
-                params[param_name] = random_number * param_value
+            for param_name, param_value in params.items():
+                origin_type = type(param_value)
+                rand = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
+                params[param_name] = origin_type(rand * param_value)
     
     return structure
 
@@ -374,6 +384,40 @@ class AutoML:
         y_pred = self.best_structure['pipeline'].predict(X)
         return y_pred
 
+    def report_structure(self, structure):
+        arr = []
+        keys = list(pipeline_components.keys())
+        for k in keys:
+            class_info = structure[k]
+            if isinstance(class_info, str):
+                s = class_info
+            else:
+                class_name = class_info['class_name']
+                if 'params' in class_info:
+                    params = ', '.join([f'{k}: {v}' for k, v in class_info['params'].items()])
+                    s = f"({class_name}: {params})"
+                else:
+                    s = f"({class_name})"  
+
+            arr.append(s)
+
+        if 'valid_metric' in structure:
+            r2 = structure['valid_metric']['r2']
+            r2_std = structure['valid_metric']['r2_std']
+            arr.append(f'{r2:.4f}±{r2_std:.4f}')
+
+        s = ' - '.join(arr)
+        return s
+
+    def report(self):
+        self.structures = sort(self.structures)
+        for i, structure in enumerate(self.structures):
+            s = self.report_structure(structure)
+            print(f'{i+1}: {s}')
+
+
+
+
 
     def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
         """
@@ -422,8 +466,11 @@ class AutoML:
             self.best_structure = self.structures[0]
             self.best_score = self.best_structure['valid_metric']['r2']
             
+            
             self.log(f"{generation+1} - best R2: {self.best_score:.3f}") # 최적값 기록
-            self.log(" - ".join([str(self.best_structure[k]) for k in keys])) # 구조 기록
+            # self.print_structure(self.best_structure)
+            # self.log(" - ".join([str(self.best_structure[k]) for k in keys])) # 구조 기록
+            self.report()
 
             if (generation+1 == self.n_generation):
                 break
