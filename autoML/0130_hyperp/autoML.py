@@ -37,15 +37,15 @@ feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regressi
                       'passthrough': 'passthrough'} 
 
 models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
-          'RandomForestRegressor': {'class': RandomForestRegressor(),
+          'RandomForestRegressor': {'class': RandomForestRegressor,
                                     'params': {'n_estimators': 100}}, 
-          'GradientBoostingRegressor': {'class': GradientBoostingRegressor(),
+          'GradientBoostingRegressor': {'class': GradientBoostingRegressor,
                                         'params': {'n_estimators': 100, 'learning_rate': 0.1}},
-          'LogisticRegression': {'class': LogisticRegression(),
+          'LogisticRegression': {'class': LogisticRegression,
                                  'params': {'C': 1.0}},
-          'KNeighborsRegressor': {'class': KNeighborsRegressor(),
+          'KNeighborsRegressor': {'class': KNeighborsRegressor,
                                   'params': {'n_neighbors': 5}},
-          'XGBRegressor': {'class': XGBRegressor(),
+          'XGBRegressor': {'class': XGBRegressor,
                            'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
 
 
@@ -79,11 +79,15 @@ def build_pipeline(structure):
     
     _pipeline = []
     for k, v in structure.items():
-        if isinstance(v, str):
+        if isinstance(v, str): # v가 str 타입
             _pipeline.append((k, v))
-        else:
-            
-            _pipeline.append((k, clone(v)))
+        elif isinstance(v, dict): # v가 dict 타입
+            class_name = v['class']
+            if 'params' in v: # params 값이 v에 있으면 instance 생성
+                _pipeline.append((k, class_name(**v['params'])))
+            else:
+                _pipeline.append((k, clone(class_name))) # instance 복사
+                                     
     return Pipeline(_pipeline)
 
 
@@ -186,7 +190,7 @@ def crossover(structure1, structure2):
     return new_structure
 
 
-def mutation(structure, prob_mutation):
+def mutation(structure, prob_mutation, hyperparam_bound=[0.5, 1.5]):
     """
     돌연변이 구조 생성
 
@@ -199,12 +203,25 @@ def mutation(structure, prob_mutation):
     """
     keys = list(pipeline_components.keys())
     
+    # 구조 변이
     for k in keys:
         rand = random.random()
-        if rand < prob_mutation:
+        if rand < prob_mutation: 
             element = choose_random_key(pipeline_components[k])
             if structure[k] != element:
                 structure[k] = element
+
+    # 하이퍼 파라미터 변이
+    for k, v in structure.item():
+        if 'params' not in v: # 파라미터가 없으면 continue
+            continue
+
+        rand = random.random()
+        if rand < prob_mutation:
+            params = v['params']
+            for param_name, param_value in params.item():
+                random_number = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
+                params[param_name] = random_number * param_value
     
     return structure
 
