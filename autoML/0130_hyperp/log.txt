@@ -6,3 +6,15 @@
 [2025-01-30 11:12:04] StandardScaler() - passthrough - RandomForestRegressor()
 [2025-01-30 11:12:48] 2 - best R2: 0.756
 [2025-01-30 11:12:48] StandardScaler() - SelectKBest(score_func=<function f_regression at 0x7fd255222d40>) - RandomForestRegressor()
+[2025-01-30 12:02:22] 1 - best R2: 0.734
+[2025-01-30 12:02:22] RobustScaler() - passthrough - RandomForestRegressor()
+[2025-01-30 12:02:54] 2 - best R2: 0.746
+[2025-01-30 12:02:54] PolynomialFeatures() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-30 12:06:39] 1 - best R2: 0.734
+[2025-01-30 12:06:39] StandardScaler() - SelectKBest(score_func=<function f_regression at 0x7f3e9d452d40>) - RandomForestRegressor()
+[2025-01-30 12:07:20] 2 - best R2: 0.736
+[2025-01-30 12:07:20] passthrough - passthrough - RandomForestRegressor()
+[2025-01-30 12:10:51] 1 - best R2: 0.737
+[2025-01-30 12:10:51] RobustScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-30 12:11:37] 2 - best R2: 0.737
+[2025-01-30 12:11:37] RobustScaler() - VarianceThreshold() - RandomForestRegressor()

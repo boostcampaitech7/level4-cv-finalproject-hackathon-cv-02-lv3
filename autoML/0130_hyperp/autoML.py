@@ -25,18 +25,29 @@ import statistics
 from collections import defaultdict
 
 
-preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScaler(), 
-                 'PolynomialFeatures': PolynomialFeatures(), 'passthrough': 'passthrough'}
 
-feature_selections = {'SelectKBest': SelectKBest(score_func=f_regression), 
-                      'SelectPercentile': SelectPercentile(score_func=f_regression),
-                      'VarianceThreshold': VarianceThreshold(),
+preprocessors = {'StandardScaler': {'class': StandardScaler()},
+                 'RobustScaler': {'class': RobustScaler()}, 
+                 'PolynomialFeatures': {'class': PolynomialFeatures()},
+                 'passthrough': 'passthrough'}
+
+feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regression)}, 
+                      'SelectPercentile': {'class': SelectPercentile(score_func=f_regression)},
+                      'VarianceThreshold': {'class': VarianceThreshold()},
                       'passthrough': 'passthrough'} 
 
+models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
+          'RandomForestRegressor': {'class': RandomForestRegressor(),
+                                    'params': {'n_estimators': 100}}, 
+          'GradientBoostingRegressor': {'class': GradientBoostingRegressor(),
+                                        'params': {'n_estimators': 100, 'learning_rate': 0.1}},
+          'LogisticRegression': {'class': LogisticRegression(),
+                                 'params': {'C': 1.0}},
+          'KNeighborsRegressor': {'class': KNeighborsRegressor(),
+                                  'params': {'n_neighbors': 5}},
+          'XGBRegressor': {'class': XGBRegressor(),
+                           'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
 
-models = {'DecisionTreeRegressor': DecisionTreeRegressor(), 'RandomForestRegressor': RandomForestRegressor(), 
-          'GradientBoostingRegressor': GradientBoostingRegressor(), 'LogisticRegression': LogisticRegression(),
-          'KNeighborsRegressor': KNeighborsRegressor(), 'XGBRegressor': XGBRegressor()} 
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
 choose_random_key = lambda dictionary: random.choice(list(dictionary.values()))
@@ -71,6 +82,7 @@ def build_pipeline(structure):
         if isinstance(v, str):
             _pipeline.append((k, v))
         else:
+            
             _pipeline.append((k, clone(v)))
     return Pipeline(_pipeline)
 
@@ -97,8 +109,10 @@ def get_random_structures(n):
         
     return random_structures
 
+
 def fit_pipeline(pipeline, X_train, y_train):
     pipeline.fit(X_train, y_train)    
+
 
 def sort(structures):
     """
@@ -217,7 +231,11 @@ def average_metrics(metrics):
     avg_metric = {}
     for key, values in grouped_metrics.items():
         avg_metric[key] = statistics.mean(values)
-        avg_metric[f'{key}_std'] = statistics.stdev(values)
+
+        if 1 < len(values):
+            avg_metric[f'{key}_std'] = statistics.stdev(values)
+        else: 
+            avg_metric[f'{key}_std'] = 0
 
     return avg_metric
 
@@ -268,7 +286,7 @@ class AutoML:
         if 'valid_metric' in structure: # fitting 결과가 있으면 skip
             return structure
         
-        structure['valid_metric'] = {'r2': -100} # valid_metric 초기화
+        structure['valid_metric'] = {'r2': -100, 'r2_std': -100} # valid_metric 초기화
         signal.signal(signal.SIGALRM, timeout_handler)
         signal.alarm(timeout)  # timeout 초 후에 알람 발생
         pipeline = structure['pipeline']
@@ -277,34 +295,33 @@ class AutoML:
 
         try:
             for i in range(len(self.X_trains)):
-                clone_pipeline = clone(pipeline)
+                pipeline_clone = clone(pipeline)
                 X_train, y_train = self.X_trains[i], self.y_trains[i]
                 X_valid, y_valid = self.X_valids[i], self.y_valids[i]
 
-                clone_pipeline.fit(X_train, y_train)
-                y_train_pred = pipeline.predict(X_train)
-                y_valid_pred = pipeline.predict(X_valid)
+                pipeline_clone.fit(X_train, y_train)
+                y_train_pred = pipeline_clone.predict(X_train)
+                y_valid_pred = pipeline_clone.predict(X_valid)
 
                 train_metric = evaluate_regression(y_train, y_train_pred)
                 valid_metric = evaluate_regression(y_valid, y_valid_pred)
                 train_metrics.append(train_metric)
                 valid_metrics.append(valid_metric)
 
-
-            # print(f"structure - r2: {structure['valid_metric']['r2']}") # 결과 출력
+            structure['pipeline'] = pipeline_clone
+            structure['train_metric'] = average_metrics(train_metrics)
+            structure['valid_metric'] = average_metrics(valid_metrics)
+            structure['train_metrics'] = train_metrics
+            structure['valid_metrics'] = valid_metrics
 
         except TimeoutException as e:
             print(e)
 
         finally:
             signal.alarm(0) # alarm 초기화
-        
-        pipeline = clone_pipeline
-        structure['train_metric'] = average_metrics(train_metrics)
-        structure['valid_metric'] = average_metrics(valid_metrics)
+
         valid_r2 = structure['valid_metric']['r2']
         valid_r2_std = structure['valid_metric']['r2_std']
-        
         print(f"structure - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
         return structure
 
@@ -364,10 +381,10 @@ class AutoML:
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
             
             for train_index, valid_index in kf.split(X_train):
-                self.X_trains.append(X_train[train_index])
-                self.X_valids.append(X_train[valid_index])
-                self.y_trains.append(y_train[train_index])
-                self.y_valids.append(y_train[valid_index])
+                self.X_trains.append(X_train.iloc[train_index, :])
+                self.X_valids.append(X_train.iloc[valid_index, :])
+                self.y_trains.append(y_train.iloc[train_index])
+                self.y_valids.append(y_train.iloc[valid_index])
  
         else: # single-fold validation으로 모델 평가
             X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, 

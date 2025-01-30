@@ -9,10 +9,11 @@ data_path = os.path.join(py_dir_path, '../data/melb_split.csv')
 X_train, y_train, X_test, y_test = data_preparation(data_path) # 데이터 준비
 
 start = time.time()
-autoML = AutoML(n_population=25, n_generation=2, n_parent=5, prob_mutation=0.1, use_joblib=True, n_jobs=-1)
-autoML.fit(X_train, y_train, timeout=30)
-end = time.time()
 
+autoML = AutoML(n_population=30, n_generation=2, n_parent=5, prob_mutation=0.1, use_joblib=True, n_jobs=-1)
+autoML.fit(X_train, y_train, use_kfold=True, kfold=5, timeout=30, seed=42)
+
+end = time.time()
 y_test_pred = autoML.predict(X_test)
 y_train_pred = autoML.predict(X_train)
 
