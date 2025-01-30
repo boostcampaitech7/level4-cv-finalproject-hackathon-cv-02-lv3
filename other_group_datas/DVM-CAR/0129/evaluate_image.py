@@ -7,7 +7,7 @@ from tqdm import tqdm
 import signal, time
 
 def timeout_handler(signum, frame):
-    print("timeout")
+    print("Timeout")
 
 
 def validate_path(path):
@@ -20,14 +20,21 @@ def validate_path(path):
 
     return validate_path
 
-def chat(model, instruction, image_path=None):
+def chat(model, instruction, image_path=None, timeout=30):
+    chat = ollama.Client(timeout=timeout).chat
     messages = {'role': 'user', 'content': instruction}
+    
     if image_path is not None:
         messages['images'] = [image_path]
-
     messages = [messages] # List로 변환 
-    response = ollama.chat(model=model, messages=messages)
-    content = response['message']['content']
+    
+    try:
+        response = chat(model=model, messages=messages)
+        content = response['message']['content']
+    except Exception as e:
+        content = f"Error - {e}"
+        print(content)
+
     return content
 
 def find_score_from_response(pattern, response):
@@ -51,7 +58,7 @@ def get_score_from_chat(model, instruction, image_path=None, pattern = r"\d\.\d{
         signal.alarm(timeout)
         
         try: 
-            response = chat(model, instruction, image_path)
+            response = chat(model, instruction, image_path, timeout)
             score = find_score_from_response(pattern, response)
         finally:
             signal.alarm(0)
