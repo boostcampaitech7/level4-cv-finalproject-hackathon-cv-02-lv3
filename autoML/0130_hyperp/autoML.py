@@ -9,11 +9,10 @@ from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThr
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.base import clone
 from xgboost import XGBRegressor
-
 
 import random
 from datetime import datetime
@@ -21,7 +20,9 @@ import math
 import signal
 import os
 from joblib import Parallel, delayed
-
+import numpy as np
+import statistics
+from collections import defaultdict
 
 
 preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScaler(), 
@@ -29,12 +30,13 @@ preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScale
 
 feature_selections = {'SelectKBest': SelectKBest(score_func=f_regression), 
                       'SelectPercentile': SelectPercentile(score_func=f_regression),
-                      'VarianceThreshold': VarianceThreshold(score_func=f_regression),
+                      'VarianceThreshold': VarianceThreshold(),
                       'passthrough': 'passthrough'} 
+
 
 models = {'DecisionTreeRegressor': DecisionTreeRegressor(), 'RandomForestRegressor': RandomForestRegressor(), 
           'GradientBoostingRegressor': GradientBoostingRegressor(), 'LogisticRegression': LogisticRegression(),
-          'KNeighborsRegressor': KNeighborsRegressor(), 'XGBRegressor': XGBRegressor()}
+          'KNeighborsRegressor': KNeighborsRegressor(), 'XGBRegressor': XGBRegressor()} 
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
 choose_random_key = lambda dictionary: random.choice(list(dictionary.values()))
@@ -54,7 +56,8 @@ def evaluate_regression(y_true, y_pred):
 
 
 def build_pipeline(structure):
-    """ ML 계산을 위한 scikit pipeline 생성
+    """
+    ML 계산을 위한 scikit pipeline 생성
 
     Args:
         structure (dict): pipeline을 생성하기 위한 구조체
@@ -73,7 +76,8 @@ def build_pipeline(structure):
 
 
 def get_random_structures(n):
-    """n개의 임의의 structure 생성
+    """
+    n개의 임의의 structure 생성
 
     Args:
         n (int): 임의로 생성할 structure 개수
@@ -81,6 +85,7 @@ def get_random_structures(n):
     Returns:
         random_structures (list): 임의로 생성한 structure
     """
+
     random_structures = []
     for _ in range(n):
         random_structure = {'preprocessors': choose_random_key(preprocessors),
@@ -96,7 +101,8 @@ def fit_pipeline(pipeline, X_train, y_train):
     pipeline.fit(X_train, y_train)    
 
 def sort(structures):
-    """ structures를 평가지표를 기준으로 정렬
+    """
+    structures를 평가지표를 기준으로 정렬
 
     Args:
         structures (list): 정렬되지 않은 구조
@@ -108,7 +114,8 @@ def sort(structures):
 
 
 def is_same_structure(structure1, structure2):
-    """ structure1과 structure2가 동일한지 확인
+    """
+    structure1과 structure2가 동일한지 확인
 
     Args:
         structure1 (dict): 구조1
@@ -125,7 +132,8 @@ def is_same_structure(structure1, structure2):
 
 
 def is_in_structures(structure, structures):
-    """structures 내 동일한 structure가 있는지 확인
+    """
+    structures 내 동일한 structure가 있는지 확인
 
     Args:
         structure (dict): 구조
@@ -141,7 +149,8 @@ def is_in_structures(structure, structures):
 
 
 def crossover(structure1, structure2):
-    """유전적 교차를 이용한 새로운 구조 생성
+    """
+    유전적 교차를 이용한 새로운 구조 생성
 
     Args:
         structure1 (dict): 부모 구조1
@@ -164,7 +173,8 @@ def crossover(structure1, structure2):
 
 
 def mutation(structure, prob_mutation):
-    """돌연변이 구조 생성
+    """
+    돌연변이 구조 생성
 
     Args:
         structure (dict): 입력 구조
@@ -183,6 +193,33 @@ def mutation(structure, prob_mutation):
                 structure[k] = element
     
     return structure
+
+def average_metrics(metrics):
+    """
+    각 메트릭의 평균과 표준 편차를 계산
+
+    Parameters:
+    metrics (List[Dict[str, float]]): 여러 번의 측정에서 얻은 메트릭 딕셔너리들의 리스트.
+                                      각 딕셔너리는 메트릭 이름을 키로 하며, 그 값은 측정된 값.
+
+    Returns:
+    Dict[str, float]: 각 메트릭의 평균과 표준 편차를 포함하는 딕셔너리.
+                      메트릭 이름으로 평균 값이, '메트릭_std' 형태로 표준 편차가 저장.
+    """
+
+    # 모든 메트릭 딕셔너리를 순회하며 값을 그룹화
+    grouped_metrics = defaultdict(list)
+    for metric in metrics:
+        for key, value in metric.items():
+            grouped_metrics[key].append(value)
+    
+    # 평균과 표준 편차를 저장할 딕셔너리
+    avg_metric = {}
+    for key, values in grouped_metrics.items():
+        avg_metric[key] = statistics.mean(values)
+        avg_metric[f'{key}_std'] = statistics.stdev(values)
+
+    return avg_metric
 
 
 class AutoML:
@@ -203,7 +240,8 @@ class AutoML:
 
 
     def fit_structures(self, timeout=30):
-        """ self.structures에 fitting 및 evaluation 수행
+        """
+        self.structures에 fitting 및 evaluation 수행
 
         Args:
             timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30초.
@@ -220,7 +258,8 @@ class AutoML:
 
 
     def fit_structure(self, structure, timeout=30):
-        """ 입력 structure에 fitting 및 evaluation 수행
+        """
+        입력 structure에 fitting 및 evaluation 수행
 
         Args:
             structure (dict): 입력 구조
@@ -232,28 +271,48 @@ class AutoML:
         structure['valid_metric'] = {'r2': -100} # valid_metric 초기화
         signal.signal(signal.SIGALRM, timeout_handler)
         signal.alarm(timeout)  # timeout 초 후에 알람 발생
+        pipeline = structure['pipeline']
+        train_metrics = []
+        valid_metrics = []
 
         try:
-            pipeline = structure['pipeline']
-            pipeline.fit(self.X_train, self.y_train)
-            y_train_pred = pipeline.predict(self.X_train)
-            y_valid_pred = pipeline.predict(self.X_valid)
-            structure['train_metric'] = evaluate_regression(self.y_train, y_train_pred)
-            structure['valid_metric'] = evaluate_regression(self.y_valid, y_valid_pred)
-            print(f"structure - r2: {structure['valid_metric']['r2']}") # 결과 출력
+            for i in range(len(self.X_trains)):
+                clone_pipeline = clone(pipeline)
+                X_train, y_train = self.X_trains[i], self.y_trains[i]
+                X_valid, y_valid = self.X_valids[i], self.y_valids[i]
+
+                clone_pipeline.fit(X_train, y_train)
+                y_train_pred = pipeline.predict(X_train)
+                y_valid_pred = pipeline.predict(X_valid)
+
+                train_metric = evaluate_regression(y_train, y_train_pred)
+                valid_metric = evaluate_regression(y_valid, y_valid_pred)
+                train_metrics.append(train_metric)
+                valid_metrics.append(valid_metric)
+
+
+            # print(f"structure - r2: {structure['valid_metric']['r2']}") # 결과 출력
 
         except TimeoutException as e:
             print(e)
 
         finally:
             signal.alarm(0) # alarm 초기화
-
+        
+        pipeline = clone_pipeline
+        structure['train_metric'] = average_metrics(train_metrics)
+        structure['valid_metric'] = average_metrics(valid_metrics)
+        valid_r2 = structure['valid_metric']['r2']
+        valid_r2_std = structure['valid_metric']['r2_std']
+        
+        print(f"structure - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
         return structure
 
 
     
     def log(self, message):
-        """ log 기록
+        """
+        log 기록
 
         Args:
             message (str): log 메세지
@@ -269,7 +328,8 @@ class AutoML:
 
 
     def predict(self, X):
-        """얻은 최적 구조를 이용한 예측 수행
+        """
+        얻은 최적 구조를 이용한 예측 수행
 
         Args:
             X (DataFrame): 예측할 X값
@@ -281,20 +341,44 @@ class AutoML:
         return y_pred
 
 
-    def fit(self, X_train, y_train, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
-        """ 유전 알고리즘을 이용한 최적 모델 탐색
+    def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
+        """
+        유전 알고리즘을 이용한 최적 모델 탐색
 
         Args:
             X_train (DataFrame): X_train
             y_train (DataFrame): y_train
-            valid_size (float, optional): train data로 나눌 valid 비율. 기본값 0.2.
+            use_kfold (bool, optional): k-fold validation 사용 여부. 기본값 True.
+            kfold (int, optional): k-fold 수. 기본값 5.
+            valid_size (float, optional): k-fold validation을 사용하지 않을 때 train와 valid 비율. 기본값 0.2.
             seed (int, optional): 동일한 실험결과를 위한 시드 설정. 기본값 42.
-            max_n_try (int, optional): 최대 새 구조 생성횟수. 기본값 1000.
+            max_n_try (int, optional): 최대 새 구조 생성 시도횟수. 기본값 1000.
             timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30.
         """
 
-        self.X_train, self.X_valid, self.y_train, self.y_valid = train_test_split(X_train, y_train, 
-                                                                                    test_size=valid_size, random_state=seed)
+        random.seed(seed)
+        np.random.seed(seed)
+
+        if use_kfold: # k-fold validation으로 모델 평가
+            kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
+            self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
+            
+            for train_index, valid_index in kf.split(X_train):
+                self.X_trains.append(X_train[train_index])
+                self.X_valids.append(X_train[valid_index])
+                self.y_trains.append(y_train[train_index])
+                self.y_valids.append(y_train[valid_index])
+ 
+        else: # single-fold validation으로 모델 평가
+            X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, 
+                                                                    test_size=valid_size, random_state=seed)
+            self.X_trains = [X_train] # List로 변환
+            self.X_valids = [X_valid]
+            self.y_trains = [y_train]
+            self.y_valids = [y_valid]
+
+
+            
         self.structures = get_random_structures(self.n_population) # 임의 구조 생성
         keys = list(pipeline_components.keys())
 

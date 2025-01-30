@@ -1,0 +1,8 @@
+[2025-01-30 10:57:28] 1 - best R2: 0.753
+[2025-01-30 10:57:28] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-30 10:57:44] 2 - best R2: 0.760
+[2025-01-30 10:57:44] passthrough - SelectKBest(score_func=<function f_regression at 0x7f69b25165f0>) - RandomForestRegressor()
+[2025-01-30 11:12:04] 1 - best R2: 0.753
+[2025-01-30 11:12:04] StandardScaler() - passthrough - RandomForestRegressor()
+[2025-01-30 11:12:48] 2 - best R2: 0.756
+[2025-01-30 11:12:48] StandardScaler() - SelectKBest(score_func=<function f_regression at 0x7fd255222d40>) - RandomForestRegressor()
