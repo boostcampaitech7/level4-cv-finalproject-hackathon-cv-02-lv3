@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.base import clone
 from xgboost import XGBRegressor
+from sklearn.exceptions import ConvergenceWarning
 
 import random
 from datetime import datetime
@@ -23,8 +24,15 @@ from joblib import Parallel, delayed
 import numpy as np
 import statistics
 from collections import defaultdict
-from copy import copy
+from copy import deepcopy
+import warnings
 
+warnings.filterwarnings(
+    "ignore",
+    message="k=10 is greater than n_features=6. All the features will be returned."
+)
+
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 
 
@@ -81,14 +89,11 @@ def build_pipeline(structure):
     
     _pipeline = []
     for k, v in structure.items():
-        if isinstance(v, str): # v가 str 타입
-            _pipeline.append((k, v))
-        elif isinstance(v, dict): # v가 dict 타입
-            cl = v['class']
-            if 'params' in v: # params 값이 v에 있으면 instance 생성
-                _pipeline.append((k, cl(**v['params'])))
-            else:
-                _pipeline.append((k, clone(cl))) # instance 복사
+        cl = v['class']
+        if 'params' in v: # params 값이 v에 있으면 instance 생성
+            _pipeline.append((k, clone(cl(**v['params']))))
+        else:
+            _pipeline.append((k, clone(cl))) # instance 복사
                                      
     return Pipeline(_pipeline)
 
@@ -107,13 +112,13 @@ def get_random_structures(n):
     random_structures = []
     
     for _ in range(n):
-        random_structure = {'preprocessors': preprocessors,
-                            'feature_selections': feature_selections,
-                            'models': models}
+        random_structure = deepcopy({'preprocessors': preprocessors,
+                                     'feature_selections': feature_selections,
+                                     'models': models})
         
         for category, options in random_structure.items():
             class_name = choose_random_key(options)
-            random_structure[category] = copy(options[class_name])
+            random_structure[category] = options[class_name]
             if isinstance(random_structure[category], dict):
                 random_structure[category]['class_name'] = class_name
         
@@ -196,16 +201,17 @@ def crossover(structure1, structure2):
             new_structure[k] = structure1[k]
         else:
             new_structure[k] = structure2[k]
-    return new_structure
+    
+    return deepcopy(new_structure)
 
 
-def mutation(structure, prob_mutation, hyperparam_bound=[0.5, 2.0]):
+def mutation(structure, prob_mutations, hyperparam_bound=[0.5, 2.0]):
     """
     돌연변이 구조 생성
 
     Args:
         structure (dict): 입력 구조
-        prob_mutation (float): 각 요소의 변이확률
+        prob_mutations (List): 각 요소의 변이확률 (첫 번째: 구조변이, 두 번째: hyperparameter 변이)
 
     Returns:
         structure (dict): 돌연변이 구조
@@ -215,24 +221,28 @@ def mutation(structure, prob_mutation, hyperparam_bound=[0.5, 2.0]):
     # 구조 변이
     for k in keys:
         rand = random.random()
-        if rand < prob_mutation: 
+        if rand < prob_mutations[0]: 
             element = choose_random_key(pipeline_components[k])
-            if structure[k] != element:
-                structure[k] = element
+            if structure[k]['class_name'] != element:
+                structure[k] = deepcopy(pipeline_components[k][element])
+                structure[k]['class_name'] = element
 
     # 하이퍼 파라미터 변이
     for k, v in structure.items():
         if 'params' not in v: # 파라미터가 없으면 continue
             continue
 
-        rand = random.random()
-        if rand < prob_mutation:
-            params = v['params']
-            for param_name, param_value in params.items():
-                origin_type = type(param_value)
-                rand = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
-                params[param_name] = origin_type(rand * param_value)
-    
+        params = v['params']
+
+        for param_name, param_value in params.items():
+            rand = random.random()
+            if prob_mutations[1] <= rand:
+                continue
+                   
+            origin_type = type(param_value)
+            rand = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
+            params[param_name] = origin_type(rand * param_value)
+
     return structure
 
 def average_metrics(metrics):
@@ -271,11 +281,11 @@ class AutoML:
     """
     유전 알고리즘을 이용한 ML pipeline 최적화 수행
     """
-    def __init__(self, n_population=20, n_generation=50, n_parent=5, prob_mutation=0.1, use_joblib=True, n_jobs=-1):
+    def __init__(self, n_population=20, n_generation=50, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
         self.n_population = n_population
         self.n_generation = n_generation
         self.n_parent = n_parent
-        self.prob_mutation = prob_mutation
+        self.prob_mutations = prob_mutations
         self.use_joblib = use_joblib
         self.n_jobs = n_jobs
         self.n_child = n_population - n_parent
@@ -294,15 +304,15 @@ class AutoML:
         
         if self.use_joblib:
             self.structures = Parallel(n_jobs=self.n_jobs)(
-                              delayed(self.fit_structure)(structure, timeout)
-                              for structure in self.structures
+                              delayed(self.fit_structure)(structure, timeout, i)
+                              for i, structure in enumerate(self.structures)
                               )
             
         else:
-            self.structures = [self.fit_structure(structure, timeout) for structure in self.structures]
+            self.structures = [self.fit_structure(structure, timeout, i) for i, structure in enumerate(self.structures)]
 
 
-    def fit_structure(self, structure, timeout=30):
+    def fit_structure(self, structure, timeout=30, order=0):
         """
         입력 structure에 fitting 및 evaluation 수행
 
@@ -349,7 +359,7 @@ class AutoML:
 
         valid_r2 = structure['valid_metric']['r2']
         valid_r2_std = structure['valid_metric']['r2_std']
-        print(f"structure - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
+        print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
         return structure
 
 
@@ -387,6 +397,7 @@ class AutoML:
     def report_structure(self, structure):
         arr = []
         keys = list(pipeline_components.keys())
+        
         for k in keys:
             class_info = structure[k]
             if isinstance(class_info, str):
@@ -458,7 +469,6 @@ class AutoML:
 
             
         self.structures = get_random_structures(self.n_population) # 임의 구조 생성
-        keys = list(pipeline_components.keys())
 
         for generation in range(self.n_generation):
             self.fit_structures(timeout) # 형질 별 피팅 및 점수 계산
@@ -468,8 +478,6 @@ class AutoML:
             
             
             self.log(f"{generation+1} - best R2: {self.best_score:.3f}") # 최적값 기록
-            # self.print_structure(self.best_structure)
-            # self.log(" - ".join([str(self.best_structure[k]) for k in keys])) # 구조 기록
             self.report()
 
             if (generation+1 == self.n_generation):
@@ -484,7 +492,7 @@ class AutoML:
                 n_try += 1
                 structure1, structure2 = random.sample(self.structures, 2) # 임의로 형질 2개 고르기
                 new_structure = crossover(structure1, structure2) # 형질 교차
-                new_structure = mutation(new_structure, self.prob_mutation) # 형질 변형
+                new_structure = mutation(new_structure, self.prob_mutations) # 형질 변형
 
                 if is_in_structures(new_structure, self.structures): # 이미 존재하는 형질이면 재생성
                     continue

@@ -10,7 +10,7 @@ from sklearn.metrics import (
 )
 
 
-def data_preparation(data_path):
+def data_preparation(data_path, verbose=False):
     drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
                'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
                'Regionname', 'Propertycount']
@@ -38,15 +38,16 @@ def data_preparation(data_path):
     y_test = test_data['Price']
     X_test = test_data.drop(['Price'], axis=1)
 
-    # 결과 확인
-    print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+    if verbose:
+        # 결과 확인
+        print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
-    # na값 통계
-    print("X_train, y_train, X_test, y_test null")
-    print(X_train.isnull().sum())
-    print(y_train.isnull().sum())
-    print(X_test.isnull().sum())
-    print(y_test.isnull().sum())
+        # na값 통계
+        print("X_train, y_train, X_test, y_test null")
+        print(X_train.isnull().sum())
+        print(y_train.isnull().sum())
+        print(X_test.isnull().sum())
+        print(y_test.isnull().sum())
 
     return X_train, y_train, X_test, y_test
 
