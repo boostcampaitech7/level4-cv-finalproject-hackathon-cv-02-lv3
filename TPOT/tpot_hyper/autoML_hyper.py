@@ -27,7 +27,9 @@ preprocessors = {'StandardScaler': StandardScaler(), 'RobustScaler': RobustScale
 feature_selections = {'SelectKBest': SelectKBest(), 'SelectPercentile': SelectPercentile(),
                       'VarianceThreshold': VarianceThreshold()} # RFE
 
-models = {'RandomForestRegressor': RandomForestRegressor()}
+models = {'DecisionTreeRegressor': DecisionTreeRegressor(), 'RandomForestRegressor': RandomForestRegressor(), 
+          'GradientBoostingRegressor': GradientBoostingRegressor(), 'LogisticRegression': LogisticRegression(),
+          'KNeighborsRegressor': KNeighborsRegressor()}
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
 choose_random_key = lambda dictionary: random.choice(list(dictionary.values()))
@@ -178,14 +180,14 @@ def mutation(structure, prob_mutation):
 ##### hyperparameter - tuning #####
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
-# def tune_hyperparameters(pipeline, param_grid, X_train, y_train):
-#     # Grid Search로 파라미터 튜닝
-#     search = GridSearchCV(pipeline, param_grid, cv=3, scoring='r2', n_jobs=-1, verbose=1)
-#     search.fit(X_train, y_train)
-#     return search.best_estimator_, search.best_params_, search.best_score_
+def tune_hyperparameters(pipeline, param_grid, X_train, y_train):
+    # Grid Search로 파라미터 튜닝
+    search = GridSearchCV(pipeline, param_grid, cv=3, scoring='r2', n_jobs=-1, verbose=1)
+    search.fit(X_train, y_train)
+    return search.best_estimator_, search.best_params_, search.best_score_
 
 def tune_hyperparameters(pipeline, param_grid, X_train, y_train, n_iter=50):
-    # Randomized Search로 파라미터 튜닝
+    # Random Search로 파라미터 튜닝
     search = RandomizedSearchCV(
         pipeline, param_distributions=param_grid, n_iter=n_iter, 
         cv=3, scoring='r2', n_jobs=-1, verbose=1, random_state=42
