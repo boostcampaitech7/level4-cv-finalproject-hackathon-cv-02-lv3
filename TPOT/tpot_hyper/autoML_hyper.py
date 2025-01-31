@@ -12,6 +12,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.base import clone
+from sklearn.model_selection import RandomizedSearchCV
 
 import random
 from datetime import datetime
@@ -176,16 +177,7 @@ def mutation(structure, prob_mutation):
     
     return structure
 
-
 ##### hyperparameter - tuning #####
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
-
-def tune_hyperparameters(pipeline, param_grid, X_train, y_train):
-    # Grid Search로 파라미터 튜닝
-    search = GridSearchCV(pipeline, param_grid, cv=3, scoring='r2', n_jobs=-1, verbose=1)
-    search.fit(X_train, y_train)
-    return search.best_estimator_, search.best_params_, search.best_score_
-
 def tune_hyperparameters(pipeline, param_grid, X_train, y_train, n_iter=50):
     # Random Search로 파라미터 튜닝
     search = RandomizedSearchCV(
@@ -252,7 +244,7 @@ class AutoML:
         self.n_child = n_population - n_parent
 
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
-        self.log_path = os.path.join(py_dir_path, "log_hyper_rs_exp1.txt")
+        self.log_path = os.path.join(py_dir_path, "log.txt")
 
 
     def fit_structures(self, timeout=30):

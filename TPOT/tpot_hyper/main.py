@@ -27,25 +27,33 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 
 
 data_path = '/data/ephemeral/home/Jungyeon/level4-cv-finalproject-hackathon-cv-02-lv3/TPOT/melb_split.csv'
-drop_tables = ['Address', 'BuildingArea', 'YearBuilt',
-               'Suburb', 'Address', 'Method', 'SellerG', 'Date', 'CouncilArea', 'Regionname']
+drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
+               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
+               'Regionname', 'Propertycount']
 
-Type -> 원핫
 
 # df 불러오기 및 column 제거
 df = pd.read_csv(data_path)
 df = df.drop(drop_tables, axis=1)
 df = df.dropna(axis=0)
 
+index = 0.1 < df['BuildingArea'] # BuildingArea 0값 제거
+df = df.loc[index]
+
 # 데이터셋 분리
 train_data = df[df['Split'] == 'Train']
+train_data = train_data.drop(['Split'], axis=1)
+train_data = pd.get_dummies(train_data, dtype='float')
+
 test_data = df[df['Split'] == 'Test']
+test_data = test_data.drop(['Split'], axis=1)
+test_data = pd.get_dummies(test_data, dtype='float')
 
 # 타겟 변수와 특성 분리
 y_train = train_data['Price']
-X_train = train_data.drop(['Price', 'Split'], axis=1)
+X_train = train_data.drop(['Price'], axis=1)
 y_test = test_data['Price']
-X_test = test_data.drop(['Price', 'Split'], axis=1)
+X_test = test_data.drop(['Price'], axis=1)
 
 # 결과 확인
 print("X_train.shape, y_train.shape, X_test.shape, y_test.shape: ", X_train.shape, y_train.shape, X_test.shape, y_test.shape)
@@ -68,5 +76,5 @@ evaluate_regression(y_train, y_train_pred, 'train')
 evaluate_regression(y_test, y_test_pred, 'test')
 
 py_dir_path = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(py_dir_path, "autoML_hyper_rs_exp1.pkl"), "wb") as file:
+with open(os.path.join(py_dir_path, "autoML_hyper_test.pkl"), "wb") as file:
     pickle.dump(autoML, file)
