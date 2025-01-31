@@ -1,0 +1,79 @@
+[2025-01-31 09:50:53] 1 - best R2: 0.703
+[2025-01-31 09:50:53] StandardScaler() - VarianceThreshold() - KNeighborsRegressor()
+[2025-01-31 09:50:55] 2 - best R2: 0.740
+[2025-01-31 09:50:55] StandardScaler() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:50:58] 3 - best R2: 0.740
+[2025-01-31 09:50:58] StandardScaler() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:50:58] 4 - best R2: 0.740
+[2025-01-31 09:50:58] StandardScaler() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:50:59] 5 - best R2: 0.740
+[2025-01-31 09:50:59] StandardScaler() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:00] 6 - best R2: 0.740
+[2025-01-31 09:51:00] StandardScaler() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:46] 7 - best R2: 0.745
+[2025-01-31 09:51:46] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:48] 8 - best R2: 0.745
+[2025-01-31 09:51:48] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:52] 9 - best R2: 0.745
+[2025-01-31 09:51:52] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:52] 10 - best R2: 0.745
+[2025-01-31 09:51:52] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:54] 11 - best R2: 0.745
+[2025-01-31 09:51:54] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:56] 12 - best R2: 0.745
+[2025-01-31 09:51:56] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:51:59] 13 - best R2: 0.745
+[2025-01-31 09:51:59] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:52:01] 14 - best R2: 0.745
+[2025-01-31 09:52:01] PolynomialFeatures() - VarianceThreshold() - GradientBoostingRegressor()
+[2025-01-31 09:52:15] 15 - best R2: 0.754
+[2025-01-31 09:52:15] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:52:52] 16 - best R2: 0.754
+[2025-01-31 09:52:52] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:53:09] 17 - best R2: 0.754
+[2025-01-31 09:53:09] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:53:13] 18 - best R2: 0.754
+[2025-01-31 09:53:13] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:53:19] 19 - best R2: 0.754
+[2025-01-31 09:53:19] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:53:37] 20 - best R2: 0.754
+[2025-01-31 09:53:37] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:53:43] 21 - best R2: 0.754
+[2025-01-31 09:53:43] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:54:22] 22 - best R2: 0.754
+[2025-01-31 09:54:22] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:54:37] 23 - best R2: 0.754
+[2025-01-31 09:54:37] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:54:53] 24 - best R2: 0.754
+[2025-01-31 09:54:53] StandardScaler() - VarianceThreshold() - RandomForestRegressor()
+[2025-01-31 09:54:57] 25 - best R2: 0.755
+[2025-01-31 09:54:57] StandardScaler() - SelectKBest() - RandomForestRegressor()
+[2025-01-31 09:54:57] 26 - best R2: 0.755
+[2025-01-31 09:54:57] StandardScaler() - SelectKBest() - RandomForestRegressor()
+[2025-01-31 09:55:15] 27 - best R2: 0.755
+[2025-01-31 09:55:15] StandardScaler() - SelectKBest() - RandomForestRegressor()
+[2025-01-31 09:55:20] 28 - best R2: 0.755
+[2025-01-31 09:55:20] StandardScaler() - SelectKBest() - RandomForestRegressor()
+[2025-01-31 09:55:33] 29 - best R2: 0.755
+[2025-01-31 09:55:33] StandardScaler() - SelectKBest() - RandomForestRegressor()
+[2025-01-31 09:55:40] 30 - best R2: 0.755
+[2025-01-31 09:55:40] StandardScaler() - SelectKBest() - RandomForestRegressor()
+
+
+Evaluation for train:
+R2 Score: 0.9224
+Mean Absolute Error (MAE): 97672.0053
+Mean Squared Error (MSE): 35119215718.0165
+Root Mean Squared Error (RMSE): 187401.2159
+Median Absolute Error (MedAE): 49977.5000
+Mean Squared Log Error (MSLE): 0.0189
+Explained Variance Score: 0.9224
+
+Evaluation for test:
+R2 Score: 0.7086
+Mean Absolute Error (MAE): 206566.4110
+Mean Squared Error (MSE): 133786433864.9830
+Root Mean Squared Error (RMSE): 365768.2789
+Median Absolute Error (MedAE): 114813.3233
+Mean Squared Log Error (MSLE): 0.0587
+Explained Variance Score: 0.7086

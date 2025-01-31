@@ -188,7 +188,7 @@ class AutoML:
         self.n_child = n_population - n_parent
 
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
-        self.log_path = os.path.join(py_dir_path, "log_org.txt")
+        self.log_path = os.path.join(py_dir_path, "log.txt")
 
 
     def fit_structures(self, timeout=30):
