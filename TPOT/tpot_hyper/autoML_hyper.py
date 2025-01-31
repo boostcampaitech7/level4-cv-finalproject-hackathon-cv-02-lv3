@@ -177,9 +177,21 @@ def mutation(structure, prob_mutation):
     
     return structure
 
-##### hyperparameter - tuning #####
 def tune_hyperparameters(pipeline, param_grid, X_train, y_train, n_iter=50):
-    # Random Search로 파라미터 튜닝
+    """하이퍼파라미터 튜닝을 위한 Randomized Search 수행
+
+    Args:
+        pipeline (Pipeline): 모델 학습을 위한 파이프라인
+        param_grid (dict): 하이퍼파라미터 검색 공간
+        X_train (DataFrame): 학습 데이터의 특성(feature) 값
+        y_train (Series): 학습 데이터의 타겟(target) 값
+        n_iter (int, optional): 탐색할 하이퍼파라미터 조합 개수 (기본값: 50)
+
+    Returns:
+        best_estimator_ (Pipeline): 최적 하이퍼파라미터로 학습된 모델
+        best_params_ (dict): 최적 하이퍼파라미터 값
+        best_score_ (float): 검증 데이터에서의 최고 R2 점수
+    """
     search = RandomizedSearchCV(
         pipeline, param_distributions=param_grid, n_iter=n_iter, 
         cv=3, scoring='r2', n_jobs=-1, verbose=1, random_state=42
@@ -188,6 +200,17 @@ def tune_hyperparameters(pipeline, param_grid, X_train, y_train, n_iter=50):
     return search.best_estimator_, search.best_params_, search.best_score_
 
 def get_param_grid(model_name):
+    """모델별 하이퍼파라미터 검색 공간 정의
+
+    Args:
+        model_name (str): 사용할 모델의 이름
+
+    Returns:
+        param_grid (dict): 모델에 해당하는 하이퍼파라미터 검색 공간
+
+    Raises:
+        ValueError: 지원하지 않는 모델명이 입력된 경우
+    """
     if model_name == 'DecisionTreeRegressor':
         return {
             'models__max_depth': range(1, 11),
