@@ -1,0 +1,38 @@
+name: Feature Request
+description: 새로운 기능이나 개선 사항을 제안하는 템플릿입니다.
+title: "[Feat] 기능 제목을 입력해주세요"
+labels: ["✨feat"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 기능 요청 템플릿
+        이 템플릿을 사용하여 새로운 기능이나 개선 사항을 제안해주세요.
+
+  - type: input
+    id: feature_summary
+    attributes:
+      label: Feature Summary
+      description: 기능이나 개선 사항을 간략하게 요약해주세요.
+      placeholder: "기능에 대한 간략한 요약을 적어주세요"
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature_details
+    attributes:
+      label: Details
+      description: 기능이나 개선 사항을 자세히 설명해주세요.
+      placeholder: "여기에 기능에 대한 자세한 정보와 상세 작업 내용을 적어주세요"
+    validations:
+      required: true
+
+  - type: input
+    id: use_case
+    attributes:
+      label: Use Case
+      description: 이 기능이 어떻게 사용될지를 설명해주세요.
+      placeholder: "여기에 사용 사례나 이점을 적어주세요"
+    validations:
+      required: true
