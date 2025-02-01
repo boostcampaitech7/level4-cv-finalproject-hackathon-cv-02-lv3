@@ -54,14 +54,13 @@ def data_preparation(data_path, verbose=False):
 
 
 def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
+    dicts = {'R2': r2_score(y_true, y_pred),
+             'MAE': mean_absolute_error(y_true, y_pred),
+             'RMSE': math.sqrt(mean_squared_error(y_true, y_pred))}
+
     print(f"\nEvaluation for {dataset_name}:")
-    print(f"R2 Score: {r2_score(y_true, y_pred):.4f}")
-    print(f"Mean Absolute Error (MAE): {mean_absolute_error(y_true, y_pred):.4f}")
-    print(f"Mean Squared Error (MSE): {mean_squared_error(y_true, y_pred):.4f}")
-    print(f"Root Mean Squared Error (RMSE): {math.sqrt(mean_squared_error(y_true, y_pred)):.4f}")
-    print(f"Median Absolute Error (MedAE): {median_absolute_error(y_true, y_pred):.4f}")
-    try:
-        print(f"Mean Squared Log Error (MSLE): {mean_squared_log_error(y_true, y_pred):.4f}")
-    except ValueError:
-        print("Mean Squared Log Error (MSLE): Not defined for negative values.")
-    print(f"Explained Variance Score: {explained_variance_score(y_true, y_pred):.4f}")
+    print(f"R2 Score: {dicts['R2']:.4f}")
+    print(f"Mean Absolute Error (MAE): {dicts['MAE']:.4f}")
+    print(f"Root Mean Squared Error (RMSE): {dicts['RMSE']:.4f}")
+
+    return dicts

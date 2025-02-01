@@ -295,14 +295,14 @@ class AutoML:
                  'prob_mutations': prob_mutations, 'use_joblib': use_joblib, 'n_jobs': n_jobs}
         
         now = datetime.now()
-        time_string = now.strftime("%Y%m%d_%H%M%S")
+        time_string = now.strftime("%y%m%d_%H%M%S")
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
 
         self.log_dir_path = os.path.join(py_dir_path, 'log')
         self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
         os.makedirs(self.log_dir_path, exist_ok=True)
 
-        self.log_dicts(dicts)
+        self.log_dicts(dicts, 'AutoML.__init__()')
 
 
     def fit_structures(self, timeout=30):
@@ -373,12 +373,17 @@ class AutoML:
         print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
         return structure
 
-    def log_dicts(self, dicts):
+    def log_dicts(self, dicts, message=""):
         log = []
         for k, v in dicts.items():
-            log.append(f'{k}: {v}')
+            if isinstance(v, float):
+                log.append(f'{k}: {v:.4f}')
+            else:
+                log.append(f'{k}: {v}')
         
         log = ', '.join(log)
+        if len(message):
+            log = f'{message} - {log}'
         self.log(log)
     
     def log(self, message):
@@ -422,7 +427,8 @@ class AutoML:
             else:
                 class_name = class_info['class_name']
                 if 'params' in class_info:
-                    params = ', '.join([f'{k}: {v}' for k, v in class_info['params'].items()])
+                    params = ', '.join([f'{k}: {v}' if not isinstance(v, float) else f'{k}: {v:.4f}'
+                                        for k, v in class_info['params'].items()])
                     s = f"({class_name}: {params})"
                 else:
                     s = f"({class_name})"  
@@ -443,7 +449,7 @@ class AutoML:
         for i, structure in enumerate(self.structures):
             log.append(self.report_structure(structure))
         
-        log = '\n'.join(log)
+        log = '\n' + '\n'.join(log)
         self.log(log)
 
 
@@ -461,9 +467,13 @@ class AutoML:
             max_n_try (int, optional): 최대 새 구조 생성 시도횟수. 기본값 1000.
             timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30.
         """
+        
+        dicts = {'use_kfold': use_kfold, 'kfold': kfold, 'valid_size': valid_size,
+                 'seed': seed, 'max_n_try': max_n_try, 'timeout': timeout}
 
         random.seed(seed)
         np.random.seed(seed)
+        self.log_dicts(dicts, 'AutoML.fit()')
 
         if use_kfold: # k-fold validation으로 모델 평가
             kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
