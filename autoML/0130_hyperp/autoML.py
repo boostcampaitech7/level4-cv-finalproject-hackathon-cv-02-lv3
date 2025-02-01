@@ -26,6 +26,7 @@ import statistics
 from collections import defaultdict
 from copy import deepcopy
 import warnings
+from datetime import datetime
 
 warnings.filterwarnings(
     "ignore",
@@ -290,8 +291,18 @@ class AutoML:
         self.n_jobs = n_jobs
         self.n_child = n_population - n_parent
 
+        dicts = {'n_population': n_population, 'n_generation': n_generation, 'n_parent': n_parent,
+                 'prob_mutations': prob_mutations, 'use_joblib': use_joblib, 'n_jobs': n_jobs}
+        
+        now = datetime.now()
+        time_string = now.strftime("%Y%m%d_%H%M%S")
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
-        self.log_path = os.path.join(py_dir_path, "log.txt")
+
+        self.log_dir_path = os.path.join(py_dir_path, 'log')
+        self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
+        os.makedirs(self.log_dir_path, exist_ok=True)
+
+        self.log_dicts(dicts)
 
 
     def fit_structures(self, timeout=30):
@@ -362,7 +373,13 @@ class AutoML:
         print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
         return structure
 
-
+    def log_dicts(self, dicts):
+        log = []
+        for k, v in dicts.items():
+            log.append(f'{k}: {v}')
+        
+        log = ', '.join(log)
+        self.log(log)
     
     def log(self, message):
         """
@@ -421,13 +438,13 @@ class AutoML:
         return s
 
     def report(self):
+        log = []
         self.structures = sort(self.structures)
         for i, structure in enumerate(self.structures):
-            s = self.report_structure(structure)
-            print(f'{i+1}: {s}')
-
-
-
+            log.append(self.report_structure(structure))
+        
+        log = '\n'.join(log)
+        self.log(log)
 
 
     def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
