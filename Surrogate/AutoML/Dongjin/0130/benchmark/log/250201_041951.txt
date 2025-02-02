@@ -1,0 +1,19 @@
+[2025-02-01 04:19:51] Start
+[2025-02-01 04:23:43] Evaluation - Train - R2: 0.8665, MAE: 138494.9240, RMSE: 245829.3962
+[2025-02-01 04:23:43] Evaluation - Test - R2: 0.7843, MAE: 189014.4866, RMSE: 314683.1429
+[2025-02-01 04:23:43]           rank  ensemble_weight                 type      cost   duration
+model_id                                                                 
+75           1             0.24        random_forest  0.226335   7.707492
+5            2             0.02        random_forest  0.227971  18.356977
+81           3             0.18        random_forest  0.229799   6.651789
+68           4             0.06        random_forest  0.232204  12.942079
+25           5             0.14        random_forest  0.233874  11.372694
+86           6             0.02        random_forest  0.237619   4.662898
+19           7             0.02          extra_trees  0.238542   6.717490
+12           8             0.12    gradient_boosting  0.238716   1.892487
+15           9             0.06    gradient_boosting  0.255342   4.498823
+27          10             0.02    gradient_boosting  0.275892   3.606428
+7           11             0.04    gradient_boosting  0.289183   5.505527
+51          12             0.04  k_nearest_neighbors  0.384862   3.748483
+11          13             0.04  k_nearest_neighbors  0.393048   0.929307
+[2025-02-01 04:23:43] Autosklearn.regression init to training finished in: 206.2 s
