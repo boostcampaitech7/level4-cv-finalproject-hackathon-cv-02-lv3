@@ -121,13 +121,13 @@ if mode == 'row':
         initial_lattitude = row["Lattitude"]
         initial_longtitude = row["Longtitude"]
         # initial_buildingarea = row["BuildingArea"]
-        # initial_price = y_train.iloc[index]
+        initial_price = y_train.iloc[index]
 
 
         def objective_function(Lattitude, Longtitude):
             # 🔹 Concave Hull 내부인지 확인 (아닐 경우, 큰 패널티 값 반환)
             if not concave_hull_polygon.contains(Point(Longtitude, Lattitude)):
-                return -1e9  # 패널티 값 반환
+                return initial_price  # 패널티 값 반환
 
             X_simulation = row.copy()  # 현재 행을 복사하여 사용
             X_simulation["Lattitude"] = Lattitude
