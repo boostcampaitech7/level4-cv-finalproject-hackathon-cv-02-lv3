@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
 
 
 @st.dialog("진행 불가")
@@ -13,6 +13,22 @@ def vote():
     if st.button("다시 지정하기"):
         st.rerun()
 
+@st.dialog("우선 순위를 정해주세요!")
+def prior(option, opt):
+    st.write("목표가 2개 이상이기 때문에 우선순위를 정해주세요!")
+
+    options = [option]+opt
+    selection = st.pills("Directions", options, selection_mode="multi")
+    st.markdown(f"Your selected options:  \n {[f'{i+1}순위 : {j}'for i,j in enumerate(selection)]}.")
+
+    if st.button("submit"):
+        for i,j in enumerate(options):
+            if j in st.session_state.search_x.keys():
+                st.session_state.search_x[j]['순위'] = i+1
+            
+            else:
+                st.session_state.search_y[j]['순위'] = i+1
+        st.rerun()
 
 # IQR을 이용한 이상치 제거 함수
 def remove_outliers_iqr(df, option, method):
@@ -24,7 +40,7 @@ def remove_outliers_iqr(df, option, method):
         upper_bound = Q3 + 1.5 * IQR  # 이상치 상한값
 
         # 이상치가 아닌 데이터만 선택
-        filtered_df = df[(df[option] >= lower_bound) & (df[option] <= upper_bound)]
+        filtered_df = df[(df[option] >= lower_bound) & (df[option] <= upper_bound)].reset_index(drop=True)
         return filtered_df
     
     else:
@@ -33,7 +49,7 @@ def remove_outliers_iqr(df, option, method):
 def remove_na(df, option, method):
 
     if method == "관련 행 제거하기":
-        return df.dropna(subset=[option])  # 해당 열에서 결측치가 있는 행 제거
+        return df.dropna(subset=[option]).reset_index(drop=True)  # 해당 열에서 결측치가 있는 행 제거
     
     elif method == "평균으로 채우기":
         mean_value = df[option].mean()  # 평균값 계산
@@ -402,7 +418,7 @@ elif st.session_state.page=="solution":
         if method3 == "범위에 맞추기":
             st.write("* output 범위 설정")
             values = st.slider("", min(df[option])-2*int(IQR), max(df[option])+2*int(IQR), (min(df[option]), max(df[option])))
-            search_y[option]=[method3,values]
+            search_y[option]={'목표' : method3, '범위 설정' : values}
 
         elif method3 == "목표값에 맞추기":
             st.write("* 원하는 output 목표값 설정")
@@ -410,10 +426,10 @@ elif st.session_state.page=="solution":
             "Insert a number", value=None, placeholder="Type a number..."
             )
             st.write("The current number is ", number)
-            search_y[option]=[method3,number]
+            search_y[option]={'목표' : method3, '목표값' : number}
         
         else:
-            search_y[option]=[method3]
+            search_y[option]={'목표' : method3}
 
     
     st.divider()
@@ -439,7 +455,7 @@ elif st.session_state.page=="solution":
 
                     with col1:
                         purpose=["최소화하기", "최대화하기", "최적화하지 않기"]
-                        search_x[option2[ind]] = [st.radio("목표 설정", purpose, key = option2[ind])]
+                        search_x[option2[ind]] = {"목표" : st.radio("목표 설정", purpose, key = option2[ind])}
                         
 
                     with col2:
@@ -454,7 +470,7 @@ elif st.session_state.page=="solution":
 
                         values = st.slider("솔루션 최대 범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
                                 (min(df[option2[ind]]), max(df[option2[ind]])), key = option2[ind]+'2')
-                        search_x[option2[ind]].append(values)
+                        search_x[option2[ind]]['범위 설정'] = values
                         
                 
                 else:
@@ -475,7 +491,6 @@ elif st.session_state.page=="solution":
     )
 
     st.divider()
-
 
 
     #레이아웃 나누기
@@ -502,9 +517,20 @@ elif st.session_state.page=="solution":
                 
                 st.session_state.page = "train"  # train page로 넘어가기
                 
-                df=df[[option]+option2+option3]
+                st.session_state.X=df[option2+option3]
+                st.session_state.y=df[option]
+                st.session_state.search_x=search_x
+                st.session_state.search_y=search_y
 
-                st.rerun()
+                opt=[]
+                for i,j in search_x.items():
+                    if len(j)>=2 and j['목표']!="최적화하지 않기":
+                        opt.append(i)
+                
+                if opt:
+                    prior(option,opt)
+                else:
+                    st.rerun()
 
             else:
                 vote()
@@ -521,9 +547,18 @@ else:
     with st.spinner('Wait for it...'):
         time.sleep(5)
 
-    df=st.session_state.df
+    X=st.session_state.X
+    y=st.session_state.y
+    search_x=st.session_state.search_x
+    search_y=st.session_state.search_y
+
     st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
+
+    st.table(X.head())
+    st.table(y.head())
+    st.write(search_x)
+    st.write(search_y)
 
     st.divider()
 
