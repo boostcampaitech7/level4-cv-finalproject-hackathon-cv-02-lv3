@@ -27,9 +27,8 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 
 
 data_path = '/data/ephemeral/home/Jungyeon/level4-cv-finalproject-hackathon-cv-02-lv3/TPOT/melb_split.csv'
-drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
-               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
-               'Regionname', 'Propertycount']
+drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode', 
+               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea','Regionname', 'Propertycount']
 
 
 # df 불러오기 및 column 제거
