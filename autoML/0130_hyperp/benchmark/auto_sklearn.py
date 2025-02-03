@@ -22,7 +22,7 @@ def main():
     automl = autosklearn.regression.AutoSklearnRegressor(
     time_left_for_this_task=200,
     per_run_time_limit=30,
-    tmp_folder="/data/ephemeral/home/Dongjin/tmp",
+    tmp_folder="/data/ephemeral/tmp",
     n_jobs=-1)
     automl.fit(X_train, y_train)
 

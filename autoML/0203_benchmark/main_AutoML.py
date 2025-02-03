@@ -32,7 +32,7 @@ def evaluate_AutoML(X_train, y_train, n_population=30, n_generation=5, n_parent=
     return test_score['R2'], elapsed_time
 
 if __name__ == '__main__':
-    seed_list = [1] #list(range(1, 4))
+    seed_list = list(range(1, 4))
     n_jobs_list = [1, 2, 4, 6, 8, -1] # list(range(1, 9))
     rel_data_path = '../data/melb_split.csv'
     rel_save_path = 'result/AutoML/parallel.csv'
@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     for n_jobs in n_jobs_list:
         for seed in seed_list:
-            test_score, elapsed_time = evaluate_AutoML(X_train, y_train, seed=seed, n_jobs=n_jobs)
+            test_score, elapsed_time = evaluate_AutoML(X_train, y_train, seed=seed, n_jobs=n_jobs, n_generation=5)
             df.loc[len(df)] = [n_jobs, seed, test_score, elapsed_time]
 
     df_analysis = df.groupby('n_jobs')[['test_score', 'elapsed_time']].agg(['mean', 'std'])
