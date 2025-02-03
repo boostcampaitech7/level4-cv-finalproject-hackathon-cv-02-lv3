@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import time
+from sklearn.model_selection import train_test_split
+
 
 @st.dialog("진행 불가")
 def vote():
@@ -11,7 +14,36 @@ def vote():
         st.rerun()
 
 
+# IQR을 이용한 이상치 제거 함수
+def remove_outliers_iqr(df, option, method):
+    if method == "제거하기":
+        Q1 = df[option].quantile(0.25)  # 1사분위수 (Q1)
+        Q3 = df[option].quantile(0.75)  # 3사분위수 (Q3)
+        IQR = Q3 - Q1  # IQR 계산
+        lower_bound = Q1 - 1.5 * IQR  # 이상치 하한값
+        upper_bound = Q3 + 1.5 * IQR  # 이상치 상한값
 
+        # 이상치가 아닌 데이터만 선택
+        filtered_df = df[(df[option] >= lower_bound) & (df[option] <= upper_bound)]
+        return filtered_df
+    
+    else:
+        return df
+
+def remove_na(df, option, method):
+
+    if method == "관련 행 제거하기":
+        return df.dropna(subset=[option])  # 해당 열에서 결측치가 있는 행 제거
+    
+    elif method == "평균으로 채우기":
+        mean_value = df[option].mean()  # 평균값 계산
+        return df.fillna({option: mean_value})  # 결측치 평균값으로 대체
+    
+    elif method == "0으로 채우기":
+        return df.fillna({option: 0})
+    
+    else:
+        return df
 
 # 페이지 레이아웃 설정
 st.set_page_config(layout="wide", page_title="AI solution", page_icon="📊")
@@ -59,7 +91,7 @@ elif st.session_state.page=="analysis":
         st.header("전체 데이터 분석")
 
         # 레이아웃 나누기
-        col1, col2 = st.columns([3, 1])  # 왼쪽 3: 오른쪽 1 비율 설정
+        col1, col2 = st.columns([3, 1],border=True)  # 왼쪽 3: 오른쪽 1 비율 설정
 
         with col1:
             st.write("### 데이터프레임")
@@ -96,7 +128,7 @@ elif st.session_state.page=="analysis":
             st.write("### Visualization")
 
             # 레이아웃 나누기
-            col_1, col_2 = st.columns([1, 1])  # 왼쪽 1: 오른쪽 1 비율 설정
+            col_1, col_2 = st.columns([1, 1], border=True)  # 왼쪽 1: 오른쪽 1 비율 설정
             # pie chart
             with col_1:
                 st.write('missing value')
@@ -136,7 +168,7 @@ elif st.session_state.page=="analysis":
             st.write("### Visualization")
 
             # 레이아웃 나누기
-            col_1, col_2 = st.columns([1, 1])  # 왼쪽 1: 오른쪽 1 비율 설정
+            col_1, col_2 = st.columns([1, 1] , border=True)  # 왼쪽 1: 오른쪽 1 비율 설정
             # pie chart
             with col_1:
                 st.write('missing value')
@@ -164,7 +196,7 @@ elif st.session_state.page=="analysis":
         elif pd.api.types.is_string_dtype(df[column]) or pd.api.types.is_object_dtype(df[column]):
 
             # 레이아웃 나누기
-            col_11, col_22 = st.columns([1, 2])  # 왼쪽 1: 오른쪽 1 비율 설정
+            col_11, col_22 = st.columns([1, 2], border=True)  # 왼쪽 1: 오른쪽 1 비율 설정
             
             
             # 데이터 기본 분석
@@ -320,6 +352,7 @@ elif st.session_state.page=="solution":
         # 이상치 기준 계산
         lower_bound = Q1 - 1.5 * IQR
         upper_bound = Q3 + 1.5 * IQR
+        method = None
 
         if (df[option].dropna()>upper_bound).any() or (df[option].dropna()<lower_bound).any:
             st.write("IQR 기준으로 이상치가 존재합니다! 어떻게 처리할까요?")
@@ -356,6 +389,7 @@ elif st.session_state.page=="solution":
             st.write("You selected:", method2)
 
         else:
+            method2 = None
             st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
          
     # 범위 설정
@@ -364,10 +398,11 @@ elif st.session_state.page=="solution":
 
         purpose=["최소화하기","최대화하기","범위에 맞추기","목표값에 맞추기"]
         method3 = st.radio("* 목표 설정",purpose)
-
+        search_y={}
         if method3 == "범위에 맞추기":
             st.write("* output 범위 설정")
-            st.slider("", min(df[option])-2*int(IQR), max(df[option])+2*int(IQR), (min(df[option]), max(df[option])))
+            values = st.slider("", min(df[option])-2*int(IQR), max(df[option])+2*int(IQR), (min(df[option]), max(df[option])))
+            search_y[option]=[method3,values]
 
         elif method3 == "목표값에 맞추기":
             st.write("* 원하는 output 목표값 설정")
@@ -375,6 +410,10 @@ elif st.session_state.page=="solution":
             "Insert a number", value=None, placeholder="Type a number..."
             )
             st.write("The current number is ", number)
+            search_y[option]=[method3,number]
+        
+        else:
+            search_y[option]=[method3]
 
     
     st.divider()
@@ -391,7 +430,7 @@ elif st.session_state.page=="solution":
     if option2:
         tabs = st.tabs(option2)
     control_feature={}  
-
+    search_x={}
     if tabs:
         for ind,i in enumerate(tabs):
             with i:
@@ -399,12 +438,13 @@ elif st.session_state.page=="solution":
                     col1,col2,col3 = st.columns(3)
 
                     with col1:
-                        purpose=["최소화하기", "최대화하기", "범위에 맞추기", "최적화하지 않기"]
-                        control_feature[option2[ind]] = [st.radio("목표 설정", purpose, key = option2[ind])]
+                        purpose=["최소화하기", "최대화하기", "최적화하지 않기"]
+                        search_x[option2[ind]] = [st.radio("목표 설정", purpose, key = option2[ind])]
+                        
 
                     with col2:
                         purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
-                        control_feature[option2[ind]].append(st.radio("결측치 설정", purpose2, key = option2[ind]+'1'))
+                        control_feature[option2[ind]]=[st.radio("결측치 설정", purpose2, key = option2[ind]+'1')]
 
                     with col3:
                         # 1사분위수(Q1)와 3사분위수(Q3) 계산
@@ -412,8 +452,10 @@ elif st.session_state.page=="solution":
                         Q3 = df[option2[ind]].dropna().quantile(0.75)
                         IQR = Q3 - Q1
 
-                        st.slider("범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
+                        values = st.slider("솔루션 최대 범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
                                 (min(df[option2[ind]]), max(df[option2[ind]])), key = option2[ind]+'2')
+                        search_x[option2[ind]].append(values)
+                        
                 
                 else:
                     purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
@@ -451,8 +493,19 @@ elif st.session_state.page=="solution":
         # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
         if st.button("진행하기"):
             if option and option2 and option3:
+
+                df=remove_outliers_iqr(df,option,method)
+                df=remove_na(df,option,method)
+
+                for i in control_feature.keys():
+                    df=remove_na(df,i,control_feature[i]) 
+                
                 st.session_state.page = "train"  # train page로 넘어가기
+                
+                df=df[[option]+option2+option3]
+
                 st.rerun()
+
             else:
                 vote()
     
@@ -465,4 +518,26 @@ elif st.session_state.page=="solution":
 # 결과 보여주는 건 tab을 이용하자
 
 else:
+    with st.spinner('Wait for it...'):
+        time.sleep(5)
+
+    df=st.session_state.df
+    st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
+
+    st.divider()
+
+    st.subheader("모델 성능")
+
+    st.divider()
+
+    st.subheader("각 변수와 output간의 관계")
+
+
+    st.divider()
+
+    st.subheader("최적화 결과")
+
+
+    st.divider()
+    st.subheader("Feature importance")
