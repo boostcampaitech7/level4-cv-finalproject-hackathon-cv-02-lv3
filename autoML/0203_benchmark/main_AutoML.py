@@ -33,7 +33,7 @@ def evaluate_AutoML(X_train, y_train, n_population=30, n_generation=5, n_parent=
 
 if __name__ == '__main__':
     seed_list = list(range(1, 4))
-    n_jobs_list = [1, 2, 4, 6, 8, -1] # list(range(1, 9))
+    n_jobs_list = [1, 2, 4, 6, 7, 8, 9, 10, -1] # list(range(1, 9))
     rel_data_path = '../data/melb_split.csv'
     rel_save_path = 'result/AutoML/parallel.csv'
 
