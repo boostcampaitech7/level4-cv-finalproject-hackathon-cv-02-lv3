@@ -1,0 +1,4 @@
+[2025-02-03 01:43:43] Start
+[2025-02-03 01:55:42] Evaluation - Train - R2: 0.8520, MAE: 142738.6826, RMSE: 258882.1501
+[2025-02-03 01:55:42] Evaluation - Test - R2: 0.7581, MAE: 197571.1024, RMSE: 333266.6029
+[2025-02-03 01:55:42] TPOT init to training finished in: 719.3 s
