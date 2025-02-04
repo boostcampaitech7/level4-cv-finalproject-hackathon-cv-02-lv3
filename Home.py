@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
+from aisolution import aisolution
 
 
 @st.dialog("진행 불가")
@@ -28,7 +29,16 @@ def prior(option, opt):
             
             else:
                 st.session_state.search_y[j]['순위'] = i+1
+        st.session_state.page = "train"  # train page로 넘어가기
         st.rerun()
+
+@st.dialog('분석 진행 중')
+def train(X_train, X_test, y_train, y_test):
+    with st.spinner('분석 진행 중입니다..(약 5~10분 소요 예정)'):
+        train_score,test_score=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
+    
+    st.session_state.train_score=train_score
+    st.session_state.test_score=test_score
 
 # IQR을 이용한 이상치 제거 함수
 def remove_outliers_iqr(df, option, method):
@@ -515,8 +525,6 @@ elif st.session_state.page=="solution":
                 for i in control_feature.keys():
                     df=remove_na(df,i,control_feature[i]) 
                 
-                st.session_state.page = "train"  # train page로 넘어가기
-                
                 st.session_state.X=df[option2+option3]
                 st.session_state.y=df[option]
                 st.session_state.search_x=search_x
@@ -541,28 +549,36 @@ elif st.session_state.page=="solution":
 
 
 # page - train
-# 결과 보여주는 건 tab을 이용하자
 
-else:
-    with st.spinner('Wait for it...'):
-        time.sleep(5)
-
+elif st.session_state.page=="train":
     X=st.session_state.X
     y=st.session_state.y
     search_x=st.session_state.search_x
     search_y=st.session_state.search_y
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # 훈련시키기
+    train(X_train, X_test, y_train, y_test)
+    st.session_state.page='result'
+    st.rerun()
+
+    
+    
+# page - result
+# 결과 보여주는 건 tab을 이용하자
+
+else:
+    train_score=st.session_state.train_score
+    test_score=st.session_state.test_score
 
     st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
 
-    st.table(X.head())
-    st.table(y.head())
-    st.write(search_x)
-    st.write(search_y)
-
     st.divider()
 
     st.subheader("모델 성능")
+    st.write(train_score)
+    st.write(test_score)
 
     st.divider()
 
