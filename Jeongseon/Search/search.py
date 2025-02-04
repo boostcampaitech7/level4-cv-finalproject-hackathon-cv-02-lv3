@@ -39,23 +39,15 @@ X_train = train_data.drop(['Price'], axis=1)
 # 위도, 경도의 유니크한 조합 가져오기
 lat_lon_unique = X_train[['Lattitude', 'Longtitude']].drop_duplicates().values
 
-# 🔹 Alpha Shape을 사용하여 Concave Hull 생성 (더 세밀한 외곽선)
+# Alpha Shape을 사용하여 Concave Hull 생성 (더 세밀한 외곽선)
 alpha_value = 9  # 값이 작을수록 더 세밀한 다각형이 됨
 concave_hull = alphashape.alphashape(lat_lon_unique, alpha_value)
 
-concave_hull_coords = list(concave_hull.exterior.coords)
+concave_hull_coords = list(concave_hull.exterior.coords)                   #concave 외각선 좌표
 concave_hull_coords = [(lon, lat) for lon, lat in concave_hull_coords]
-
-print("------------------------------------------")
-print("concave_hull_coords : ", concave_hull_coords)
-print("------------------------------------------")
 
 # Concave Hull을 Polygon 객체로 변환
 concave_hull_polygon = Polygon(concave_hull_coords)
-
-print("------------------------------------------")
-print("concave_hull_polygon : " , concave_hull_polygon)
-print("------------------------------------------")
 
 def sample_within_concave_hull():
     """Concave Hull 내부에서 랜덤한 위도·경도 값을 샘플링하는 함수"""
