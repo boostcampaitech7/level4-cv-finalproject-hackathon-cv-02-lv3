@@ -35,10 +35,11 @@ def prior(option, opt):
 @st.dialog('분석 진행 중')
 def train(X_train, X_test, y_train, y_test):
     with st.spinner('분석 진행 중입니다..(약 5~10분 소요 예정)'):
-        train_score,test_score=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
+        train_score,test_score,train_time=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
     
     st.session_state.train_score=train_score
     st.session_state.test_score=test_score
+    st.session_state.train_time=train_time
 
 # IQR을 이용한 이상치 제거 함수
 def remove_outliers_iqr(df, option, method):
@@ -559,6 +560,8 @@ elif st.session_state.page=="train":
 
     # 훈련시키기
     train(X_train, X_test, y_train, y_test)
+    # search 목표에 맞게 하기
+    # search()
     st.session_state.page='result'
     st.rerun()
 
@@ -570,15 +573,26 @@ elif st.session_state.page=="train":
 else:
     train_score=st.session_state.train_score
     test_score=st.session_state.test_score
-
+    train_time=st.session_state.train_time
     st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
-
     st.divider()
 
-    st.subheader("모델 성능")
-    st.write(train_score)
-    st.write(test_score)
+    col1, col2 = st.columns([2,3], border= True)
+    with col1:
+        st.subheader("모델 훈련 시간")
+        st.write(f'훈련에 든 시간 {train_time:.1f}초')
+        st.write(f'최적화(search)에 든 시간 {train_time:.1f}초')
+
+    with col2:
+        st.subheader("모델 성능")
+        col11,col22=st.columns((1,2))
+        with col11:
+            score=test_score['R2']*100
+            st.metric("모델 정확도(Adjusted R2 기준)", f'{score:.1f}%')
+        with col22:
+            df=pd.DataFrame({'Train 성능' : train_score,'Test 성능': test_score})
+            st.table(df)
 
     st.divider()
 
