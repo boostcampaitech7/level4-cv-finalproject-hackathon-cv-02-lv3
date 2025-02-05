@@ -35,11 +35,17 @@ drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Dista
 
 # df 불러오기 및 column 제거
 df = pd.read_csv(data_path)
+
+print(df.shape)
+print(df.head(5))
 df = df.drop(drop_tables, axis=1)
 df = df.dropna(axis=0)
 
 index = 0.1 < df['BuildingArea'] # BuildingArea 0값 제거
 df = df.loc[index]
+
+print(df.shape)
+print(df.head(5))
 
 # 데이터셋 분리
 train_data = df[df['Split'] == 'Train']
