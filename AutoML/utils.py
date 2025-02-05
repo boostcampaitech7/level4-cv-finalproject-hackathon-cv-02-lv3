@@ -45,15 +45,15 @@ def data_preparation(data_path, verbose=False):
     test_data = test_data.drop(['Split'], axis=1)
     # test_data = pd.get_dummies(test_data, dtype='float')
     
-    print(train_data.head(10))
-    print(train_data.isnull().sum())
-    print(train_data.info())
 
     # 타겟 변수와 특성 분리
     y_train = train_data['Attrition']
     X_train = train_data.drop(['Attrition'], axis=1)
     y_test = test_data['Attrition']
     X_test = test_data.drop(['Attrition'], axis=1)
+    
+    print(y_train.head(10))
+    print(X_test.head(10))
 
     if verbose:
         # 결과 확인
