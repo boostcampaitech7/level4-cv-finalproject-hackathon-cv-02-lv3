@@ -22,6 +22,8 @@ def data_preparation(data_path, verbose=False):
 
     # df 불러오기
     df = pd.read_csv(data_path)
+    df["Attrition"] = df["Attrition"].map({"No": 0, "Yes": 1})
+
     
     # 8:2 비율로 train/test 분리
     split_index = int(10000 * 0.8)  # 8000번째 행까지 Train, 나머지 Test
@@ -29,23 +31,23 @@ def data_preparation(data_path, verbose=False):
     # Split 컬럼 추가
     df["Split"] = ["Train"] * split_index + ["Test"] * (10000 - split_index)
     
-    print(df.head(10))
-    print(df.isnull().sum())
-    print(df.info())
-    
     #column 제거
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
-    
+
     
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
     train_data = train_data.drop(['Split'], axis=1)
-    train_data = pd.get_dummies(train_data, dtype='float')
+    # train_data = pd.get_dummies(train_data, dtype='float')
 
     test_data = df[df['Split'] == 'Test']
     test_data = test_data.drop(['Split'], axis=1)
-    test_data = pd.get_dummies(test_data, dtype='float')
+    # test_data = pd.get_dummies(test_data, dtype='float')
+    
+    print(train_data.head(10))
+    print(train_data.isnull().sum())
+    print(train_data.info())
 
     # 타겟 변수와 특성 분리
     y_train = train_data['Attrition']
