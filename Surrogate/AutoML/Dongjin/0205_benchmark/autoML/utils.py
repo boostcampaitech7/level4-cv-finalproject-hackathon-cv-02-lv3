@@ -71,6 +71,7 @@ class Log:
             self.log_dir_path = os.path.join(py_dir_path, 'log', logger_name)
         
         self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
+        os.makedirs(self.log_dir_path, exist_ok=True)
         
 
     def log_dicts(self, dicts, message=""):

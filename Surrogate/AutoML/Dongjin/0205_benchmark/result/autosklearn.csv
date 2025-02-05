@@ -1,0 +1,4 @@
+,seed,seed,n_jobs,n_jobs,elapsed_time,elapsed_time,train_R2,train_R2,train_MAE,train_MAE,train_RMSE,train_RMSE,test_R2,test_R2,test_MAE,test_MAE,test_RMSE,test_RMSE
+,mean,sum,mean,sum,mean,sum,mean,sum,mean,sum,mean,sum,mean,sum,mean,sum,mean,sum
+target_time,,,,,,,,,,,,,,,,,,
+30,2.0,6,10.0,30,37.845707178115845,113.53712153434753,0.8887487415873873,2.666246224762162,126202.70720102942,378608.1216030883,224419.18965030104,673257.5689509031,0.7731326602029699,2.3193979806089096,194479.44934649733,583438.348039492,322742.5893630749,968227.7680892248
