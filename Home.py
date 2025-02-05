@@ -5,6 +5,9 @@ import seaborn as sns
 import time
 from sklearn.model_selection import train_test_split
 from aisolution import aisolution
+from sklearn.inspection import PartialDependenceDisplay
+from regplot import partial_dependence_with_confidence
+from search import single_search
 
 
 @st.dialog("진행 불가")
@@ -32,14 +35,19 @@ def prior(option, opt):
         st.session_state.page = "train"  # train page로 넘어가기
         st.rerun()
 
-@st.dialog('분석 진행 중')
-def train(X_train, X_test, y_train, y_test):
-    with st.spinner('분석 진행 중입니다..(약 5~10분 소요 예정)'):
-        train_score,test_score,train_time=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
-    
+@st.dialog('solution 진행 중')
+def train(X_train, X_test, y_train, y_test, search_x, search_y):
+    with st.spinner('분석 및 최적화 진행 중입니다..(약 10분 소요 예정)'):
+        train_score,test_score,train_time,model=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
+        elapsed_time, optimal_solutions_df = single_search(X_train, y_train, model, search_x,search_y)
+        
     st.session_state.train_score=train_score
     st.session_state.test_score=test_score
     st.session_state.train_time=train_time
+    st.session_state.opt_time=elapsed_time
+    st.session_state.df2=optimal_solutions_df
+    st.session_state.model=model
+
 
 # IQR을 이용한 이상치 제거 함수
 def remove_outliers_iqr(df, option, method):
@@ -539,6 +547,7 @@ elif st.session_state.page=="solution":
                 if opt:
                     prior(option,opt)
                 else:
+                    st.session_state.page='train'
                     st.rerun()
 
             else:
@@ -558,10 +567,12 @@ elif st.session_state.page=="train":
     search_y=st.session_state.search_y
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # 훈련시키기
-    train(X_train, X_test, y_train, y_test)
-    # search 목표에 맞게 하기
-    # search()
+    st.session_state.X_train = X_train
+    st.session_state.X_test = X_test
+
+    # 모델 훈련 및 최적화시키기
+    train(X_train, X_test, y_train, y_test, search_x,search_y)
+
     st.session_state.page='result'
     st.rerun()
 
@@ -574,6 +585,7 @@ else:
     train_score=st.session_state.train_score
     test_score=st.session_state.test_score
     train_time=st.session_state.train_time
+    
     st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
     st.divider()
@@ -598,11 +610,43 @@ else:
 
     st.subheader("각 변수와 output간의 관계")
 
+    # 모델이랑 data 불러오기
+    model=st.session_state.model
+    X_test=st.session_state.X_test
+
+    # PDP 플롯 그리기
+
+    # Streamlit UI 추가 (사용자가 Feature 선택)
+    tabs = st.tabs(X_test.columns.tolist())
+
+    for ind, tab in enumerate(tabs):
+            
+        with tab:
+
+            with st.columns([2,1])[0]:
+                # PDP 그래프 생성
+                fig, ax = plt.subplots(figsize=(9,3), dpi=100)
+                x_vals, y_vals, lower_bounds, upper_bounds = partial_dependence_with_confidence(model, X_test, X_test.columns.tolist()[ind])
+
+                # PDP 평균값 라인
+                sns.lineplot(x=x_vals, y=y_vals, label=f"PDP - {X_test.columns.tolist()[ind]}", color="blue")
+
+                # 신뢰구간(Confidence Interval) 추가
+                ax.fill_between(x_vals, lower_bounds, upper_bounds, color="blue", alpha=0.2)
+
+                ax.set_xlabel(X_test.columns.tolist()[ind])
+                ax.set_ylabel("Predicted Price")
+                ax.legend()
+                # ✅ X축 숫자 제거
+                ax.set_xticklabels([])
+                
+                st.pyplot(fig)
 
     st.divider()
 
     st.subheader("최적화 결과")
 
+    st.table(st.session_state.df2)
 
     st.divider()
     st.subheader("Feature importance")

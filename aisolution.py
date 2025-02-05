@@ -33,7 +33,7 @@ def aisolution(n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2,
     elapsed_time = end-start
     autoML.log(f'AutoML init to training finished in: {elapsed_time:.1f} s')
 
-    return train_score, test_score, elapsed_time
+    return train_score, test_score, elapsed_time, autoML
 
 
 
