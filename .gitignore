@@ -6,3 +6,4 @@ data_origin/
 *.zip
 data
 AutoML_/
+log/
