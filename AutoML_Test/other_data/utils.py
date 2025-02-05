@@ -11,7 +11,7 @@ from sklearn.metrics import (
 
 
 def data_preparation(data_path, verbose=False):
-    drop_tables = [
+    drop_tables = [ "Employee_ID",
     "Gender", "Marital_Status", "Department", "Job_Role", "Monthly_Income", 
     "Hourly_Rate", "Years_at_Company", "Years_in_Current_Role", 
     "Work_Environment_Satisfaction", "Performance_Rating", "Training_Hours_Last_Year", 
@@ -39,11 +39,9 @@ def data_preparation(data_path, verbose=False):
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
     train_data = train_data.drop(['Split'], axis=1)
-    # train_data = pd.get_dummies(train_data, dtype='float')
 
     test_data = df[df['Split'] == 'Test']
     test_data = test_data.drop(['Split'], axis=1)
-    # test_data = pd.get_dummies(test_data, dtype='float')
     
 
     # 타겟 변수와 특성 분리
