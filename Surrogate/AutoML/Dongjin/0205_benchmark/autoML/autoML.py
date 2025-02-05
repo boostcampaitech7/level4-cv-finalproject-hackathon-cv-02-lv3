@@ -282,7 +282,7 @@ class AutoML:
     """
     유전 알고리즘을 이용한 ML pipeline 최적화 수행
     """
-    def __init__(self, n_population=20, n_generation=50, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
+    def __init__(self, n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
         logger_name = "AutoML"
 
         self.n_population = n_population

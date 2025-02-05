@@ -1,9 +1,35 @@
-from tpot import TPOTRegressor
-from autoML.utils import evaluate_regression, data_preparation, Log
-import time
-import shutil
+import pandas as pd
+from autoML.autoML import AutoML
 import os
-import pandas as pd 
+from autoML.utils import evaluate_regression, data_preparation
+import time
+
+
+def run_autoML(X_train, y_train, X_test, y_test, generations, seed, n_jobs):
+
+    start = time.time()
+    
+    autoML = AutoML(n_population=30, n_generation=generations, n_jobs=n_jobs)
+    autoML.fit(X_train, y_train, seed=seed, use_kfold=True, kfold=5)
+    
+    end = time.time()
+
+    y_test_pred = autoML.predict(X_test)
+    y_train_pred = autoML.predict(X_train)
+
+    train_score = evaluate_regression(y_train, y_train_pred, 'train') 
+    test_score = evaluate_regression(y_test, y_test_pred, 'test')
+    scores = flat_dicts({'train': train_score, 'test': test_score})
+
+    elapsed_time = end - start
+
+    autoML.log(f'AutoML init to training finished in: {elapsed_time:.1f} s')
+    autoML.log_dicts(train_score, 'Evaluation - Train')
+    autoML.log_dicts(test_score, 'Evaluation - Test')
+
+    return scores, elapsed_time
+
+
 
 def flat_dicts(dicts):
     flat_dicts = {}
@@ -14,37 +40,10 @@ def flat_dicts(dicts):
     return flat_dicts
 
 
-def run_TPOT(X_train, y_train, X_test, y_test, generations, seed, n_jobs):
-    log = Log(logger_name="TPOT")
-    log.log("TPOT - start")
-    log.log(f"generation: {generations}, seed: {seed}, n_jobs: {n_jobs}")
-    
-    start = time.time()
-    automl = TPOTRegressor(generations=generations, population_size=30, cv=5,
-                            random_state=seed, verbosity=2, n_jobs=n_jobs)
-
-    automl.fit(X_train, y_train)
-
-    end = time.time()
-
-    y_train_pred = automl.predict(X_train)
-    y_test_pred = automl.predict(X_test)
-
-    train_score = evaluate_regression(y_train, y_train_pred, 'train') 
-    test_score = evaluate_regression(y_test, y_test_pred, 'test')
-    scores = flat_dicts({'train': train_score, 'test': test_score})
-    elapsed_time = end - start
-
-    log.log(f'Autosklearn.regression init to training finished in: {elapsed_time:.1f} s')
-    log.log_dicts(train_score, message="train")
-    log.log_dicts(test_score, message="test")
-
-    return scores, elapsed_time
-
 
 if __name__ == "__main__":
-    save_name = 'TPOT'
-    generations = list(range(1, 21, 1))
+    save_name = 'autoML'
+    generations = list(range(1, 31, 1))
     seeds = [1, 2, 3]
     n_jobs = -1
     data_path = '/data/ephemeral/home/Dongjin/data/melbourne/melb_split.csv'
@@ -60,7 +59,7 @@ if __name__ == "__main__":
 
     for generation in generations:
         for seed in seeds:
-            scores, elapsed_time = run_TPOT(X_train, y_train, X_test, y_test, 
+            scores, elapsed_time = run_autoML(X_train, y_train, X_test, y_test, 
                                                 generations=generation, seed=seed, n_jobs=n_jobs)
             result = {'generation': generation, 'seed': seed, 'n_jobs': n_jobs, 'elapsed_time': elapsed_time}
             result.update(scores)

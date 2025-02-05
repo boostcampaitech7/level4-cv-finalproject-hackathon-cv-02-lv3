@@ -1,0 +1,4 @@
+,seed,seed,n_jobs,n_jobs,elapsed_time,elapsed_time,train_R2,train_R2,train_MAE,train_MAE,train_RMSE,train_RMSE,test_R2,test_R2,test_MAE,test_MAE,test_RMSE,test_RMSE
+,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std,mean,std
+generation,,,,,,,,,,,,,,,,,,
+1,2.0,1.0,10.0,0.0,64.92904527982076,31.56647687981154,0.8367520172642271,0.037734438529032306,150512.95352891245,18781.78631019829,270696.2905468916,30670.298429519895,0.7494835003286179,0.009106327400547108,201374.4995547095,5171.812585297477,339110.24474850396,6147.74085640485

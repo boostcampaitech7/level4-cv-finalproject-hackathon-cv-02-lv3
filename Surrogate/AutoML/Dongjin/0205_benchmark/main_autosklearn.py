@@ -44,18 +44,18 @@ def run_autosklearn(X_train, y_train, X_test, y_test, target_time, seed, n_jobs)
 
     log.log(automl.leaderboard())
     log.log(f'Autosklearn.regression init to training finished in: {elapsed_time:.1f} s')
-    log.log_dicts(train_score)
-    log.log_dicts(test_score)
+    log.log_dicts(train_score, message="train")
+    log.log_dicts(test_score, message="test")
 
     return scores, elapsed_time
 
 
 if __name__ == "__main__":
     save_name = 'autosklearn'
-    target_times = [] # list(range(60, 610, 60))
+    target_times = list(range(60, 610, 60))
     target_times.insert(0, 30)
     seeds = [1, 2, 3]
-    n_jobs = 10
+    n_jobs = -1
     data_path = '/data/ephemeral/home/Dongjin/data/melbourne/melb_split.csv'
 
 
