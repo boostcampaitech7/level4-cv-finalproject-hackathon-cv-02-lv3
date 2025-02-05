@@ -11,18 +11,33 @@ from sklearn.metrics import (
 
 
 def data_preparation(data_path, verbose=False):
-    drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
-               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
-               'Regionname', 'Propertycount']
+    drop_tables = [
+    "Gender", "Marital_Status", "Department", "Job_Role", "Monthly_Income", 
+    "Hourly_Rate", "Years_at_Company", "Years_in_Current_Role", 
+    "Work_Environment_Satisfaction", "Performance_Rating", "Training_Hours_Last_Year", 
+    "Overtime", "Project_Count", "Average_Hours_Worked_Per_Week", "Absenteeism", 
+    "Relationship_with_Manager", "Job_Involvement", "Distance_From_Home", 
+    "Number_of_Companies_Worked"
+    ]   
 
-    # df 불러오기 및 column 제거
+    # df 불러오기
     df = pd.read_csv(data_path)
+    
+    # 8:2 비율로 train/test 분리
+    split_index = int(10000 * 0.8)  # 8000번째 행까지 Train, 나머지 Test
+
+    # Split 컬럼 추가
+    df["Split"] = ["Train"] * split_index + ["Test"] * (10000 - split_index)
+    
+    print(df.head(10))
+    print(df.isnull().sum())
+    print(df.info())
+    
+    #column 제거
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
-
-    index = 0.1 < df['BuildingArea'] # BuildingArea 0값 제거
-    df = df.loc[index]
-
+    
+    
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
     train_data = train_data.drop(['Split'], axis=1)
@@ -33,10 +48,10 @@ def data_preparation(data_path, verbose=False):
     test_data = pd.get_dummies(test_data, dtype='float')
 
     # 타겟 변수와 특성 분리
-    y_train = train_data['Price']
-    X_train = train_data.drop(['Price'], axis=1)
-    y_test = test_data['Price']
-    X_test = test_data.drop(['Price'], axis=1)
+    y_train = train_data['Attrition']
+    X_train = train_data.drop(['Attrition'], axis=1)
+    y_test = test_data['Attrition']
+    X_test = test_data.drop(['Attrition'], axis=1)
 
     if verbose:
         # 결과 확인
