@@ -283,6 +283,8 @@ class AutoML:
     유전 알고리즘을 이용한 ML pipeline 최적화 수행
     """
     def __init__(self, n_population=20, n_generation=50, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
+        logger_name = "AutoML"
+
         self.n_population = n_population
         self.n_generation = n_generation
         self.n_parent = n_parent
@@ -298,7 +300,11 @@ class AutoML:
         time_string = now.strftime("%y%m%d_%H%M%S")
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
 
-        self.log_dir_path = os.path.join(py_dir_path, 'log')
+        if logger_name is None:
+            self.log_dir_path = os.path.join(py_dir_path, 'log')
+        else:
+            self.log_dir_path = os.path.join(py_dir_path, 'log', logger_name)
+
         self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
         os.makedirs(self.log_dir_path, exist_ok=True)
 

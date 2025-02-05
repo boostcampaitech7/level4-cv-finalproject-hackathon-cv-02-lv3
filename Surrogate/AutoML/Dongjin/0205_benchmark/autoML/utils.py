@@ -1,14 +1,8 @@
 import math
 import pandas as pd
-from sklearn.metrics import (
-    r2_score,
-    mean_absolute_error,
-    mean_squared_error,
-    median_absolute_error,
-    mean_squared_log_error,
-    explained_variance_score
-)
-
+from datetime import datetime
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+import os
 
 def data_preparation(data_path, verbose=False):
     drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
@@ -20,7 +14,7 @@ def data_preparation(data_path, verbose=False):
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
 
-    index = 0.1 < df['BuildingArea'] # BuildingArea 0값 제거
+    index = 0.1 < df['BuildingArea'] # BuildingArea가 0인 값 제거
     df = df.loc[index]
 
     # 데이터셋 분리
@@ -64,3 +58,46 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
     print(f"Root Mean Squared Error (RMSE): {dicts['RMSE']:.4f}")
 
     return dicts
+
+class Log:
+    def __init__(self, logger_name=None):
+        now = datetime.now()
+        time_string = now.strftime("%y%m%d_%H%M%S")
+        py_dir_path = os.path.dirname(os.path.abspath(__file__))
+
+        if logger_name is None:
+            self.log_dir_path = os.path.join(py_dir_path, 'log')
+        else:
+            self.log_dir_path = os.path.join(py_dir_path, 'log', logger_name)
+        
+        self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
+        
+
+    def log_dicts(self, dicts, message=""):
+        log = []
+        for k, v in dicts.items():
+            if isinstance(v, float):
+                log.append(f'{k}: {v:.4f}')
+            else:
+                log.append(f'{k}: {v}')
+        
+        log = ', '.join(log)
+        if len(message):
+            log = f'{message} - {log}'
+        self.log(log)
+    
+    def log(self, message):
+        """
+        log 기록
+
+        Args:
+            message (str): log 메세지
+        """
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_message = f"[{now}] {message}"
+        print(log_message) # 로그 출력 
+
+        # 로그 저장
+        with open(self.log_path, 'a') as file:
+            file.write(log_message + "\n") 
+            file.flush()
