@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from aisolution import aisolution
 from sklearn.inspection import PartialDependenceDisplay
 from regplot import partial_dependence_with_confidence
-from search import single_search
+from search import search
 
 
 @st.dialog("진행 불가")
@@ -36,11 +36,19 @@ def prior(option, opt):
         st.rerun()
 
 @st.dialog('solution 진행 중')
-def train(X_train, X_test, y_train, y_test, search_x, search_y):
+def train(X, y, search_x, search_y):
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    st.session_state.X_train = X_train
+    st.session_state.X_test = X_test
+
     with st.spinner('분석 및 최적화 진행 중입니다..(약 10분 소요 예정)'):
         train_score,test_score,train_time,model=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
-        elapsed_time, optimal_solutions_df = single_search(X_train, y_train, model, search_x,search_y)
-        
+
+        # 50개의 데이터로 예시를 들어 준다.
+        elapsed_time, optimal_solutions_df = search(X.head(50), y.head(50), model, search_x,search_y)
+
     st.session_state.train_score=train_score
     st.session_state.test_score=test_score
     st.session_state.train_time=train_time
@@ -525,6 +533,10 @@ elif st.session_state.page=="solution":
 
     with col2:
         # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
+        st.write(search_x)
+        st.write(search_y)
+        st.write(list(search_y.keys())[0])
+
         if st.button("진행하기"):
             if option and option2 and option3:
 
@@ -555,9 +567,6 @@ elif st.session_state.page=="solution":
     
 
 
-
-
-
 # page - train
 
 elif st.session_state.page=="train":
@@ -565,13 +574,9 @@ elif st.session_state.page=="train":
     y=st.session_state.y
     search_x=st.session_state.search_x
     search_y=st.session_state.search_y
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    st.session_state.X_train = X_train
-    st.session_state.X_test = X_test
 
     # 모델 훈련 및 최적화시키기
-    train(X_train, X_test, y_train, y_test, search_x,search_y)
+    train(X, y, search_x,search_y)
 
     st.session_state.page='result'
     st.rerun()
@@ -585,7 +590,8 @@ else:
     train_score=st.session_state.train_score
     test_score=st.session_state.test_score
     train_time=st.session_state.train_time
-    
+    opt_time=st.session_state.opt_time
+
     st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
     st.divider()
@@ -594,7 +600,7 @@ else:
     with col1:
         st.subheader("모델 훈련 시간")
         st.write(f'훈련에 든 시간 {train_time:.1f}초')
-        st.write(f'최적화(search)에 든 시간 {train_time:.1f}초')
+        st.write(f'최적화(search)에 든 시간 {opt_time:.1f}초')
 
     with col2:
         st.subheader("모델 성능")
@@ -611,13 +617,15 @@ else:
     st.subheader("각 변수와 output간의 관계")
 
     # 모델이랑 data 불러오기
-    model=st.session_state.model
-    X_test=st.session_state.X_test
+    model = st.session_state.model
+    X_test = st.session_state.X_test
 
     # PDP 플롯 그리기
 
     # Streamlit UI 추가 (사용자가 Feature 선택)
-    tabs = st.tabs(X_test.columns.tolist())
+    search_x = st.session_state.search_x
+    search_y = st.session_state.search_y
+    tabs = st.tabs(list(search_x.keys()))
 
     for ind, tab in enumerate(tabs):
             
@@ -626,15 +634,15 @@ else:
             with st.columns([2,1])[0]:
                 # PDP 그래프 생성
                 fig, ax = plt.subplots(figsize=(9,3), dpi=100)
-                x_vals, y_vals, lower_bounds, upper_bounds = partial_dependence_with_confidence(model, X_test, X_test.columns.tolist()[ind])
+                x_vals, y_vals, lower_bounds, upper_bounds = partial_dependence_with_confidence(model, X_test, list(search_x.keys())[ind])
 
                 # PDP 평균값 라인
-                sns.lineplot(x=x_vals, y=y_vals, label=f"PDP - {X_test.columns.tolist()[ind]}", color="blue")
+                sns.lineplot(x=x_vals, y=y_vals, label=f"PDP - {list(search_x.keys())[ind]}", color="blue")
 
                 # 신뢰구간(Confidence Interval) 추가
                 ax.fill_between(x_vals, lower_bounds, upper_bounds, color="blue", alpha=0.2)
 
-                ax.set_xlabel(X_test.columns.tolist()[ind])
+                ax.set_xlabel(list(search_x.keys())[ind])
                 ax.set_ylabel("Predicted Price")
                 ax.legend()
                 # ✅ X축 숫자 제거
@@ -646,7 +654,45 @@ else:
 
     st.subheader("최적화 결과")
 
-    st.table(st.session_state.df2)
+    df2 = st.session_state.df2
+    X=st.session_state.X
+    y=st.session_state.y
+
+    # 최적화 된 y값 vs 기존 y 값 비교
+    chart_data = pd.DataFrame(pd.concat([df2[['y']], y.head(50)],axis=1),columns=['y',list(search_y.keys())[0]])
+    st.line_chart(chart_data)
+
+
+    for i in search_x.keys():
+        chart_data = pd.DataFrame(pd.concat([df2[[i]].add_prefix("df2_"), X[i].head(50)],axis=1),columns=[f"df2_{i}",i])
+        st.line_chart(chart_data)
+        
 
     st.divider()
+
+
+
+    # 피쳐 중요도
     st.subheader("Feature importance")
+    col1, col2 = st.columns([1,2])
+
+    with col1:
+        # ✅ Feature Importance 값 (JSON 형식의 딕셔너리)
+        feature_importance_dict = model.get_feature_importance()
+
+        # ✅ 딕셔너리를 DataFrame으로 변환
+        feature_importance_df = pd.DataFrame(list(feature_importance_dict.items()), columns=['Feature', 'Importance'])
+
+        # ✅ 중요도 값 기준으로 정렬 (내림차순)
+        feature_importance_df = feature_importance_df.sort_values(by="Importance", ascending=False)
+
+        st.table(feature_importance_df)
+
+
+    with col2:
+        # ✅ 파이 차트 그리기
+        fig, ax = plt.subplots(figsize=(5, 2))
+        ax.pie(feature_importance_df["Importance"], labels=feature_importance_df["Feature"], autopct='%1.1f%%', startangle=140)
+        ax.set_title("Feature Importance (Pie Chart)")
+
+        st.pyplot(fig)

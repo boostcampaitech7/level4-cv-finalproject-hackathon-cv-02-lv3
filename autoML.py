@@ -14,6 +14,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.base import clone
 from xgboost import XGBRegressor
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.inspection import permutation_importance
 
 import random
 from datetime import datetime
@@ -47,13 +48,12 @@ feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regressi
                       'VarianceThreshold': {'class': VarianceThreshold()},
                       'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
+
 models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
           'RandomForestRegressor': {'class': RandomForestRegressor,
                                     'params': {'n_estimators': 100}}, 
           'GradientBoostingRegressor': {'class': GradientBoostingRegressor,
                                         'params': {'n_estimators': 100, 'learning_rate': 0.1}},
-          'LogisticRegression': {'class': LogisticRegression,
-                                 'params': {'C': 1.0}},
           'KNeighborsRegressor': {'class': KNeighborsRegressor,
                                   'params': {'n_neighbors': 5}},
           'XGBRegressor': {'class': XGBRegressor,
@@ -415,6 +415,23 @@ class AutoML:
         """
         y_pred = self.best_structure['pipeline'].predict(X)
         return y_pred
+    
+
+    def get_feature_importance(self):
+        feature_names = self.X_trains[0].columns
+        model = self.best_structure['pipeline']['models']
+
+        try:
+            feature_importances = model.feature_importances_
+        except:
+            result = permutation_importance(model, self.X_valids[0], self.y_valids[0], n_repeats=10)
+            feature_importances = result.importances_mean 
+
+        importance_dict = {name: importance for name, importance in zip(feature_names, feature_importances)}
+        sorted_importances = dict(sorted(importance_dict.items(), key=lambda x: x[1], reverse=True))
+
+        return sorted_importances
+
 
     def report_structure(self, structure):
         arr = []
@@ -450,6 +467,11 @@ class AutoML:
             log.append(self.report_structure(structure))
         
         log = '\n' + '\n'.join(log)
+        self.log(log)
+
+    def report_best_structure(self):
+        self.log("Best structure")
+        log = self.report_structure(self.best_structure)
         self.log(log)
 
 
@@ -508,6 +530,7 @@ class AutoML:
             self.report()
 
             if (generation+1 == self.n_generation):
+                self.report_best_structure()
                 break
             
             del self.structures[self.n_parent:] # 점수가 낮은 형질 제거
