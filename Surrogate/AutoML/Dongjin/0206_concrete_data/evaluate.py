@@ -60,6 +60,7 @@ def evaluate_auto_scikit(X_train, y_train, X_test, y_test, target_time):
     scores = flat_dicts({'train': train_score, 'test': test_score})
     elapsed_time = end - start
     scores['elapsed_time'] = elapsed_time
+    print(f'Auto-scikitlearn init to training finished in: {elapsed_time:.1f} s')
     return scores
 
 
@@ -83,4 +84,5 @@ def evaluate_tpot(X_train, y_train, X_test, y_test, generations):
     scores = flat_dicts({'train': train_score, 'test': test_score})
     elapsed_time = end - start
     scores['elapsed_time'] = elapsed_time
+    print(f'TPOT init to training finished in: {elapsed_time:.1f} s')
     return scores

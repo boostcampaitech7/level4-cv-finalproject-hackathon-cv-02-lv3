@@ -26,8 +26,9 @@ if __name__ == "__main__":
         print(f"Invalid mode: {mode}")
         sys.exit()
 
+    # mode = 'autoML'
     rel_data_dir_path = 'data'
-    rel_save_path = 'result/result.csv'
+    rel_save_path = 'result/concrete.csv'
 
     py_dir_path = os.path.dirname(os.path.abspath(__file__))
     data_dir_path = os.path.join(py_dir_path, rel_data_dir_path)
@@ -38,10 +39,9 @@ if __name__ == "__main__":
     X_test = pd.read_csv(data_dir_path + '/X_test.csv')
     y_test = pd.read_csv(data_dir_path + '/y_test.csv')['strength']
 
-    func_dicts = {'autoML': {'func': evaluate_autoML, 'args': {'n_generation': 5}},
-                'auto-scikitlearn': {'func': evaluate_auto_scikit, 'args': {'target_time': 60}},
+    func_dicts = {'autoML': {'func': evaluate_autoML, 'args': {'n_generation': 6}},
+                'auto-scikitlearn': {'func': evaluate_auto_scikit, 'args': {'target_time': 80}},
                 'tpot': {'func': evaluate_tpot, 'args': {'generations': 3}}}
-
 
     func = func_dicts[mode]['func']
     args = func_dicts[mode]['args']
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     scores['args'] = args
 
     if os.path.exists(save_path):
-        df = pd.read_csv(save_path)
+        df = pd.read_csv(save_path, index_col='func')
     else:
         df = pd.DataFrame(columns=scores.keys())
         df.index.name = 'func'
