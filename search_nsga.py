@@ -90,16 +90,6 @@ if mode == 'all':
 if mode == 'row':
     start_time = time.time()  # ⏱️ 최적화 시작 시간 기록
 
-    controllable = {
-    "price" : {"목표" : "최대화하기", "범위 설정" : [1, 4], "순위" : 1},
-    "buildingarea" : {"목표" : "최소화하기", "범위 설정" : [1, 4], "순위" : 2}
-    } 
-
-    weights = [1 / list(controllable.items())[p][1]['순위'] for p in range(len(controllable))]
-    total_weights = sum(weights)
-
-    normalized_weights = [w/total_weights for w in weights]
-
     def optimize_row(index, row):
         initial_lattitude = row["Lattitude"]
         initial_longtitude = row["Longtitude"]
@@ -109,19 +99,17 @@ if mode == 'row':
         idx_loc = y_train.index.get_loc(index)
         initial_price = y_train.iloc[idx_loc]  # 에러 해결
 
-        # 1 1/2 1/2 -> 2/4 1/4 1/4
-
-        def objective_function(controllable, normalized_weights):
+        def objective_function(Lattitude, Longtitude, BuildingArea):
             X_simulation = row.copy()  # 현재 행을 복사하여 사용
-            for i in range(len(list(controllable))):
-                temp = "'"+str(list(controllable)[i])+"'"
-                X_simulation[temp] = list(controllable)[i]
+            X_simulation["Lattitude"] = Lattitude
+            X_simulation["Longtitude"] = Longtitude
+            X_simulation["BuildingArea"] = BuildingArea
             
             # 데이터를 모델에 맞는 포맷으로 변환
             input_df = pd.DataFrame([X_simulation])
             prediction = loaded_model.predict(input_df)[0]  # 1개의 값 예측
-            # 0 ~ 5백만, 0 ~ 2000
-            return [a*b for a,b in zip(controllable, normalized_weights)][0] # = target 최적화된 가격 반환
+            
+            return prediction  # 최적화된 가격 반환
 
         # Bayesian Optimization 실행
         optimizer = BayesianOptimization(
