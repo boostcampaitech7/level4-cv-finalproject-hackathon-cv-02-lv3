@@ -6,8 +6,11 @@ import time
 from sklearn.model_selection import train_test_split
 from aisolution import aisolution
 from sklearn.inspection import PartialDependenceDisplay
-from regplot import partial_dependence_with_confidence
+from regplot import partial_dependence_with_error
 from search import search
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
 
 
 @st.dialog("진행 불가")
@@ -88,33 +91,95 @@ def remove_na(df, option, method):
     else:
         return df
 
+# # 페이지 레이아웃 설정
+# st.set_page_config(layout="wide", page_title="AI solution", page_icon="📊")
+
+# # 상태를 저장할 page 초기화
+# if "page" not in st.session_state:
+#     st.session_state.page = False
+#     st.session_state.uploaded_file = None
+#     st.session_state.df = None  # 데이터프레임을 저장할 새로운 상태 변수
+
+
+# # 로그인 창처럼 구현된 파일 업로드 화면
+# if not st.session_state.page:
+#     st.title("Prescript AI solution")
+#     st.write("분석하고 싶은 CSV 파일을 제출하세요.")
+    
+#     # 파일 업로드 위젯
+#     uploaded_file = st.file_uploader("",type="csv")
+
+#     # 파일 업로드 후 로그인 상태로 전환
+#     if uploaded_file is not None:
+#         st.session_state.uploaded_file = uploaded_file
+#         st.session_state.page = "analysis"
+#         # 데이터프레임을 세션 상태에 저장
+#         st.session_state.df = pd.read_csv(uploaded_file)
+#         st.success("파일 업로드 성공! 분석 화면으로 이동합니다.")
+#         st.rerun()  # 화면 갱신
+
 # 페이지 레이아웃 설정
-st.set_page_config(layout="wide", page_title="AI solution", page_icon="📊")
+st.set_page_config(layout="wide", page_title="AI Solution", page_icon="📊")
 
 # 상태를 저장할 page 초기화
 if "page" not in st.session_state:
     st.session_state.page = False
-    st.session_state.uploaded_file = None
-    st.session_state.df = None  # 데이터프레임을 저장할 새로운 상태 변수
-
+    st.session_state.uploaded_files = None
+    st.session_state.df = None  # 데이터프레임을 저장할 상태 변수
 
 # 로그인 창처럼 구현된 파일 업로드 화면
 if not st.session_state.page:
-    st.title("Prescript AI solution")
+    st.title("Prescript AI Solution")
     st.write("분석하고 싶은 CSV 파일을 제출하세요.")
-    
-    # 파일 업로드 위젯
-    uploaded_file = st.file_uploader("",type="csv")
 
-    # 파일 업로드 후 로그인 상태로 전환
-    if uploaded_file is not None:
-        st.session_state.uploaded_file = uploaded_file
+    # ✅ 여러 개의 파일 업로드 가능
+    uploaded_files = st.file_uploader("CSV 파일을 업로드하세요", type="csv", accept_multiple_files=True)
+
+    # ✅ 파일이 여러 개 업로드되었을 경우
+    if uploaded_files and len(uploaded_files) > 1:
+        merge_option = st.radio("파일을 합치는 방법을 선택하세요:", ("행으로 합치기", "열로 합치기"))
+
+        if st.button("파일 병합 및 분석 시작"):
+            try:
+                dfs = [pd.read_csv(file) for file in uploaded_files]  # 모든 CSV 읽기
+                
+                if merge_option == "행으로 합치기":
+                    # ✅ 모든 데이터프레임의 열 개수 및 열 이름이 동일한지 확인
+                    columns_set = {tuple(df.columns) for df in dfs}
+                    if len(columns_set) > 1:
+                        st.error("오류: 모든 CSV 파일의 열 개수가 같아야 합니다. 다시 업로드해주세요.")
+                        st.stop()
+
+                    # ✅ 행으로 합치기
+                    merged_df = pd.concat(dfs, axis=0, ignore_index=True)
+
+                else:  # "열으로 합치기"
+                    # ✅ 모든 데이터프레임의 행 개수가 동일한지 확인
+                    row_counts = {df.shape[0] for df in dfs}
+                    if len(row_counts) > 1:
+                        st.error("오류: 모든 CSV 파일의 행 개수가 같아야 합니다. 다시 업로드해주세요.")
+                        st.stop()
+
+                    # ✅ 열으로 합치기
+                    merged_df = pd.concat(dfs, axis=1)
+
+                # ✅ 병합된 데이터프레임 저장 후 분석 화면으로 이동
+                st.session_state.uploaded_files = uploaded_files
+                st.session_state.df = merged_df
+                st.session_state.page = "analysis"
+                st.success("파일 병합 완료! 분석 화면으로 이동합니다.")
+                st.rerun()
+
+            except Exception as e:
+                st.error(f"파일 병합 중 오류 발생: {e}")
+
+    # ✅ 단일 파일 업로드 시 기존 방식 유지
+    elif uploaded_files and len(uploaded_files) == 1:
+        st.session_state.uploaded_files = uploaded_files
+        st.session_state.df = pd.read_csv(uploaded_files[0])
         st.session_state.page = "analysis"
-        # 데이터프레임을 세션 상태에 저장
-        st.session_state.df = pd.read_csv(uploaded_file)
         st.success("파일 업로드 성공! 분석 화면으로 이동합니다.")
-        st.rerun()  # 화면 갱신
-
+        st.rerun()
 
 
 
@@ -170,32 +235,45 @@ elif st.session_state.page=="analysis":
             # 데이터 시각화
             st.write("### Visualization")
 
-            # 레이아웃 나누기
-            col_1, col_2 = st.columns([1, 1], border=True)  # 왼쪽 1: 오른쪽 1 비율 설정
-            # pie chart
-            with col_1:
-                st.write('missing value')
-                sns.set_style("whitegrid")  # Seaborn 스타일 설정
+            # 레이아웃 나누기 (비율 유지)
+            col_1, col_2 = st.columns(2)  
 
-                fig, ax = plt.subplots(figsize=(8, 4))
-                ax.pie(
-                    [missing_ratio, non_missing_ratio],
-                    labels=['missing', 'non_missing'],
-                    colors=['#FF0000', '#66b3ff'],
-                    autopct='%1.1f%%',
-                    startangle=90,
-                    wedgeprops={'edgecolor': 'black'}
+            # ✅ Pie Chart (Missing Values)
+            with col_1:
+                st.write('Missing Value Distribution')
+
+                missing_ratio = df[column].isna().sum()
+                non_missing_ratio = df[column].notna().sum()
+
+                pie_df = pd.DataFrame({
+                    'Category': ['Missing', 'Non-Missing'],
+                    'Count': [missing_ratio, non_missing_ratio]
+                })
+
+                fig_pie = px.pie(
+                    pie_df,
+                    names='Category',
+                    values='Count',
+                    color='Category',
+                    color_discrete_map={'Missing': '#FF0000', 'Non-Missing': '#66b3ff'},
+                    title="Missing Values"
                 )
-                plt.legend()
-                ax.axis('equal')  # 원형 유지
-                st.pyplot(fig)
-            
-            # histogram
+                
+                st.plotly_chart(fig_pie, use_container_width=True)
+
+            # ✅ Histogram
             with col_2:
-                st.write("Histogram")
-                fig, ax = plt.subplots(figsize=(8, 4))
-                sns.histplot(df[column].dropna(), bins=20, color="blue", ax=ax)
-                st.pyplot(fig)
+                st.write("Histogram of Selected Column")
+
+                fig_hist = px.histogram(
+                    df, 
+                    x=column, 
+                    nbins=20, 
+                    title=f"Histogram of {column}",
+                    color_discrete_sequence=["blue"]
+                )
+                
+                st.plotly_chart(fig_hist, use_container_width=True)
                 
         
         # bool 형일때
@@ -288,20 +366,25 @@ elif st.session_state.page=="analysis":
                     st.dataframe(result_df)
 
             with col_22:
-                #  결측치 비율 파이 차트
+                # 📌 결측치 데이터 준비
+                missing_data = pd.DataFrame({
+                    "Category": ["Missing", "Non-Missing"],
+                    "Ratio": [missing_ratio, non_missing_ratio]
+                })
                 st.write("### Missing Value Visualization")
-                fig, ax = plt.subplots(figsize=(4, 2))
-                ax.pie(
-                    [missing_ratio, non_missing_ratio],
-                    colors=['#FF0000', '#66b3ff'],
-                    startangle=90,
-                    wedgeprops={'edgecolor': 'black'}
+                # 📌 Plotly Pie Chart 생성
+                fig = px.pie(
+                    missing_data,
+                    names="Category",
+                    values="Ratio",
+                    #title="Missing Value Visualization",
+                    color="Category",
+                    color_discrete_map={"Missing": "#FF0000", "Non-Missing": "#66b3ff"},  # 기존 색상 유지
+                    hole=0.3  # 도넛 차트 스타일 (완전 원형이면 제거 가능)
                 )
-                ax.legend(labels=['missing', 'non_missing'],loc='lower right',fontsize=6)
 
-                ax.axis('equal')  # 원형 비율 유지
-                plt.tight_layout()  # 여백 최소화
-                st.pyplot(fig,bbox_inches="tight", use_container_width=False)
+                # 📌 Streamlit에 출력
+                st.plotly_chart(fig, use_container_width=True)
 
 
         
@@ -594,13 +677,15 @@ else:
 
     st.success("Done!")
     st.title("🖥️ AI 솔루션 결과")
+    st.write("빠른 결과를 보기 위해 최적화는 50개의 데이터만을 진행하였습니다!")
+    st.write("좋은 결과라고 생각이 든다면 완성하기를 눌러주세요!")
     st.divider()
 
     col1, col2 = st.columns([2,3], border= True)
     with col1:
         st.subheader("모델 훈련 시간")
-        st.write(f'훈련에 든 시간 {train_time:.1f}초')
-        st.write(f'최적화(search)에 든 시간 {opt_time:.1f}초')
+        st.metric('훈련에 든 시간', f'{train_time:.1f}초')
+        st.metric('최적화(search)에 든 시간', f'{opt_time:.1f}초')
 
     with col2:
         st.subheader("모델 성능")
@@ -627,46 +712,131 @@ else:
     search_y = st.session_state.search_y
     tabs = st.tabs(list(search_x.keys()))
 
+
     for ind, tab in enumerate(tabs):
-            
         with tab:
+            col1, col2 = st.columns([2,1])
+            with col1:
+                # PDP 값 및 오차 계산
+                x_vals, y_vals, error = partial_dependence_with_error(model, X_test, list(search_x.keys())[ind])
 
-            with st.columns([2,1])[0]:
-                # PDP 그래프 생성
-                fig, ax = plt.subplots(figsize=(9,3), dpi=100)
-                x_vals, y_vals, lower_bounds, upper_bounds = partial_dependence_with_confidence(model, X_test, list(search_x.keys())[ind])
+                # 리스트를 NumPy 배열로 변환
+                y_vals = np.array(y_vals)
+                errors = np.array(error)
 
-                # PDP 평균값 라인
-                sns.lineplot(x=x_vals, y=y_vals, label=f"PDP - {list(search_x.keys())[ind]}", color="blue")
+                # Plotly Figure 생성
+                fig = go.Figure()
 
-                # 신뢰구간(Confidence Interval) 추가
-                ax.fill_between(x_vals, lower_bounds, upper_bounds, color="blue", alpha=0.2)
+                # ✅ 오차 범위 (± error) 추가 (투명한 fill 영역)
+                fig.add_trace(go.Scatter(
+                    x=x_vals, 
+                    y=y_vals + errors, 
+                    mode='lines', 
+                    line=dict(color='rgba(255, 255, 255, 0)'),  # ✅ 완전히 투명하게
+                    name="Upper Bound"
+                ))
 
-                ax.set_xlabel(list(search_x.keys())[ind])
-                ax.set_ylabel("Predicted Price")
-                ax.legend()
-                # ✅ X축 숫자 제거
-                ax.set_xticklabels([])
-                
-                st.pyplot(fig)
+                fig.add_trace(go.Scatter(
+                    x=x_vals, 
+                    y=y_vals - errors, 
+                    mode='lines', 
+                    fill='tonexty',  # 아래 영역을 채우는 옵션
+                    line=dict(color='rgba(255, 255, 255, 0)'),  # ✅ 완전히 투명하게
+                    fillcolor='rgba(255, 165, 0, 0.5)',  # ✅ 오렌지색 + 투명도 50%
+                    name="Lower Bound"
+                ))
+
+                # ✅ PDP 평균값 라인 추가
+                fig.add_trace(go.Scatter(
+                    x=x_vals, 
+                    y=y_vals, 
+                    mode='lines', 
+                    line=dict(color='yellow', width=2),  # ✅ PDP 라인 색상 밝게 변경 (노란색)
+                    name=f"PDP - {list(search_x.keys())[ind]}"
+                ))
+
+                # ✅ 레이아웃 설정
+                fig.update_layout(
+                    title=f"PDP - {list(search_x.keys())[ind]}",
+                    xaxis_title=list(search_x.keys())[ind],
+                    yaxis_title="Predicted Price",
+                    template="plotly_white"
+                )
+
+                # ✅ Plotly 차트 출력
+                st.plotly_chart(fig)
+
+            with col2:
+                st.write("🧐 PDP (Partial Dependence Plot)란?")
+                st.write("PDP(부분 의존도 플롯, Partial Dependence Plot)은")
+                st.write("머신러닝 모델에서 특정 변수(Feature)가 모델의 예측값에 어떻게 영향을 미치는지를 시각적으로 보여주는 그래프")
+
+
 
     st.divider()
 
     st.subheader("최적화 결과")
 
     df2 = st.session_state.df2
-    X=st.session_state.X
-    y=st.session_state.y
+    X = st.session_state.X
+    y = st.session_state.y
 
-    # 최적화 된 y값 vs 기존 y 값 비교
-    chart_data = pd.DataFrame(pd.concat([df2[['y']], y.head(50)],axis=1),columns=['y',list(search_y.keys())[0]])
-    st.line_chart(chart_data)
+    # ✅ Y축 마진 설정 (10% 여유)
+    def add_margin(y_min, y_max, margin_ratio=0.1):
+        margin = (y_max - y_min) * margin_ratio
+        return y_min - margin, y_max + margin
 
+    # 📌 최적화 된 y값 vs 기존 y 값 비교
+    original_col = list(search_y.keys())[0]
+    solution_col = f"solution_{original_col}"
 
+    chart_data = pd.DataFrame(
+        pd.concat([df2[['y']].rename(columns={'y': solution_col}), y.head(50)], axis=1), 
+        columns=[solution_col, original_col]
+    )
+
+    # ✅ 평균 차이 및 변화율(%) 계산
+    original_mean = chart_data[original_col].mean()
+    optimized_mean = chart_data[solution_col].mean()
+    mean_difference = optimized_mean - original_mean
+    percentage_change = (mean_difference / abs(original_mean)) * 100  # ✅ 변화율 계산
+
+    # ✅ Y축 범위 계산 + 마진 추가
+    y_min, y_max = add_margin(chart_data.min().min(), chart_data.max().max())
+
+    fig = px.line(chart_data, labels={'index': 'Index', 'value': original_col}, title=f"Optimized vs Original {original_col}")
+    fig.update_yaxes(range=[y_min, y_max])  # Y축 범위에 여유 추가
+
+    st.plotly_chart(fig)
+
+    # ✅ 변화율 출력
+    st.write(f"**{original_col}의 변화율:** {percentage_change:.2f}%")
+
+    # 📌 X 값에 대해 반복
     for i in search_x.keys():
-        chart_data = pd.DataFrame(pd.concat([df2[[i]].add_prefix("df2_"), X[i].head(50)],axis=1),columns=[f"df2_{i}",i])
-        st.line_chart(chart_data)
+        solution_col = f"solution_{i}"
         
+        chart_data = pd.DataFrame(
+            pd.concat([df2[[i]].rename(columns={i: solution_col}), X[i].head(50)], axis=1),
+            columns=[solution_col, i]
+        )
+
+        # ✅ 평균 차이 및 변화율(%) 계산
+        original_mean = chart_data[i].mean()
+        optimized_mean = chart_data[solution_col].mean()
+        mean_difference = optimized_mean - original_mean
+        percentage_change = (mean_difference / abs(original_mean)) * 100  # ✅ 변화율 계산
+
+        # ✅ Y축 범위 계산 + 마진 추가
+        y_min, y_max = add_margin(chart_data.min().min(), chart_data.max().max())
+
+        fig = px.line(chart_data, labels={'index': 'Index', 'value': i}, title=f"Optimized vs Original {i}")
+        fig.update_yaxes(range=[y_min, y_max])  # Y축 범위에 여유 추가
+
+        st.plotly_chart(fig)
+
+        # ✅ 변화율 출력
+        st.write(f"**{i}의 변화율:** {percentage_change:.2f}%")
 
     st.divider()
 
@@ -690,9 +860,15 @@ else:
 
 
     with col2:
-        # ✅ 파이 차트 그리기
-        fig, ax = plt.subplots(figsize=(5, 2))
-        ax.pie(feature_importance_df["Importance"], labels=feature_importance_df["Feature"], autopct='%1.1f%%', startangle=140)
-        ax.set_title("Feature Importance (Pie Chart)")
 
-        st.pyplot(fig)
+        # ✅ Plotly Pie Chart 그리기
+        fig1 = px.pie(
+            feature_importance_df,  # DataFrame 전체를 전달
+            names="Feature",        # Label로 사용할 컬럼
+            values="Importance",    # 값으로 사용할 컬럼
+            #title="Feature Importance (Pie Chart)",  # 제목 추가
+            hole=0.3  # 도넛 차트 스타일 (원형이면 제거 가능)
+        )
+
+        # ✅ Streamlit에 Plotly 차트 출력
+        st.plotly_chart(fig1)
