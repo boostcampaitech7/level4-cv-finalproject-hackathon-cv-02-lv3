@@ -1,6 +1,7 @@
 from evaluate import evaluate_autoML, evaluate_auto_scikit, evaluate_tpot
 import pandas as pd
 import os
+import sys
 
 def rename_index_if_exists(df, index):
     if not index in df.index:
@@ -16,7 +17,15 @@ def rename_index_if_exists(df, index):
     
 
 if __name__ == "__main__":
-    mode = 'autoML'
+    if len(sys.argv) != 2:
+        print("Insufficient arguments")
+        sys.exit()
+
+    mode = sys.argv[1]
+    if mode not in ['autoML', 'auto-scikitlearn', 'tpot']:
+        print(f"Invalid mode: {mode}")
+        sys.exit()
+
     rel_data_dir_path = 'data'
     rel_save_path = 'result/result.csv'
 
