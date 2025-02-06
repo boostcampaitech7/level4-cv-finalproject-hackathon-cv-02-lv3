@@ -1,0 +1,5 @@
+[2025-02-06 02:05:55] TPOT - start
+[2025-02-06 02:05:55] generation: 4, seed: 3, n_jobs: -1
+[2025-02-06 02:08:48] Autosklearn.regression init to training finished in: 172.5 s
+[2025-02-06 02:08:48] train - R2: 0.8640, MAE: 139429.3089, RMSE: 248124.4850
+[2025-02-06 02:08:48] test - R2: 0.7574, MAE: 199369.8872, RMSE: 333718.0278
