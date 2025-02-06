@@ -44,7 +44,7 @@ def run_TPOT(X_train, y_train, X_test, y_test, generations, seed, n_jobs):
 
 if __name__ == "__main__":
     save_name = 'TPOT'
-    generations = list(range(1, 21, 1))
+    generations = list(range(1, 11, 1))
     seeds = [1, 2, 3]
     n_jobs = -1
     data_path = '/data/ephemeral/home/Dongjin/data/melbourne/melb_split.csv'

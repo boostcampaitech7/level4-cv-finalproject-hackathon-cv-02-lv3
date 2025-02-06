@@ -45,8 +45,9 @@ if __name__ == "__main__":
     save_name = 'autoML_njobs'
     generation = 5
     seeds = [1, 2, 3]
-    n_jobs = list(range(1, 11, 1))
+    n_jobs = list(range(2, 11, 2))
     n_jobs.append(-1)
+    n_jobs.append(1)
     data_path = '/data/ephemeral/home/Dongjin/data/melbourne/melb_split.csv'
 
 

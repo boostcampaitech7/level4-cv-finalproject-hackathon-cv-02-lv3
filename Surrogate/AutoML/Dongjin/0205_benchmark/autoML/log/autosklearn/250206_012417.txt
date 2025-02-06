@@ -1,0 +1,15 @@
+[2025-02-06 01:24:17] autosklearn - start
+[2025-02-06 01:24:17] target_time: 600, seed: 2, n_jobs: -1
+[2025-02-06 01:34:38]           rank  ensemble_weight                 type      cost   duration
+model_id                                                                 
+65           1             0.20    gradient_boosting  0.222095   3.307314
+192          2             0.02    gradient_boosting  0.223112   3.154733
+55           3             0.16    gradient_boosting  0.225706   2.002691
+25           4             0.24        random_forest  0.229224  10.466319
+19           5             0.08          extra_trees  0.237487   5.920408
+166          6             0.14                  mlp  0.253877   7.705795
+133          7             0.12  k_nearest_neighbors  0.276162   0.766707
+44           8             0.04  k_nearest_neighbors  0.331933   4.028079
+[2025-02-06 01:34:38] Autosklearn.regression init to training finished in: 614.5 s
+[2025-02-06 01:34:38] train - R2: 0.8569, MAE: 147203.1384, RMSE: 254535.9727
+[2025-02-06 01:34:38] test - R2: 0.7824, MAE: 190583.7312, RMSE: 316077.4235
