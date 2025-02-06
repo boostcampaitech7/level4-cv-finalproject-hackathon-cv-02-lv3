@@ -3,11 +3,14 @@ from autoML import AutoML
 import os
 from utils import evaluate_regression, data_preparation
 import time
+import cloudpickle
+from joblib import dump
+
 
 
 def main(n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1, use_kfold=True, kfold=5, timeout=30, seed=42):
     py_dir_path = os.path.dirname(os.path.abspath(__file__)) # 현재 파이썬 스크립트 디렉토리
-    data_path = os.path.join(py_dir_path, 'data/employee_attrition_dataset.csv') 
+    data_path = os.path.join(py_dir_path, 'data/employee_attrition_dataset_encoding.csv') 
     X_train, y_train, X_test, y_test = data_preparation(data_path) # 데이터 준비
 
     start = time.time()
@@ -31,12 +34,17 @@ def main(n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2, 0.5],
 
     elapsed_time = end-start
     autoML.log(f'AutoML init to training finished in: {elapsed_time:.1f} s')
+    
+    py_dir_path = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(py_dir_path, "autoML_filtered.pkl"), "wb") as file:
+        cloudpickle.dump(autoML, file)
+    # dump(autoML, os.path.join(py_dir_path, "autoML.joblib"))
+    print(f"Model saved in '{os.path.join(py_dir_path, 'autoML_filtered.pkl')}'.")
 
 if __name__ == '__main__':
     main()
-    main(use_joblib=False)
-    main(use_kfold=False)
-    main(prob_mutations=[0.2, -1]) # hyperparameter mutation X
-
+    # main(use_joblib=False)
+    # main(use_kfold=False)
+    # main(prob_mutations=[0.2, -1]) # hyperparameter mutation X
 
 
