@@ -47,21 +47,22 @@ feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regressi
                       'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
 
-models = {
+models_regression = {
     'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
     'RandomForestRegressor': {'class': RandomForestRegressor,'params': {'n_estimators': 100}}, 
     'GradientBoostingRegressor': {'class': GradientBoostingRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1}},
+    'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0}},
     'KNeighborsRegressor': {'class': KNeighborsRegressor, 'params': {'n_neighbors': 5}},
-    'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}},
-    
-    # Classifier Models
+    'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
+
+models_classification = {
     'DecisionTreeClassifier': {'class': DecisionTreeClassifier()},  # 추가
     'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100, 'class_weight' : 'balanced'}},
     'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}},
     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0, 'class_weight' : 'balanced'}}}
+    
+    
 
-
-pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
 choose_random_key = lambda dictionary: random.choice(list(dictionary.keys()))
 
 
@@ -109,7 +110,7 @@ def build_pipeline(structure):
     return Pipeline(_pipeline)
 
 
-def get_random_structures(n):
+def get_random_structures(n, task_type):
     """
     n개의 임의의 structure 생성
 
@@ -123,9 +124,14 @@ def get_random_structures(n):
     random_structures = []
     
     for _ in range(n):
-        random_structure = deepcopy({'preprocessors': preprocessors,
+        if task_type == 'regression':
+            random_structure = deepcopy({'preprocessors': preprocessors,
                                      'feature_selections': feature_selections,
-                                     'models': models})
+                                     'models': models_regression})
+        else:
+            random_structure = deepcopy({'preprocessors': preprocessors,
+                                     'feature_selections': feature_selections,
+                                     'models': models_classification})
         
         for category, options in random_structure.items():
             class_name = choose_random_key(options)
@@ -160,7 +166,7 @@ def sort(structures, task_type):
         # 분류 문제에서는 'f1'를 기준으로 정렬
         return sorted(structures, key=lambda x: x['valid_metric']['f1'], reverse=True)
 
-def is_same_structure(structure1, structure2):
+def is_same_structure(structure1, structure2, pipeline_components):
     """
     structure1과 structure2가 동일한지 확인
 
@@ -178,7 +184,7 @@ def is_same_structure(structure1, structure2):
     return True
 
 
-def is_in_structures(structure, structures):
+def is_in_structures(structure, structures, pipeline_components):
     """
     structures 내 동일한 structure가 있는지 확인
 
@@ -190,12 +196,12 @@ def is_in_structures(structure, structures):
         Bool: 동일하면 True, 다르면 False 반환
     """
     for s in structures:
-        if is_same_structure(structure, s):
+        if is_same_structure(structure, s, pipeline_components):
             return True
     return False
 
 
-def crossover(structure1, structure2):
+def crossover(structure1, structure2, pipeline_components):
     """
     유전적 교차를 이용한 새로운 구조 생성
 
@@ -220,7 +226,7 @@ def crossover(structure1, structure2):
     return deepcopy(new_structure)
 
 
-def mutation(structure, prob_mutations, hyperparam_bound=[0.5, 2.0]):
+def mutation(pipeline_components, structure, prob_mutations, hyperparam_bound=[0.5, 2.0]):
     """
     돌연변이 구조 생성
 
@@ -304,6 +310,7 @@ class AutoML:
     """
     def __init__(self, task_type='regression', n_population=20, n_generation=50, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
         assert task_type in ['regression', 'classification'], "task_type은 'regression' 또는 'classification' 이어야 합니다."
+
         self.task_type = task_type  # task type 설정
         self.n_population = n_population
         self.n_generation = n_generation
@@ -312,6 +319,12 @@ class AutoML:
         self.use_joblib = use_joblib
         self.n_jobs = n_jobs
         self.n_child = n_population - n_parent
+        
+        if self.task_type == "classification":
+            self.pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models_classification}
+        else:
+            self.pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models_regression}
+        
 
         dicts = {'task_type' : task_type, 'n_population': n_population, 'n_generation': n_generation, 'n_parent': n_parent,
                  'prob_mutations': prob_mutations, 'use_joblib': use_joblib, 'n_jobs': n_jobs}
@@ -454,7 +467,7 @@ class AutoML:
 
     def report_structure(self, structure):
         arr = []
-        keys = list(pipeline_components.keys())
+        keys = list(self.pipeline_components.keys())
         
         for k in keys:
             class_info = structure[k]
@@ -554,7 +567,7 @@ class AutoML:
 
 
             
-        self.structures = get_random_structures(self.n_population) # 임의 구조 생성
+        self.structures = get_random_structures(self.n_population, self.task_type) # 임의 구조 생성
 
         for generation in range(self.n_generation):
             self.fit_structures(timeout) # 형질 별 피팅 및 점수 계산
@@ -583,10 +596,10 @@ class AutoML:
             while (n_success < self.n_child and n_try < max_n_try):
                 n_try += 1
                 structure1, structure2 = random.sample(self.structures, 2) # 임의로 형질 2개 고르기
-                new_structure = crossover(structure1, structure2) # 형질 교차
-                new_structure = mutation(new_structure, self.prob_mutations) # 형질 변형
+                new_structure = crossover(structure1, structure2, self.pipeline_components) # 형질 교차
+                new_structure = mutation(self.pipeline_components, new_structure, self.prob_mutations) # 형질 변형
 
-                if is_in_structures(new_structure, self.structures): # 이미 존재하는 형질이면 재생성
+                if is_in_structures(new_structure, self.structures, self.pipeline_components): # 이미 존재하는 형질이면 재생성
                     continue
 
                 new_structure['pipeline'] = build_pipeline(new_structure) # pipeline 생성

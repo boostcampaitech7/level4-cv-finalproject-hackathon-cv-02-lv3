@@ -1,0 +1,34 @@
+[2025-02-07 14:20:06] AutoML.__init__() - task_type: classification, n_population: 30, n_generation: 5, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-07 14:20:06] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 42, max_n_try: 1000, timeout: 30, task_type: classification
+[2025-02-07 14:20:10] 1 - best f1: 0.749
+[2025-02-07 14:20:10] 
+(StandardScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(RobustScaler) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(passthrough) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(StandardScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(RobustScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(passthrough) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(RobustScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7490, accuracy:0.7288
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.7416, accuracy:0.7228
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.7364, accuracy:0.7194
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.7328, accuracy:0.7135
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.7318, accuracy:0.7118
+(passthrough) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.7303, accuracy:0.7118
+(RobustScaler) - (SelectKBest) - (DecisionTreeClassifier) - f1:0.7285, accuracy:0.7049
+(passthrough) - (VarianceThreshold) - (DecisionTreeClassifier) - f1:0.7274, accuracy:0.7041
+(StandardScaler) - (SelectKBest) - (DecisionTreeClassifier) - f1:0.7273, accuracy:0.7032
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier) - f1:0.7259, accuracy:0.7024
+(passthrough) - (VarianceThreshold) - (DecisionTreeClassifier) - f1:0.7252, accuracy:0.7024
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier) - f1:0.7247, accuracy:0.7015
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier) - f1:0.7203, accuracy:0.6964
+(PolynomialFeatures) - (SelectKBest) - (DecisionTreeClassifier) - f1:0.7158, accuracy:0.6922
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.7053, accuracy:0.6650
+(RobustScaler) - (SelectPercentile) - (DecisionTreeClassifier) - f1:0.7053, accuracy:0.6650
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.7053, accuracy:0.6650
+(PolynomialFeatures) - (VarianceThreshold) - (DecisionTreeClassifier) - f1:0.7004, accuracy:0.6718
+(passthrough) - (SelectKBest) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.6978, accuracy:0.6565
+(RobustScaler) - (SelectKBest) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.6978, accuracy:0.6565
+(passthrough) - (passthrough) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.6978, accuracy:0.6565
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.6978, accuracy:0.6565
+(StandardScaler) - (SelectKBest) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.6970, accuracy:0.6556
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.6960, accuracy:0.6548
