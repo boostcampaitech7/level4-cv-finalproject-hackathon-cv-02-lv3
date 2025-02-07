@@ -8,6 +8,7 @@ from sklearn.metrics import (
     mean_squared_log_error,
     explained_variance_score
 )
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 def data_preparation(data_path, verbose=False):
@@ -32,10 +33,10 @@ def data_preparation(data_path, verbose=False):
     
     
     # 타겟 변수와 특성 분리
-    y_train = train_data['MonthlyIncome']
-    X_train = train_data.drop(['MonthlyIncome'], axis=1)
-    y_test = test_data['MonthlyIncome']
-    X_test = test_data.drop(['MonthlyIncome'], axis=1)
+    y_train = train_data['Attrition']
+    X_train = train_data.drop(['Attrition'], axis=1)
+    y_test = test_data['Attrition']
+    X_test = test_data.drop(['Attrition'], axis=1)
 
     if verbose:
         # 결과 확인
@@ -61,5 +62,21 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
     print(f"R2 Score: {dicts['R2']:.4f}")
     print(f"Mean Absolute Error (MAE): {dicts['MAE']:.4f}")
     print(f"Root Mean Squared Error (RMSE): {dicts['RMSE']:.4f}")
+
+    return dicts
+
+def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
+    dicts = {
+        'Accuracy': accuracy_score(y_true, y_pred),
+        'Precision': precision_score(y_true, y_pred, average='binary'),  # 이진 분류의 경우
+        'Recall': recall_score(y_true, y_pred, average='binary'),        # 이진 분류의 경우
+        'F1 Score': f1_score(y_true, y_pred, average='binary')           # 이진 분류의 경우
+    }
+
+    print(f"\nEvaluation for {dataset_name}:")
+    print(f"Accuracy: {dicts['Accuracy']:.4f}")
+    print(f"Precision: {dicts['Precision']:.4f}")
+    print(f"Recall: {dicts['Recall']:.4f}")
+    print(f"F1 Score: {dicts['F1 Score']:.4f}")
 
     return dicts

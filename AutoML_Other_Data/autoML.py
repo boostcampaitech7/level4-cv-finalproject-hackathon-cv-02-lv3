@@ -14,6 +14,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.base import clone
 from xgboost import XGBRegressor
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_score
 
 import random
 from datetime import datetime
@@ -47,17 +48,20 @@ feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regressi
                       'VarianceThreshold': {'class': VarianceThreshold()},
                       'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
-models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
-          'RandomForestRegressor': {'class': RandomForestRegressor,
-                                    'params': {'n_estimators': 100}}, 
-          'GradientBoostingRegressor': {'class': GradientBoostingRegressor,
-                                        'params': {'n_estimators': 100, 'learning_rate': 0.1}},
-          'LogisticRegression': {'class': LogisticRegression,
-                                 'params': {'C': 1.0}},
-          'KNeighborsRegressor': {'class': KNeighborsRegressor,
-                                  'params': {'n_neighbors': 5}},
-          'XGBRegressor': {'class': XGBRegressor,
-                           'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from xgboost import XGBRegressor, XGBClassifier
+
+models = {
+    'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
+    'DecisionTreeClassifier': {'class': DecisionTreeClassifier()},  # 추가
+    'RandomForestRegressor': {'class': RandomForestRegressor, 'params': {'n_estimators': 100}},
+    'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100}},  # 추가
+    'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1}},
+    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1}},  # 추가
+    'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0}}  # 추가 (회귀가 아니라 분류용)
+}
 
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
@@ -76,6 +80,17 @@ def evaluate_regression(y_true, y_pred):
     dicts = {'r2': r2, 'RMSE': RMSE}
     return dicts
 
+### classification
+def evaluate_classification(y_true, y_pred):
+    # y_pred가 확률 값일 경우, 클래스 레이블로 변환
+    if y_pred.ndim > 1:  # 다중 클래스일 경우, y_pred는 2D 배열로 확률 값을 반환
+        y_pred = y_pred.argmax(axis=1)  # 각 샘플에 대해 확률이 가장 높은 클래스 선택
+    elif y_pred.ndim == 1:  # 이진 분류일 경우
+        y_pred = (y_pred >= 0.5).astype(int)  # 확률 >= 0.5이면 1, 아니면 0
+    return {
+        'accuracy': accuracy_score(y_true, y_pred),
+        'f1': f1_score(y_true, y_pred, average='weighted')
+    }
 
 def build_pipeline(structure):
     """
@@ -133,7 +148,7 @@ def fit_pipeline(pipeline, X_train, y_train):
     pipeline.fit(X_train, y_train)    
 
 
-def sort(structures):
+def sort(structures, task_type):
     """
     structures를 평가지표를 기준으로 정렬
 
@@ -143,6 +158,12 @@ def sort(structures):
     Returns:
         structures (list): ['valid_metric']['r2']를 기준으로 정렬
     """
+    if task_type == 'regression':
+        # 회귀 문제에서는 'r2'를 기준으로 정렬
+        return sorted(structures, key=lambda x: x['valid_metric']['r2'], reverse=True)
+    elif task_type == 'classification':
+        # 분류 문제에서는 'accuracy'를 기준으로 정렬
+        return sorted(structures, key=lambda x: x['valid_metric']['accuracy'], reverse=True)
     return sorted(structures, key=lambda x: x['valid_metric']['r2'], reverse=True)
 
 
@@ -282,7 +303,9 @@ class AutoML:
     """
     유전 알고리즘을 이용한 ML pipeline 최적화 수행
     """
-    def __init__(self, n_population=20, n_generation=50, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
+    def __init__(self, task_type='regression', n_population=20, n_generation=50, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1):
+        assert task_type in ['regression', 'classification'], "task_type은 'regression' 또는 'classification' 이어야 합니다."
+        self.task_type = task_type  # task type 설정
         self.n_population = n_population
         self.n_generation = n_generation
         self.n_parent = n_parent
@@ -334,7 +357,9 @@ class AutoML:
         if 'valid_metric' in structure: # fitting 결과가 있으면 skip
             return structure
         
-        structure['valid_metric'] = {'r2': -100, 'r2_std': -100} # valid_metric 초기화
+        # valid_metric 초기화
+        structure['valid_metric'] = {'r2': -100, 'r2_std': -100} if self.task_type == 'regression' else {'accuracy': -100, 'f1': -100}
+
         signal.signal(signal.SIGALRM, timeout_handler)
         signal.alarm(timeout)  # timeout 초 후에 알람 발생
         pipeline = structure['pipeline']
@@ -351,8 +376,14 @@ class AutoML:
                 y_train_pred = pipeline_clone.predict(X_train)
                 y_valid_pred = pipeline_clone.predict(X_valid)
 
-                train_metric = evaluate_regression(y_train, y_train_pred)
-                valid_metric = evaluate_regression(y_valid, y_valid_pred)
+                if self.task_type == 'regression':
+                    train_metric = evaluate_regression(y_train, y_train_pred)
+                    valid_metric = evaluate_regression(y_valid, y_valid_pred)
+                    
+                else:
+                    train_metric = evaluate_classification(y_train, y_train_pred)
+                    valid_metric = evaluate_classification(y_valid, y_valid_pred)
+                    
                 train_metrics.append(train_metric)
                 valid_metrics.append(valid_metric)
 
@@ -367,10 +398,16 @@ class AutoML:
 
         finally:
             signal.alarm(0) # alarm 초기화
-
-        valid_r2 = structure['valid_metric']['r2']
-        valid_r2_std = structure['valid_metric']['r2_std']
-        print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
+            
+        if self.task_type == 'regression':
+            valid_r2 = structure['valid_metric']['r2']
+            valid_r2_std = structure['valid_metric']['r2_std']
+            print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
+        else:
+            valid_accuracy = structure['valid_metric']['accuracy']
+            valid_f1 = structure['valid_metric']['f1']
+            print(f"Structure-{order} - valid_accuracy: {valid_accuracy:.4f}") # 결과 출력
+            print(f"Structure-{order} - valid_f1: {valid_f1:.4f}") # 결과 출력
         return structure
 
     def log_dicts(self, dicts, message=""):
@@ -436,16 +473,21 @@ class AutoML:
             arr.append(s)
 
         if 'valid_metric' in structure:
-            r2 = structure['valid_metric']['r2']
-            r2_std = structure['valid_metric']['r2_std']
-            arr.append(f'{r2:.4f}±{r2_std:.4f}')
+            if self.task_type == 'regression':
+                r2 = structure['valid_metric']['r2']
+                r2_std = structure['valid_metric']['r2_std']
+                arr.append(f'{r2:.4f}±{r2_std:.4f}')
+            else:
+                accuracy = structure['valid_metric']['accuracy']
+                f1 = structure['valid_metric']['f1']
+                arr.append(f'{accuracy:.4f}±{f1:.4f}')
 
         s = ' - '.join(arr)
         return s
 
     def report(self):
         log = []
-        self.structures = sort(self.structures)
+        self.structures = sort(self.structures, self.task_type)
         for i, structure in enumerate(self.structures):
             log.append(self.report_structure(structure))
         
@@ -453,7 +495,7 @@ class AutoML:
         self.log(log)
 
 
-    def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
+    def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30, task_type='regression'):
         """
         유전 알고리즘을 이용한 최적 모델 탐색
 
@@ -467,6 +509,7 @@ class AutoML:
             max_n_try (int, optional): 최대 새 구조 생성 시도횟수. 기본값 1000.
             timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30.
         """
+        self.task_type = task_type  # 사용자가 지정 가능
         
         dicts = {'use_kfold': use_kfold, 'kfold': kfold, 'valid_size': valid_size,
                  'seed': seed, 'max_n_try': max_n_try, 'timeout': timeout}
@@ -499,9 +542,12 @@ class AutoML:
 
         for generation in range(self.n_generation):
             self.fit_structures(timeout) # 형질 별 피팅 및 점수 계산
-            self.structures = sort(self.structures) # 점수 높은 순으로 정렬
+            self.structures = sort(self.structures, self.task_type) # 점수 높은 순으로 정렬
             self.best_structure = self.structures[0]
-            self.best_score = self.best_structure['valid_metric']['r2']
+            if self.task_type == 'regression':
+                self.best_score = self.best_structure['valid_metric']['r2']
+            else:
+                self.best_score = self.best_structure['valid_metric']['accuracy']
             
             
             self.log(f"{generation+1} - best R2: {self.best_score:.3f}") # 최적값 기록
