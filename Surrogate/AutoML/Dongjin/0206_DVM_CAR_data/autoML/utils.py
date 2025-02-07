@@ -47,13 +47,20 @@ def data_preparation(data_path, verbose=False):
 
 
 
-def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
-    dicts = {'R2': r2_score(y_true, y_pred),
+def evaluate_regression(X, y_true, y_pred, dataset_name="Dataset"):
+    n = len(y_pred)
+    k = X.shape[1]
+    r2 = r2_score(y_true, y_pred)
+    adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - k - 1)
+
+    dicts = {'R2': r2,
+             'adjusted_R2': adjusted_r2,
              'MAE': mean_absolute_error(y_true, y_pred),
              'RMSE': math.sqrt(mean_squared_error(y_true, y_pred))}
 
     print(f"\nEvaluation for {dataset_name}:")
     print(f"R2 Score: {dicts['R2']:.4f}")
+    print(f"Adjusted R2 Score: {dicts['adjusted_R2']:.4f}")
     print(f"Mean Absolute Error (MAE): {dicts['MAE']:.4f}")
     print(f"Root Mean Squared Error (RMSE): {dicts['RMSE']:.4f}")
 

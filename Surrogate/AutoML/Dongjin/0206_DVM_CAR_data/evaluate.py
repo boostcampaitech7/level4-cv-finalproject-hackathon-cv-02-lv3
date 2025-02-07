@@ -22,8 +22,8 @@ def evaluate_autoML(X_train, y_train, X_test, y_test, n_generation):
     y_test_pred = autoML.predict(X_test)
     y_train_pred = autoML.predict(X_train)
 
-    train_score = evaluate_regression(y_train, y_train_pred, 'train') 
-    test_score = evaluate_regression(y_test, y_test_pred, 'test')
+    train_score = evaluate_regression(X_train, y_train, y_train_pred, 'train') 
+    test_score = evaluate_regression(X_test, y_test, y_test_pred, 'test')
     scores = flat_dicts({'train': train_score, 'test': test_score})
     elapsed_time = end - start
 
