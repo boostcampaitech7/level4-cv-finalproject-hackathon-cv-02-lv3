@@ -11,7 +11,7 @@ from utils import evaluate_regression, data_preparation
 
 
 def main():
-    data_path = os.path.join(py_dir_path, '../../data/melb_split.csv') 
+    data_path = os.path.join(py_dir_path, '../../data/employee_attrition_dataset_encoding.csv') 
     X_train, y_train, X_test, y_test = data_preparation(data_path) # 데이터 준비
 
     log = do_log()
@@ -26,6 +26,7 @@ def main():
     n_jobs=-1)
     automl.fit(X_train, y_train)
 
+    end = time.time()
     end = time.time()
 
     y_test_pred = automl.predict(X_test)

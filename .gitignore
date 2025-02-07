@@ -4,5 +4,5 @@
 *.parquet
 data_origin/
 *.zip
-data
+*.csv
 log/
