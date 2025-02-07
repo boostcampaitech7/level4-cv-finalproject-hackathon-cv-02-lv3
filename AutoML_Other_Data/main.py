@@ -36,14 +36,14 @@ def main(task_type='regression', n_population=30, n_generation=5, n_parent=5, pr
     autoML.log(f'AutoML init to training finished in: {elapsed_time:.1f} s')
     
     py_dir_path = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(py_dir_path, "autoML_attrition_classification.pkl"), "wb") as file:
+    with open(os.path.join(py_dir_path, "autoML_attrition_classification_SMOTE.pkl"), "wb") as file:
         cloudpickle.dump(autoML, file)
     # dump(autoML, os.path.join(py_dir_path, "autoML.joblib"))
-    print(f"Model saved in '{os.path.join(py_dir_path, 'autoML_attrition_classification.pkl')}'.")
+    print(f"Model saved in '{os.path.join(py_dir_path, 'autoML_attrition_classification_SMOTE.pkl')}'.")
 
 if __name__ == '__main__':
-    main()
-    # main(task_type='classification')
+    # main()
+    main(task_type='classification')
     # main(use_joblib=False)
     # main(use_kfold=False)
     # main(prob_mutations=[0.2, -1]) # hyperparameter mutation X

@@ -12,7 +12,15 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 
 def data_preparation(data_path, verbose=False):
-    drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "OverTime", "JobRole", "EducationField", "Department"]
+    # drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "OverTime", "JobRole", "EducationField", "Department"]
+    drop_tables = [
+    "BusinessTravel", "DailyRate", "Department", "DistanceFromHome", "Education", 
+    "EducationField", "EmployeeCount", "EmployeeNumber", "EnvironmentSatisfaction", 
+    "Gender", "HourlyRate", "JobInvolvement", "JobRole", "MaritalStatus", 
+    "MonthlyIncome", "MonthlyRate", "NumCompaniesWorked", "Over18", "OverTime", 
+    "PercentSalaryHike", "PerformanceRating", "RelationshipSatisfaction", 
+    "StandardHours", "StockOptionLevel", "TotalWorkingYears", "TrainingTimesLastYear", 
+    "YearsAtCompany", "YearsInCurrentRole", "YearsWithCurrManager"]
 
     # df 불러오기 및 column 제거
     df = pd.read_csv(data_path)
@@ -68,9 +76,9 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
     dicts = {
         'Accuracy': accuracy_score(y_true, y_pred),
-        'Precision': precision_score(y_true, y_pred, average='binary'),  # 이진 분류의 경우
-        'Recall': recall_score(y_true, y_pred, average='binary'),        # 이진 분류의 경우
-        'F1 Score': f1_score(y_true, y_pred, average='binary')           # 이진 분류의 경우
+        'Precision': precision_score(y_true, y_pred, average='weighted'),  # 이진 분류의 경우
+        'Recall': recall_score(y_true, y_pred, average='weighted'),        # 이진 분류의 경우
+        'F1 Score': f1_score(y_true, y_pred, average='weighted')           # 이진 분류의 경우
     }
 
     print(f"\nEvaluation for {dataset_name}:")

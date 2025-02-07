@@ -1,0 +1,165 @@
+[2025-02-07 10:20:57] AutoML.__init__() - n_population: 30, n_generation: 5, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-07 10:20:57] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 42, max_n_try: 1000, timeout: 30
+[2025-02-07 10:21:01] 1 - best f1: 0.760
+[2025-02-07 10:21:01] 
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(passthrough) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8342±0.7595
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8342±0.7595
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8342±0.7682
+(RobustScaler) - (SelectPercentile) - (DecisionTreeClassifier) - 0.8342±0.7655
+(PolynomialFeatures) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8333±0.7607
+(StandardScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8257±0.7905
+(RobustScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8257±0.7905
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8206±0.7730
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8121±0.7795
+(PolynomialFeatures) - (SelectPercentile) - (DecisionTreeClassifier) - 0.8036±0.7618
+(RobustScaler) - (SelectKBest) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8036±0.7790
+(StandardScaler) - (passthrough) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8036±0.7790
+(PolynomialFeatures) - (VarianceThreshold) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8010±0.7780
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8002±0.7646
+(PolynomialFeatures) - (SelectKBest) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8002±0.7793
+(RobustScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100) - 0.7993±0.7765
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - 0.7968±0.7796
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100) - 0.7951±0.7694
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - 0.7874±0.7682
+(passthrough) - (SelectKBest) - (RandomForestRegressor: n_estimators: 100) - 0.7840±0.7660
+(PolynomialFeatures) - (SelectKBest) - (DecisionTreeClassifier) - 0.7619±0.7546
+(RobustScaler) - (passthrough) - (DecisionTreeClassifier) - 0.7432±0.7450
+(StandardScaler) - (SelectKBest) - (DecisionTreeClassifier) - 0.7398±0.7423
+(RobustScaler) - (SelectKBest) - (DecisionTreeRegressor) - 0.7296±0.7411
+(PolynomialFeatures) - (SelectKBest) - (DecisionTreeRegressor) - 0.7271±0.7388
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.7254±0.7362
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.7254±0.7384
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.7236±0.7357
+[2025-02-07 10:21:04] 2 - best f1: 0.760
+[2025-02-07 10:21:04] 
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 0.8771) - 0.8350±0.7600
+(passthrough) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8342±0.7595
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8342±0.7595
+(passthrough) - (passthrough) - (LogisticRegression: C: 0.8771) - 0.8342±0.7595
+(passthrough) - (SelectKBest) - (LogisticRegression: C: 1.6761) - 0.8342±0.7595
+(StandardScaler) - (passthrough) - (LogisticRegression: C: 0.8774) - 0.8342±0.7595
+(passthrough) - (passthrough) - (LogisticRegression: C: 0.8774) - 0.8342±0.7595
+(passthrough) - (passthrough) - (LogisticRegression: C: 0.8774) - 0.8342±0.7595
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8342±0.7682
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8342±0.7694
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000) - 0.8342±0.7682
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100) - 0.8333±0.7650
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1508) - 0.8333±0.7691
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 58) - 0.8325±0.7673
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 50) - 0.8316±0.7715
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8316±0.7677
+(StandardScaler) - (SelectKBest) - (XGBRegressor: n_estimators: 77, learning_rate: 0.1000) - 0.8095±0.7799
+(StandardScaler) - (SelectKBest) - (XGBRegressor: n_estimators: 92, learning_rate: 0.1014) - 0.8070±0.7803
+(PolynomialFeatures) - (SelectPercentile) - (DecisionTreeClassifier) - 0.8036±0.7618
+(passthrough) - (SelectKBest) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8036±0.7790
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 29) - 0.8010±0.7629
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 28) - 0.7976±0.7600
+(passthrough) - (passthrough) - (RandomForestClassifier: n_estimators: 100) - 0.7976±0.7715
+(passthrough) - (passthrough) - (RandomForestClassifier: n_estimators: 179) - 0.7968±0.7712
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.7288±0.7391
+[2025-02-07 10:21:05] 3 - best f1: 0.760
+[2025-02-07 10:21:05] 
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.5049) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0068) - 0.8350±0.7600
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 2.8417) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0068) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0068) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0068) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0068) - 0.8350±0.7600
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 1.7612) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0923) - 0.8350±0.7600
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 1.9279) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 3.6865) - 0.8350±0.7600
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.5049) - 0.8342±0.7595
+(RobustScaler) - (SelectKBest) - (LogisticRegression: C: 2.8417) - 0.8342±0.7595
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.6222) - 0.8342±0.7595
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8342±0.7595
+(passthrough) - (VarianceThreshold) - (LogisticRegression: C: 0.9970) - 0.8342±0.7595
+(RobustScaler) - (SelectKBest) - (LogisticRegression: C: 1.2185) - 0.8342±0.7595
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 139) - 0.7840±0.7690
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier) - 0.7440±0.7451
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier) - 0.7398±0.7437
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier) - 0.7381±0.7400
+[2025-02-07 10:21:06] 4 - best f1: 0.760
+[2025-02-07 10:21:06] 
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.2313) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 0.7862) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6508) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 0.4537) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.4537) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.7060) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0587) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.3168) - 0.8350±0.7600
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 1.3168) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0719) - 0.8350±0.7600
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 0.4537) - 0.8350±0.7600
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 0.7021) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.7328) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (XGBRegressor: n_estimators: 172, learning_rate: 0.1000) - 0.8350±0.7688
+(passthrough) - (SelectPercentile) - (XGBRegressor: n_estimators: 310, learning_rate: 0.0581) - 0.8350±0.7688
+(StandardScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000) - 0.8342±0.7595
+(RobustScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 133, learning_rate: 0.1214) - 0.8333±0.7691
+[2025-02-07 10:21:08] 5 - best f1: 0.760
+[2025-02-07 10:21:08] 
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6065) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.2024) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.5266) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.4569) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 0.9427) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.8711) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 2.6673) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.1223) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 0.6332) - 0.8350±0.7600
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000) - 0.8350±0.7600
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8333±0.7688
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 71) - 0.8333±0.7664
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 76) - 0.8325±0.7673
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 87) - 0.8316±0.7677
+(StandardScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8308±0.7686
+(PolynomialFeatures) - (SelectPercentile) - (XGBRegressor: n_estimators: 174, learning_rate: 0.1000) - 0.8036±0.7627
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 71) - 0.7942±0.7702
+(StandardScaler) - (SelectKBest) - (RandomForestRegressor: n_estimators: 100) - 0.7883±0.7694
+(StandardScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 51) - 0.7883±0.7689
+[2025-02-07 10:21:08] Evaluation - Train - Accuracy: 0.8350, Precision: 0.6973, Recall: 0.8350, F1 Score: 0.7600
+[2025-02-07 10:21:08] Evaluation - Test - Accuracy: 0.8537, Precision: 0.7289, Recall: 0.8537, F1 Score: 0.7864
+[2025-02-07 10:21:08] AutoML init to training finished in: 10.9 s

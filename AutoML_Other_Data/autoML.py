@@ -6,16 +6,15 @@ from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatur
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.model_selection import train_test_split, KFold
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.model_selection import train_test_split, KFold, StratifiedKFold
+from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, f1_score
 from sklearn.base import clone
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor, XGBClassifier
 from sklearn.exceptions import ConvergenceWarning
-from sklearn.metrics import accuracy_score, f1_score, mean_squared_error, r2_score
-
+from imblearn.over_sampling import SMOTE
 import random
 from datetime import datetime
 import math
@@ -24,10 +23,9 @@ import os
 from joblib import Parallel, delayed
 import numpy as np
 import statistics
-from collections import defaultdict
+from collections import defaultdict, Counter
 from copy import deepcopy
 import warnings
-from datetime import datetime
 
 warnings.filterwarnings(
     "ignore",
@@ -48,20 +46,19 @@ feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regressi
                       'VarianceThreshold': {'class': VarianceThreshold()},
                       'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
-from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from xgboost import XGBRegressor, XGBClassifier
 
 models = {
     'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
+    'RandomForestRegressor': {'class': RandomForestRegressor,'params': {'n_estimators': 100}}, 
+    'GradientBoostingRegressor': {'class': GradientBoostingRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1}},
+    'KNeighborsRegressor': {'class': KNeighborsRegressor, 'params': {'n_neighbors': 5}},
+    'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}},
+    
+    # Classifier Models
     'DecisionTreeClassifier': {'class': DecisionTreeClassifier()},  # 추가
-    'RandomForestRegressor': {'class': RandomForestRegressor, 'params': {'n_estimators': 100}},
-    'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100}},  # 추가
-    'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1}},
-    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1}},  # 추가
-    'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0}}  # 추가 (회귀가 아니라 분류용)
-}
+    'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100, 'class_weight' : 'balanced'}},
+    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}},
+    'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0, 'class_weight' : 'balanced'}}}
 
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
@@ -80,17 +77,15 @@ def evaluate_regression(y_true, y_pred):
     dicts = {'r2': r2, 'RMSE': RMSE}
     return dicts
 
-### classification
 def evaluate_classification(y_true, y_pred):
-    # y_pred가 확률 값일 경우, 클래스 레이블로 변환
-    if y_pred.ndim > 1:  # 다중 클래스일 경우, y_pred는 2D 배열로 확률 값을 반환
-        y_pred = y_pred.argmax(axis=1)  # 각 샘플에 대해 확률이 가장 높은 클래스 선택
-    elif y_pred.ndim == 1:  # 이진 분류일 경우
-        y_pred = (y_pred >= 0.5).astype(int)  # 확률 >= 0.5이면 1, 아니면 0
-    return {
-        'accuracy': accuracy_score(y_true, y_pred),
-        'f1': f1_score(y_true, y_pred, average='weighted')
-    }
+    # y_pred가 확률일 경우, 이진 클래스로 변환
+    if y_pred.ndim == 1:  # 이진 분류일 경우
+        y_pred = (y_pred >= 0.5).astype(int)  # 확률이 0.5 이상인 경우 1로, 그 외는 0으로 변환
+        
+    accuracy = accuracy_score(y_true, y_pred)
+    f1 = f1_score(y_true, y_pred, average='weighted')
+    dicts = {'accuracy': accuracy, 'f1': f1}
+    return dicts
 
 def build_pipeline(structure):
     """
@@ -162,10 +157,8 @@ def sort(structures, task_type):
         # 회귀 문제에서는 'r2'를 기준으로 정렬
         return sorted(structures, key=lambda x: x['valid_metric']['r2'], reverse=True)
     elif task_type == 'classification':
-        # 분류 문제에서는 'accuracy'를 기준으로 정렬
-        return sorted(structures, key=lambda x: x['valid_metric']['accuracy'], reverse=True)
-    return sorted(structures, key=lambda x: x['valid_metric']['r2'], reverse=True)
-
+        # 분류 문제에서는 'f1'를 기준으로 정렬
+        return sorted(structures, key=lambda x: x['valid_metric']['f1'], reverse=True)
 
 def is_same_structure(structure1, structure2):
     """
@@ -262,9 +255,15 @@ def mutation(structure, prob_mutations, hyperparam_bound=[0.5, 2.0]):
                 continue
                    
             origin_type = type(param_value)
-            rand = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
-            params[param_name] = origin_type(rand * param_value)
-
+            
+            # param_value가 숫자일 때만 곱셈을 수행
+            if isinstance(param_value, (int, float)):
+                rand = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
+                params[param_name] = origin_type(rand * param_value)
+            else:
+                # 그 외의 경우에는 변이 X
+                print(f"Skipping parameter {param_name} with value type {origin_type}.")
+            
     return structure
 
 def average_metrics(metrics):
@@ -314,7 +313,7 @@ class AutoML:
         self.n_jobs = n_jobs
         self.n_child = n_population - n_parent
 
-        dicts = {'n_population': n_population, 'n_generation': n_generation, 'n_parent': n_parent,
+        dicts = {'task_type' : task_type, 'n_population': n_population, 'n_generation': n_generation, 'n_parent': n_parent,
                  'prob_mutations': prob_mutations, 'use_joblib': use_joblib, 'n_jobs': n_jobs}
         
         now = datetime.now()
@@ -404,10 +403,10 @@ class AutoML:
             valid_r2_std = structure['valid_metric']['r2_std']
             print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
         else:
-            valid_accuracy = structure['valid_metric']['accuracy']
             valid_f1 = structure['valid_metric']['f1']
-            print(f"Structure-{order} - valid_accuracy: {valid_accuracy:.4f}") # 결과 출력
+            valid_accuracy = structure['valid_metric']['accuracy']
             print(f"Structure-{order} - valid_f1: {valid_f1:.4f}") # 결과 출력
+            print(f"Structure-{order} - valid_accuracy: {valid_accuracy:.4f}") # 결과 출력
         return structure
 
     def log_dicts(self, dicts, message=""):
@@ -478,9 +477,9 @@ class AutoML:
                 r2_std = structure['valid_metric']['r2_std']
                 arr.append(f'{r2:.4f}±{r2_std:.4f}')
             else:
-                accuracy = structure['valid_metric']['accuracy']
                 f1 = structure['valid_metric']['f1']
-                arr.append(f'{accuracy:.4f}±{f1:.4f}')
+                accuracy = structure['valid_metric']['accuracy']
+                arr.append(f'f1:{f1:.4f}, accuracy:{accuracy:.4f}')
 
         s = ' - '.join(arr)
         return s
@@ -509,24 +508,41 @@ class AutoML:
             max_n_try (int, optional): 최대 새 구조 생성 시도횟수. 기본값 1000.
             timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30.
         """
-        self.task_type = task_type  # 사용자가 지정 가능
+        self.task_type = task_type
         
         dicts = {'use_kfold': use_kfold, 'kfold': kfold, 'valid_size': valid_size,
-                 'seed': seed, 'max_n_try': max_n_try, 'timeout': timeout}
+                 'seed': seed, 'max_n_try': max_n_try, 'timeout': timeout, 'task_type': task_type}
 
         random.seed(seed)
         np.random.seed(seed)
         self.log_dicts(dicts, 'AutoML.fit()')
 
         if use_kfold: # k-fold validation으로 모델 평가
-            kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
+            kf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=seed)
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
-            
-            for train_index, valid_index in kf.split(X_train):
-                self.X_trains.append(X_train.iloc[train_index, :])
-                self.X_valids.append(X_train.iloc[valid_index, :])
-                self.y_trains.append(y_train.iloc[train_index])
-                self.y_valids.append(y_train.iloc[valid_index])
+            smote = SMOTE(sampling_strategy='auto', random_state=42)
+
+            for train_index, valid_index in kf.split(X_train, y_train):
+                X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
+                X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
+
+                # SMOTE 적용 (train set에만)
+                X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
+                
+                print("Before SMOTE:", Counter(y_train_fold))  
+                print("After SMOTE:", Counter(y_train_resampled))
+
+                # 리스트에 추가
+                self.X_trains.append(X_train_resampled)
+                self.y_trains.append(y_train_resampled)
+                self.X_valids.append(X_valid_fold)
+                self.y_valids.append(y_valid_fold)
+                
+                # self.X_trains.append(X_train.iloc[train_index, :])
+                # self.X_valids.append(X_train.iloc[valid_index, :])
+                # self.y_trains.append(y_train.iloc[train_index])
+                # self.y_valids.append(y_train.iloc[valid_index])
+
  
         else: # single-fold validation으로 모델 평가
             X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, 
@@ -547,11 +563,14 @@ class AutoML:
             if self.task_type == 'regression':
                 self.best_score = self.best_structure['valid_metric']['r2']
             else:
-                self.best_score = self.best_structure['valid_metric']['accuracy']
+                self.best_score = self.best_structure['valid_metric']['f1']
             
-            
-            self.log(f"{generation+1} - best R2: {self.best_score:.3f}") # 최적값 기록
-            self.report()
+            if self.task_type == 'regression':
+                self.log(f"{generation+1} - best R2: {self.best_score:.3f}") # 최적값 기록
+                self.report()
+            else:
+                self.log(f"{generation+1} - best f1: {self.best_score:.3f}") # 최적값 기록
+                self.report()
 
             if (generation+1 == self.n_generation):
                 break

@@ -1,0 +1,165 @@
+[2025-02-07 09:53:03] AutoML.__init__() - n_population: 30, n_generation: 5, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-07 09:53:03] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 42, max_n_try: 1000, timeout: 30
+[2025-02-07 09:53:25] 1 - best accuracy: 0.836
+[2025-02-07 09:53:25] 
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3998
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.8240±0.3913
+(PolynomialFeatures) - (VarianceThreshold) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8232±0.4012
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - 0.8147±0.3867
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8104±0.4220
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - 0.8096±0.3818
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.8036±0.4136
+(StandardScaler) - (passthrough) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8019±0.3637
+(RobustScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.7934±0.3918
+(RobustScaler) - (SelectKBest) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7815±0.3880
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.7781±0.4321
+(StandardScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.7772±0.3673
+(RobustScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.7772±0.3673
+(passthrough) - (SelectKBest) - (RandomForestRegressor: n_estimators: 100) - 0.7704±0.3645
+(PolynomialFeatures) - (SelectKBest) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7662±0.3766
+(PolynomialFeatures) - (SelectPercentile) - (DecisionTreeClassifier) - 0.7296±0.3594
+(RobustScaler) - (passthrough) - (DecisionTreeClassifier) - 0.7211±0.2765
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.7211±0.2886
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.7168±0.2867
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.7168±0.2955
+(StandardScaler) - (SelectKBest) - (DecisionTreeClassifier) - 0.7143±0.3042
+(PolynomialFeatures) - (SelectKBest) - (DecisionTreeClassifier) - 0.7117±0.3261
+(RobustScaler) - (SelectKBest) - (DecisionTreeRegressor) - 0.7092±0.2976
+(PolynomialFeatures) - (SelectKBest) - (DecisionTreeRegressor) - 0.7032±0.3230
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.6990±0.3700
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.6981±0.3960
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.6981±0.3960
+(RobustScaler) - (SelectPercentile) - (DecisionTreeClassifier) - 0.6913±0.3661
+(passthrough) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.6751±0.3621
+(PolynomialFeatures) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.5987±0.3235
+[2025-02-07 09:53:59] 2 - best accuracy: 0.838
+[2025-02-07 09:53:59] 
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 346, learning_rate: 0.1536, scale_pos_weight: 1) - 0.8376±0.4413
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3998
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.8240±0.3913
+(PolynomialFeatures) - (VarianceThreshold) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8232±0.4012
+(passthrough) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1104, scale_pos_weight: 1) - 0.8223±0.3990
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - 0.8147±0.3867
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8104±0.4220
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8096±0.4130
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 122) - 0.8070±0.3740
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 59) - 0.8061±0.3680
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 112) - 0.8053±0.3771
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 122) - 0.8036±0.3665
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - 0.8028±0.3698
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - 0.8027±0.3626
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 399, learning_rate: 0.1497, scale_pos_weight: 1) - 0.8019±0.4042
+(passthrough) - (passthrough) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8019±0.3637
+(PolynomialFeatures) - (SelectPercentile) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1377) - 0.7959±0.4025
+(PolynomialFeatures) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.7611±0.3538
+(PolynomialFeatures) - (SelectPercentile) - (DecisionTreeRegressor) - 0.7262±0.3537
+(PolynomialFeatures) - (SelectPercentile) - (DecisionTreeRegressor) - 0.7203±0.3472
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 183, learning_rate: 0.1536, scale_pos_weight: 1) - 0.6990±0.3700
+(passthrough) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.6990±0.3700
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 275, learning_rate: 0.1497, scale_pos_weight: 1) - 0.6930±0.3671
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.6913±0.3661
+(StandardScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 165) - 0.6913±0.3661
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.6905±0.3655
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 179) - 0.6879±0.3641
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 137) - 0.6879±0.3641
+(PolynomialFeatures) - (passthrough) - (RandomForestRegressor: n_estimators: 73) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+[2025-02-07 09:54:23] 3 - best accuracy: 0.838
+[2025-02-07 09:54:23] 
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8376±0.3888
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 346, learning_rate: 0.1536, scale_pos_weight: 1) - 0.8376±0.4413
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3930
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3998
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 167, class_weight: balanced) - 0.8359±0.3914
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1163, scale_pos_weight: 0) - 0.8350±0.0000
+(RobustScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 192, learning_rate: 0.1028, scale_pos_weight: 0) - 0.8350±0.0000
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 197, class_weight: balanced) - 0.8342±0.4145
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 70, class_weight: balanced) - 0.8342±0.4023
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8325±0.3862
+(PolynomialFeatures) - (passthrough) - (RandomForestClassifier: n_estimators: 278, class_weight: balanced) - 0.8325±0.4168
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8325±0.3810
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 167, class_weight: balanced) - 0.8325±0.3827
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8308±0.3865
+(passthrough) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8308±0.3768
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 185, class_weight: balanced) - 0.8300±0.3855
+(PolynomialFeatures) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1163, scale_pos_weight: 1) - 0.8299±0.4072
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8291±0.3772
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 113, class_weight: balanced) - 0.8291±0.3622
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8257±0.3448
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - 0.8240±0.3913
+(PolynomialFeatures) - (VarianceThreshold) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.8232±0.4012
+(StandardScaler) - (passthrough) - (XGBClassifier: n_estimators: 346, learning_rate: 0.1536, scale_pos_weight: 1) - 0.8231±0.3931
+(passthrough) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1104, scale_pos_weight: 1) - 0.8223±0.3990
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8215±0.3415
+(StandardScaler) - (VarianceThreshold) - (LogisticRegression: C: 0.6162, class_weight: balanced) - 0.7781±0.4294
+(StandardScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.7764±0.4248
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.6981±0.3960
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 249, class_weight: balanced) - 0.6879±0.3641
+(PolynomialFeatures) - (VarianceThreshold) - (LogisticRegression: C: 1.1962, class_weight: balanced) - 0.6132±0.3194
+[2025-02-07 09:54:51] 4 - best accuracy: 0.838
+[2025-02-07 09:54:51] 
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8376±0.3888
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 346, learning_rate: 0.1536, scale_pos_weight: 1) - 0.8376±0.4413
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 335, class_weight: balanced) - 0.8368±0.3842
+(passthrough) - (passthrough) - (RandomForestClassifier: n_estimators: 190, class_weight: balanced) - 0.8368±0.4113
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3930
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3998
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 167, class_weight: balanced) - 0.8359±0.3914
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8359±0.4018
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8351±0.3900
+(RobustScaler) - (passthrough) - (XGBClassifier: n_estimators: 138, learning_rate: 0.1000, scale_pos_weight: 0) - 0.8350±0.0000
+(RobustScaler) - (passthrough) - (XGBClassifier: n_estimators: 107, learning_rate: 0.1000, scale_pos_weight: 0) - 0.8350±0.0000
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8342±0.4044
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 111, class_weight: balanced) - 0.8342±0.3942
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 167, class_weight: balanced) - 0.8325±0.3814
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 346, learning_rate: 0.1133, scale_pos_weight: 1) - 0.8325±0.4094
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8317±0.3804
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8317±0.3692
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 97, class_weight: balanced) - 0.8317±0.3688
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8308±0.3707
+(StandardScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 116) - 0.8053±0.3714
+(StandardScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.7764±0.4248
+(StandardScaler) - (passthrough) - (LogisticRegression: C: 2.7050, class_weight: balanced) - 0.7755±0.4240
+(StandardScaler) - (SelectKBest) - (RandomForestRegressor: n_estimators: 100) - 0.7730±0.3698
+(StandardScaler) - (passthrough) - (DecisionTreeClassifier) - 0.7211±0.2888
+(PolynomialFeatures) - (passthrough) - (DecisionTreeRegressor) - 0.7203±0.3292
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.3942, class_weight: balanced) - 0.6981±0.3960
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 2.7050, class_weight: balanced) - 0.6981±0.3960
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 139, class_weight: balanced) - 0.6913±0.3661
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 77, class_weight: balanced) - 0.6913±0.3661
+(PolynomialFeatures) - (passthrough) - (LogisticRegression: C: 2.7050, class_weight: balanced) - 0.5902±0.3049
+[2025-02-07 09:55:30] 5 - best accuracy: 0.838
+[2025-02-07 09:55:30] 
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8376±0.3888
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 346, learning_rate: 0.1536, scale_pos_weight: 1) - 0.8376±0.4413
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 335, class_weight: balanced) - 0.8368±0.3842
+(passthrough) - (passthrough) - (RandomForestClassifier: n_estimators: 190, class_weight: balanced) - 0.8368±0.4113
+(passthrough) - (passthrough) - (RandomForestClassifier: n_estimators: 290, class_weight: balanced) - 0.8368±0.3956
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3930
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8359±0.3995
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 691, learning_rate: 0.1536, scale_pos_weight: 1) - 0.8359±0.4361
+(PolynomialFeatures) - (VarianceThreshold) - (XGBClassifier: n_estimators: 864, learning_rate: 0.1989, scale_pos_weight: 1) - 0.8359±0.4339
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 230, class_weight: balanced) - 0.8342±0.3867
+(PolynomialFeatures) - (passthrough) - (RandomForestClassifier: n_estimators: 115, class_weight: balanced) - 0.8334±0.4236
+(StandardScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 335, class_weight: balanced) - 0.8334±0.3826
+(PolynomialFeatures) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8325±0.4026
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 198, class_weight: balanced) - 0.8308±0.3642
+(passthrough) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.8300±0.3700
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 542, learning_rate: 0.2510, scale_pos_weight: 1) - 0.8299±0.4144
+(PolynomialFeatures) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8291±0.3865
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8282±0.3769
+(PolynomialFeatures) - (passthrough) - (RandomForestClassifier: n_estimators: 191, class_weight: balanced) - 0.8274±0.3972
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 369, class_weight: balanced) - 0.8249±0.3848
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 186, class_weight: balanced) - 0.8104±0.4096
+(RobustScaler) - (passthrough) - (XGBRegressor: n_estimators: 105, learning_rate: 0.1000) - 0.8019±0.3609
+(StandardScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - 0.7993±0.3993
+(StandardScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 415, class_weight: balanced) - 0.7925±0.3907
+(StandardScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 415, class_weight: balanced) - 0.7900±0.3841
+(StandardScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 542, learning_rate: 0.2053, scale_pos_weight: 1) - 0.7696±0.3504
+(PolynomialFeatures) - (passthrough) - (LogisticRegression: C: 0.5223, class_weight: balanced) - 0.6021±0.3196
+(PolynomialFeatures) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - 0.5987±0.3235
+(PolynomialFeatures) - (passthrough) - (LogisticRegression: C: 0.9314, class_weight: balanced) - 0.5944±0.3048
+(PolynomialFeatures) - (passthrough) - (LogisticRegression: C: 0.9314, class_weight: balanced) - 0.5944±0.3048
+[2025-02-07 09:55:30] Evaluation - Train - Accuracy: 0.9677, Precision: 0.9333, Recall: 0.8660, F1 Score: 0.8984
+[2025-02-07 09:55:30] Evaluation - Test - Accuracy: 0.8163, Precision: 0.3514, Recall: 0.3023, F1 Score: 0.3250
+[2025-02-07 09:55:30] AutoML init to training finished in: 147.4 s
