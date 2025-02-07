@@ -12,6 +12,50 @@ import random
 from sklearn.preprocessing import MinMaxScaler
 
 
+
+# 데이터 불러오기
+df = pd.read_csv('melb_split.csv')
+drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
+               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
+               'Regionname', 'Propertycount', 'Split']
+df = df.drop(drop_tables, axis=1)
+df = df.dropna(axis=0)
+
+index = 0.1 < df['BuildingArea']  # BuildingArea 0값 제거
+df = df.loc[index]
+
+# 베이지안 최적화에는 train/test 나눌 필요 없음
+train_data = pd.get_dummies(df, dtype='float')
+
+# 타겟 변수와 특성 분리
+y_train = train_data['Price']
+X_train = train_data.drop(['Price'], axis=1)
+
+
+
+# 데이터 정의
+search_y = {
+    "price": {
+        "목표": "최대화하기",
+        "순위": 1
+    }
+}
+
+search_x = {
+    "lattitude": {
+        "목표": "최소화하기",
+        "범위 설정": [0, 1],
+        "순위": 4
+    },
+    "longitude": {
+        "목표": "최소화하기",
+        "범위 설정": [0, 1],
+        "순위": 3
+    }
+}
+
+
+
 def calculate(row, priority_list, max_num, initial_y, search_y, y): # 우선순위와 방향을 고려하여 objective를 정함
     target = 0 
 
