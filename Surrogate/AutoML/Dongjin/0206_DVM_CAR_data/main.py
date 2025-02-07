@@ -17,27 +17,30 @@ def rename_index_if_exists(df, index):
     
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Insufficient arguments")
-        sys.exit()
+    use_sys_argv = False
+    if use_sys_argv:
+        if len(sys.argv) != 2:
+            print("Insufficient arguments")
+            sys.exit()
 
-    mode = sys.argv[1]
-    if mode not in ['autoML', 'auto-scikitlearn', 'tpot']:
-        print(f"Invalid mode: {mode}")
-        sys.exit()
-
-    # mode = 'autoML'
+        mode = sys.argv[1]
+        if mode not in ['autoML', 'auto-scikitlearn', 'tpot']:
+            print(f"Invalid mode: {mode}")
+            sys.exit()
+    
+    else:
+        mode = 'autoML'
+        
     rel_data_dir_path = 'data'
-    rel_save_path = 'result/concrete.csv'
+    rel_save_path = 'result/DVM-CAR.csv'
 
     py_dir_path = os.path.dirname(os.path.abspath(__file__))
     data_dir_path = os.path.join(py_dir_path, rel_data_dir_path)
     save_path = os.path.join(py_dir_path, rel_save_path)
 
-    X_train = pd.read_csv(data_dir_path + '/X_train.csv')
-    y_train = pd.read_csv(data_dir_path + '/y_train.csv')['strength']
-    X_test = pd.read_csv(data_dir_path + '/X_test.csv')
-    y_test = pd.read_csv(data_dir_path + '/y_test.csv')['strength']
+    train = pd.read_csv(data_dir_path + '/train.csv')
+    test = pd.read_csv(data_dir_path + '/test.csv')
+
 
     func_dicts = {'autoML': {'func': evaluate_autoML, 'args': {'n_generation': 6}},
                 'auto-scikitlearn': {'func': evaluate_auto_scikit, 'args': {'target_time': 80}},
