@@ -531,30 +531,30 @@ class AutoML:
         self.log_dicts(dicts, 'AutoML.fit()')
 
         if use_kfold: # k-fold validation으로 모델 평가
-            kf = StratifiedKFold(n_splits=kfold, shuffle=True, random_state=seed)
+            kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
-            smote = SMOTE(sampling_strategy='auto', random_state=42)
+            # smote = SMOTE(sampling_strategy='auto', random_state=42)
 
-            for train_index, valid_index in kf.split(X_train, y_train):
-                X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
-                X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
+            for train_index, valid_index in kf.split(X_train):
+                # X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
+                # X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
 
-                # SMOTE 적용 (train set에만)
-                X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
+                # # SMOTE 적용 (train set에만)
+                # X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
                 
-                print("Before SMOTE:", Counter(y_train_fold))  
-                print("After SMOTE:", Counter(y_train_resampled))
+                # print("Before SMOTE:", Counter(y_train_fold))  
+                # print("After SMOTE:", Counter(y_train_resampled))
 
-                # 리스트에 추가
-                self.X_trains.append(X_train_resampled)
-                self.y_trains.append(y_train_resampled)
-                self.X_valids.append(X_valid_fold)
-                self.y_valids.append(y_valid_fold)
+                # # 리스트에 추가
+                # self.X_trains.append(X_train_resampled)
+                # self.y_trains.append(y_train_resampled)
+                # self.X_valids.append(X_valid_fold)
+                # self.y_valids.append(y_valid_fold)
                 
-                # self.X_trains.append(X_train.iloc[train_index, :])
-                # self.X_valids.append(X_train.iloc[valid_index, :])
-                # self.y_trains.append(y_train.iloc[train_index])
-                # self.y_valids.append(y_train.iloc[valid_index])
+                self.X_trains.append(X_train.iloc[train_index, :])
+                self.X_valids.append(X_train.iloc[valid_index, :])
+                self.y_trains.append(y_train.iloc[train_index])
+                self.y_valids.append(y_train.iloc[valid_index])
 
  
         else: # single-fold validation으로 모델 평가
