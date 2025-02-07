@@ -10,77 +10,6 @@ from shapely.geometry import Point, Polygon
 from sklearn.preprocessing import MinMaxScaler
 
 
-# 데이터 불러오기
-df = pd.read_csv('/data/ephemeral/home/jihwan/level4-cv-finalproject-hackathon-cv-02-lv3/melb_split_test.csv')
-drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
-               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
-               'Regionname', 'Propertycount', 'Split']
-df = df.drop(drop_tables, axis=1)
-df = df.dropna(axis=0)
-
-# index = 0.1 < df['BuildingArea']  # BuildingArea 0값 제거
-# df = df.loc[index]
-
-# 베이지안 최적화에는 train/test 나눌 필요 없음
-train_data = pd.get_dummies(df, dtype='float')
-
-# 타겟 변수와 특성 분리
-y_train = train_data['Price']
-X_train = train_data.drop(['Price'], axis=1)
-
-# 학습된 모델 로드
-model_path = "autoML.pkl"  # 저장된 pkl 파일 경로
-loaded_model = joblib.load(model_path)
-
-
-
-# 데이터 정의
-search_y = {
-    "Price": {
-        "목표": "최대화하기",
-        "순위": 1
-    }
-}
-
-search_x = {
-    "Lattitude": {
-        "목표": "최소화하기",
-        "범위 설정": [-38.18255, -37.40853],
-        "순위": 4
-    },
-    "Longtitude": {
-        "목표": "최소화하기",
-        "범위 설정": [144.43181, 145.52635],
-        "순위": 3
-    }
-}
-
-
-
-# def calculate(row, priority_list, max_num, initial_y, search_y, y):
-#     target = 0 
-#     for i in row.index:
-#         if i in priority_list.keys():
-#             if priority_list[i][1]=='최대화하기':
-#                 target+= (max_num-priority_list[i][0]+1)*10*row[i]
-        
-#             else:
-#                 target-= (max_num-priority_list[i][0]+1)*10*row[i]
-#         else:
-#             target+=row[i]
-#     if priority_list[y][1] == "최대화하기":
-#         target+= (max_num-priority_list[y][0]+1)*10*initial_y
-#     elif priority_list[y][1] == "최소화하기":
-#         target-= (max_num-priority_list[y][0]+1)*10*initial_y
-        
-#     elif priority_list[y][1] == "목표값에 맞추기":
-#         target-= (max_num-priority_list[y][0]+1)*10*abs(initial_y - search_y[y]["목표값"])
-#     else:
-#         target-= (max_num-priority_list[y][0]+1)*10*abs(search_y[y]['범위 설정'].sum()-2*initial_y)
-    
-#     return target
-
-
 def calculate(row, priority_list, max_num, prediction, search_y, y):
     target = 0 
     for i in row.index:
@@ -251,7 +180,3 @@ def search(X_train, y_train, model, search_x, search_y):
     end_time = time.time()
     elapsed_time = end_time - start_time
     return elapsed_time, optimal_solutions_df
-
-
-# def search(X_train, y_train, model, search_x, search_y):
-search(X_train, y_train, loaded_model, search_x, search_y)
