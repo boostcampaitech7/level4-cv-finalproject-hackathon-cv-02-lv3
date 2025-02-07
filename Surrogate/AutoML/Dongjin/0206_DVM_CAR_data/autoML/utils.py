@@ -51,7 +51,11 @@ def evaluate_regression(X, y_true, y_pred, dataset_name="Dataset"):
     n = len(y_pred)
     k = X.shape[1]
     r2 = r2_score(y_true, y_pred)
-    adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - k - 1)
+    
+    if k+1 < n: # sample 수가 부족하면 adjusted r2 계산 X
+        adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - k - 1)
+    else:
+        adjusted_r2 = -100
 
     dicts = {'R2': r2,
              'adjusted_R2': adjusted_r2,
