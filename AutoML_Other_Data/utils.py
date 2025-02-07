@@ -11,10 +11,7 @@ from sklearn.metrics import (
 
 
 def data_preparation(data_path, verbose=False):
-    drop_tables = ["Employee_ID", "Gender", "Marital_Status", "Department", "Job_Role", "Monthly_Income", "Hourly_Rate", "Years_at_Company",
-                   "Years_in_Current_Role", "Work_Environment_Satisfaction", "Performance_Rating", "Training_Hours_Last_Year", 
-                   "Overtime", "Project_Count", "Average_Hours_Worked_Per_Week", "Absenteeism", 
-                   "Relationship_with_Manager", "Job_Involvement", "Distance_From_Home", "Number_of_Companies_Worked"]  
+    drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "OverTime", "JobRole", "EducationField", "Department"]
 
     # df 불러오기 및 column 제거
     df = pd.read_csv(data_path)
@@ -23,9 +20,6 @@ def data_preparation(data_path, verbose=False):
     print(df.head(10))
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
-
-    print(df.shape)
-    print(df.head(10))
     
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
@@ -35,12 +29,13 @@ def data_preparation(data_path, verbose=False):
     test_data = df[df['Split'] == 'Test']
     test_data = test_data.drop(['Split'], axis=1)
     test_data = pd.get_dummies(test_data, dtype='float')
-
+    
+    
     # 타겟 변수와 특성 분리
-    y_train = train_data['Attrition']
-    X_train = train_data.drop(['Attrition'], axis=1)
-    y_test = test_data['Attrition']
-    X_test = test_data.drop(['Attrition'], axis=1)
+    y_train = train_data['MonthlyIncome']
+    X_train = train_data.drop(['MonthlyIncome'], axis=1)
+    y_test = test_data['MonthlyIncome']
+    X_test = test_data.drop(['MonthlyIncome'], axis=1)
 
     if verbose:
         # 결과 확인

@@ -27,7 +27,6 @@ def main():
     automl.fit(X_train, y_train)
 
     end = time.time()
-    end = time.time()
 
     y_test_pred = automl.predict(X_test)
     y_train_pred = automl.predict(X_train)
