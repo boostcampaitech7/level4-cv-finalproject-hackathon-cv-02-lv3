@@ -145,6 +145,7 @@ def search(X_train, y_train, model, search_x, search_y):
 
         utility = UtilityFunction(kind="ei", xi=0.1)
         optimizer.maximize(init_points=10, n_iter=50, acquisition_function=utility) #acquisition_function=utility
+        
         # 최적의 결과 저장
         best_solution = optimizer.max['params']
         # 원본 데이터(row) 기반으로 새로운 DataFrame 생성 (최적화하지 않은 변수 포함)
