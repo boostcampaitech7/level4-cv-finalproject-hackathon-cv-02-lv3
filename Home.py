@@ -79,17 +79,22 @@ def remove_outliers_iqr(df, option, method):
         return df
 
 def remove_na(df, option, method):
+    df = df.copy()  # ✅ 원본을 보존하기 위해 복사 (중요!)
 
     if method == "관련 행 제거하기":
-        return df.dropna(subset=[option]).reset_index(drop=True)  # 해당 열에서 결측치가 있는 행 제거
-    
+        return df.dropna(subset=[option]).reset_index(drop=True)  # ✅ 해당 열에서 결측치가 있는 행 제거
+
     elif method == "평균으로 채우기":
         mean_value = df[option].mean()  # 평균값 계산
-        return df.fillna({option: mean_value})  # 결측치 평균값으로 대체
-    
+        return df.fillna({option: mean_value})  # ✅ 특정 열만 채우기
+
     elif method == "0으로 채우기":
-        return df.fillna({option: 0})
-    
+        return df.fillna({option: 0})  # ✅ 특정 열만 0으로 채우기
+
+    elif method == "최빈값으로 채우기":
+        mode_value = df[option].mode()[0]  # ✅ 최빈값 추출
+        return df.fillna({option: mode_value})  # ✅ 특정 열만 채우기 (inplace=False)
+
     else:
         return df
 
@@ -654,17 +659,30 @@ elif st.session_state.page=="solution":
                     
 
                 with col2:
-                    purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
-                    control_feature[option2[ind]]=[st.radio("결측치 설정", purpose2, key = option2[ind]+'1')]
+                    if df[option2[ind]].isnull().sum():
+                        purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
+                        control_feature[option2[ind]]=st.radio("결측치 설정", purpose2, key = option2[ind]+'1')
+                    else:
+                        st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
+                        control_feature[option2[ind]]='X'
 
                 with col3:
-                    # 1사분위수(Q1)와 3사분위수(Q3) 계산
-                    Q1 = df[option2[ind]].dropna().quantile(0.25)
-                    Q3 = df[option2[ind]].dropna().quantile(0.75)
-                    IQR = Q3 - Q1
+                    if min(df[option2[ind]]) == max(df[option2[ind]]):
+                        min_val = min(df[option2[ind]]) - 1
+                        max_val = max(df[option2[ind]]) + 1
+                    else:
+                        Q1 = df[option2[ind]].dropna().quantile(0.25)
+                        Q3 = df[option2[ind]].dropna().quantile(0.75)
+                        IQR = Q3 - Q1
+                        min_val = min(df[option2[ind]]) - 2 * int(IQR)
+                        max_val = max(df[option2[ind]]) + 2 * int(IQR)
 
-                    values = st.slider("솔루션 최대 범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
-                            (min(df[option2[ind]]), max(df[option2[ind]])), key = option2[ind]+'2')
+                    values = st.slider(
+                        "솔루션 최대 범위 설정", 
+                        min_val, max_val, 
+                        (min(df[option2[ind]]), max(df[option2[ind]])), 
+                        key=option2[ind]+'2'
+                    )
                     search_x[option2[ind]]['범위 설정'] = values
                     
 
@@ -675,13 +693,39 @@ elif st.session_state.page=="solution":
     # 환경 속성 정하기
 
     st.subheader("3️⃣ 환경 속성을 골라주세요!")
+
+    # ✅ "설정하지 않기"를 추가하여 사용자 선택 가능하게 함
     option3 = st.multiselect(
-    "(환경 속성이란 우리가 직접적으로 통제할 수 없는 외부 요인을 의미한다.)",
-    [x for x in df.columns if x != option and x not in option2],
+        "(환경 속성이란 우리가 직접적으로 통제할 수 없는 외부 요인을 의미한다.)",
+        [x for x in df.columns if x != option and x not in option2] + ["설정하지 않기"],
     )
 
-    st.divider()
+    tabs = None
+    env_feature = {}
 
+    # ✅ "설정하지 않기"가 선택되었을 경우 빈 리스트로 변환
+    if "설정하지 않기" in option3:
+        option3 = []  # ✅ 빈 리스트로 변환
+
+    # ✅ option3이 비어있지 않을 경우에만 `st.tabs()` 실행
+    if option3:
+        tabs = st.tabs(option3)
+
+        for ind, i in enumerate(tabs):
+            with i:
+                if df[option3[ind]].isnull().sum():
+                    if pd.api.types.is_string_dtype(df[option3[ind]]) or pd.api.types.is_object_dtype(df[option3[ind]]):
+                        purpose3 = ["관련 행 제거하기", "최빈값으로 채우기"]
+                        env_feature[option3[ind]] = st.radio("결측치 설정", purpose3, key=option3[ind]+'1')
+                    else:
+                        purpose3 = ["관련 행 제거하기", "평균으로 채우기", "0으로 채우기"]
+                        env_feature[option3[ind]] = st.radio("결측치 설정", purpose3, key=option3[ind]+'1')
+                else:
+                    st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
+                    env_feature[option3[ind]] = 'X'
+
+
+    st.divider()
 
     #레이아웃 나누기
     col1, col2 = st.columns([14,1])
@@ -698,7 +742,7 @@ elif st.session_state.page=="solution":
         # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
 
         if st.button("진행하기"):
-            if option and option2 and option3:
+            if option and option2:
                 if option in binary_cols:
                     df=df1
                     df=remove_na(df,option,method2)
@@ -708,17 +752,23 @@ elif st.session_state.page=="solution":
 
                 for i in control_feature.keys():
                     df=remove_na(df,i,control_feature[i]) 
-                
-                X= df[option2+option3]
+
+                if option3:
+                    for i in env_feature.keys():
+                        df=remove_na(df,i,env_feature[i])
+                    X= df[option2+option3]
+                else:
+                    X= df[option2]
                 X= one_hot(X)
                 y= df[option]
 
                 if option in binary_cols:
-                    # SMOTE 적용
-                    smote = SMOTE(random_state=42)  # random_state는 재현성을 위해 설정
-                    X_resampled, y_resampled = smote.fit_resample(X, y)
-                    X = pd.DataFrame(X_resampled, columns=X.columns)
-                    y = pd.Series(y_resampled, name=y.name)
+                    if st.session_state.sampling:
+                        # SMOTE 적용
+                        smote = SMOTE(random_state=42)  # random_state는 재현성을 위해 설정
+                        X_resampled, y_resampled = smote.fit_resample(X, y)
+                        X = pd.DataFrame(X_resampled, columns=X.columns)
+                        y = pd.Series(y_resampled, name=y.name)
 
                 st.session_state.X= X
                 st.session_state.y= y
@@ -760,7 +810,7 @@ elif st.session_state.page=="train":
 # page - result
 # 결과 보여주는 건 tab을 이용하자
 
-else:
+elif st.session_state.page=="result":
     train_score=st.session_state.train_score
     test_score=st.session_state.test_score
     train_time=st.session_state.train_time
@@ -860,7 +910,7 @@ else:
                 fig.update_layout(
                     title=f"PDP - {list(search_x.keys())[ind]}",
                     xaxis_title=list(search_x.keys())[ind],
-                    yaxis_title="Predicted Price",
+                    yaxis_title=f"Predicted {list(search_y.keys())[0]}",
                     template="plotly_white"
                 )
 
@@ -973,3 +1023,37 @@ else:
 
         # ✅ Streamlit에 Plotly 차트 출력
         st.plotly_chart(fig1)
+    
+    st.divider()
+    if st.button:
+        st.session_state.page='solution'
+        st.rerun()
+
+
+
+
+## page가 'solution'일때
+else:
+    model = st.session_state.model
+    search_x = st.session_state.search_x
+    search_y = st.session_state.search_y
+    X = st.session_state.X
+    y = st.session_state.y
+    with st.spinner('전체 데이터 최적화 진행 중입니다..(약 30분 소요 예정)'):
+        _, optimal_solutions_df = search(X, y, model, search_x,search_y)
+
+    @st.cache_data
+    def convert_df(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+        return df.to_csv().encode("utf-8")
+
+    csv = convert_df(optimal_solutions_df)
+
+    st.write("진행이 완료되었습니다!")
+
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name="solution.csv",
+        mime="text/csv",
+    )

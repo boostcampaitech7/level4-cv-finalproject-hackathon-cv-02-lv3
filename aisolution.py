@@ -10,12 +10,11 @@ def aisolution(n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2,
     #py_dir_path = os.path.dirname(os.path.abspath(__file__)) # 현재 파이썬 스크립트 디렉토리
     #data_path = os.path.join(py_dir_path, '../data/melb_split.csv') 
     #X_train, y_train, X_test, y_test = data_preparation(data_path) # 데이터 준비
-
     start = time.time()
     
     autoML = AutoML(n_population=n_population, n_generation=n_generation,
                     n_parent=n_parent, prob_mutations=prob_mutations,
-                    use_joblib=use_joblib, n_jobs=n_jobs)
+                    use_joblib=use_joblib, n_jobs=n_jobs, task_type=task_type)
     autoML.fit(X_train, y_train, use_kfold=use_kfold,
                kfold=kfold, timeout=timeout, seed=seed)
     
@@ -25,11 +24,11 @@ def aisolution(n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2,
     y_train_pred = autoML.predict(X_train)
 
     if task_type == 'regression':
-        train_score = evaluate_regression(X_train,y_train, y_train_pred, 'train') 
-        test_score = evaluate_regression(X_test,y_test, y_test_pred, 'test')
+        train_score = evaluate_regression(y_train, y_train_pred, 'train') 
+        test_score = evaluate_regression(y_test, y_test_pred, 'test')
     else:
-        y_test_pred = (y_test_pred >= 0.5).astype(int)
-        y_train_pred = (y_train_pred >= 0.5).astype(int)
+        # y_test_pred = (y_test_pred >= 0.5).astype(int)
+        # y_train_pred = (y_train_pred >= 0.5).astype(int)
         train_score = evaluate_classification(y_train, y_train_pred, 'train') 
         test_score = evaluate_classification(y_test, y_test_pred, 'test')        
 
