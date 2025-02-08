@@ -4,16 +4,18 @@
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures, FunctionTransformer
 from sklearn.decomposition import PCA
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.model_selection import train_test_split, KFold, StratifiedKFold
 from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, f1_score
 from sklearn.base import clone
 from xgboost import XGBRegressor, XGBClassifier
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.model_selection import RandomizedSearchCV
 from imblearn.over_sampling import SMOTE
 import random
 from datetime import datetime
@@ -62,13 +64,16 @@ models_regression = {
 #     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0,'class_weight':{0:0.5,1:2}}},
 #     'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
 #     'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}}}
+
 models_classification = {
     'DecisionTreeClassifier': {'class': DecisionTreeClassifier, 'params': {'max_depth': 6, 'class_weight': 'balanced'}},
     'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100, 'class_weight': 'balanced'}},
-    'GradientBoostingClassifier': {'class': GradientBoostingClassifier, 'params': {'max_depth': 6, 'n_estimators': 100, 'learning_rate': 0.1}},
+    'GradientBoostingClassifier': {'class': GradientBoostingClassifier, 'params': {'max_depth': 10, 'n_estimators': 100, 'learning_rate': 0.1}},
     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0, 'class_weight': 'balanced'}},
     'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
-    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}}}
+    'BernoulliNB': {'class': BernoulliNB, 'params': {'alpha':0.01}},
+    'SGDClassifier': {'class': SGDClassifier, 'params': {'class_weight': 'balanced', 'alpha': 0.001, 'power_t': 0.5}},
+    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 1.0, 'max_depth':3, 'scale_pos_weight': 1}}}
     
 
 choose_random_key = lambda dictionary: random.choice(list(dictionary.keys()))
@@ -466,6 +471,7 @@ class AutoML:
         Returns:
             y_pred (DataFrame): 예측된 y값
         """
+        print("predict:", self.best_structure['pipeline'])
         y_pred = self.best_structure['pipeline'].predict(X)
         return y_pred
 
@@ -591,6 +597,7 @@ class AutoML:
 
             if (generation+1 == self.n_generation):
                 break
+                
             
             del self.structures[self.n_parent:] # 점수가 낮은 형질 제거
             

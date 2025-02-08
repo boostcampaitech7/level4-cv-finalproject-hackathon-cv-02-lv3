@@ -33,11 +33,9 @@ def data_preparation(data_path, verbose=False):
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
     train_data = train_data.drop(['Split'], axis=1)
-    train_data = pd.get_dummies(train_data, dtype='float')
 
     test_data = df[df['Split'] == 'Test']
     test_data = test_data.drop(['Split'], axis=1)
-    test_data = pd.get_dummies(test_data, dtype='float')
 
     # 타겟 변수와 특성 분리
     y_train = train_data['Attrition']
@@ -74,14 +72,16 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 
 def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
     dicts = {
-        'Accuracy': accuracy_score(y_true, y_pred),
+        'F1 Score': f1_score(y_true, y_pred),
+        'F1 Score_Weighted': f1_score(y_true, y_pred, average='weighted'),
+        'auc' : roc_auc_score(y_true, y_pred),
         'Precision': precision_score(y_true, y_pred),
         'Recall': recall_score(y_true, y_pred),      
-        'F1 Score': f1_score(y_true, y_pred),
-        'auc' : roc_auc_score(y_true, y_pred)
+        'Accuracy': accuracy_score(y_true, y_pred)
     }
     print(f"\nEvaluation for {dataset_name}:")
     print(f"F1 Score: {dicts['F1 Score']:.4f}")
+    print(f"F1 Score_Weighted: {dicts['F1 Score_Weighted']:.4f}")
     print(f"AUC: {dicts['auc']:.4f}")
     print(f"Precision: {dicts['Precision']:.4f}")
     print(f"Recall: {dicts['Recall']:.4f}")
