@@ -690,77 +690,72 @@ elif st.session_state.page=="solution":
     st.divider()
 
 
-    # 환경 속성 정하기
-
     st.subheader("3️⃣ 환경 속성을 골라주세요!")
 
-    # ✅ "설정하지 않기"를 추가하여 사용자 선택 가능하게 함
+
     option3 = st.multiselect(
         "(환경 속성이란 우리가 직접적으로 통제할 수 없는 외부 요인을 의미한다.)",
-        [x for x in df.columns if x != option and x not in option2] + ["설정하지 않기"],
+        [x for x in df.columns if x != option and x not in option2]+["진행하지 않기"],
     )
 
+
+    non_option3=False
     tabs = None
     env_feature = {}
 
-    # ✅ "설정하지 않기"가 선택되었을 경우 빈 리스트로 변환
-    if "설정하지 않기" in option3:
-        option3 = []  # ✅ 빈 리스트로 변환
+    if option3 :
+        if "진행하지 않기" not in option3:
+            tabs = st.tabs(option3)
 
-    # ✅ option3이 비어있지 않을 경우에만 `st.tabs()` 실행
-    if option3:
-        tabs = st.tabs(option3)
-
-        for ind, i in enumerate(tabs):
-            with i:
-                if df[option3[ind]].isnull().sum():
-                    if pd.api.types.is_string_dtype(df[option3[ind]]) or pd.api.types.is_object_dtype(df[option3[ind]]):
-                        purpose3 = ["관련 행 제거하기", "최빈값으로 채우기"]
-                        env_feature[option3[ind]] = st.radio("결측치 설정", purpose3, key=option3[ind]+'1')
+            for ind, i in enumerate(tabs):
+                with i:
+                    if df[option3[ind]].isnull().sum():
+                        if pd.api.types.is_string_dtype(df[option3[ind]]) or pd.api.types.is_object_dtype(df[option3[ind]]):
+                            purpose3 = ["관련 행 제거하기", "최빈값으로 채우기"]
+                            env_feature[option3[ind]] = st.radio("결측치 설정", purpose3, key=option3[ind]+'1')
+                        else:
+                            purpose3 = ["관련 행 제거하기", "평균으로 채우기", "0으로 채우기"]
+                            env_feature[option3[ind]] = st.radio("결측치 설정", purpose3, key=option3[ind]+'1')
                     else:
-                        purpose3 = ["관련 행 제거하기", "평균으로 채우기", "0으로 채우기"]
-                        env_feature[option3[ind]] = st.radio("결측치 설정", purpose3, key=option3[ind]+'1')
-                else:
-                    st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
-                    env_feature[option3[ind]] = 'X'
+                        st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
+                        env_feature[option3[ind]] = 'X'
+        else:
+            non_option3=True
 
 
-    st.divider()
 
-    #레이아웃 나누기
-    col1, col2 = st.columns([14,1])
+    # 레이아웃 나누기
+    col1, col2 = st.columns([14, 1])
 
     with col1:
         if st.button("이전 페이지"):
-            st.session_state.page="analysis"
+            st.session_state.page = "analysis"
             st.rerun()
-
-
-
 
     with col2:
         # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
-
         if st.button("진행하기"):
             if option and option2:
                 if option in binary_cols:
-                    df=df1
-                    df=remove_na(df,option,method2)
+                    df = df1
+                    df = remove_na(df, option, method2)
                 else:
-                    df=remove_outliers_iqr(df,option,method)
-                    df=remove_na(df,option,method2)
+                    df = remove_outliers_iqr(df, option, method)
+                    df = remove_na(df, option, method2)
 
                 for i in control_feature.keys():
                     df=remove_na(df,i,control_feature[i]) 
 
-                if option3:
+                if non_option3:
+                    X= df[option2]
+                
+                else:
                     for i in env_feature.keys():
                         df=remove_na(df,i,env_feature[i])
-                    X= df[option2+option3]
-                else:
-                    X= df[option2]
-                X= one_hot(X)
-                y= df[option]
+                    X= df[option2 + option3]
+                
+                X = one_hot(X)
+                y = df[option]
 
                 if option in binary_cols:
                     if st.session_state.sampling:
@@ -770,24 +765,25 @@ elif st.session_state.page=="solution":
                         X = pd.DataFrame(X_resampled, columns=X.columns)
                         y = pd.Series(y_resampled, name=y.name)
 
-                st.session_state.X= X
-                st.session_state.y= y
-                st.session_state.search_x=search_x
-                st.session_state.search_y=search_y
+                st.session_state.X = X
+                st.session_state.y = y
+                st.session_state.search_x = search_x
+                st.session_state.search_y = search_y
 
-                opt=[]
-                for i,j in search_x.items():
-                    if len(j)>=2 and j['목표']!="최적화하지 않기":
+                opt = []
+                for i, j in search_x.items():
+                    if len(j) >= 2 and j["목표"] != "최적화하지 않기":
                         opt.append(i)
-                
+
                 if opt:
-                    prior(option,opt)
+                    prior(option, opt)
                 else:
-                    st.session_state.page='train'
+                    st.session_state.page = "train"
                     st.rerun()
 
             else:
                 vote()
+
     
 
 
@@ -1025,26 +1021,31 @@ elif st.session_state.page=="result":
         st.plotly_chart(fig1)
     
     st.divider()
-    if st.button:
-        st.session_state.page='solution'
+    if st.button("이대로 진행하기"):
+        st.session_state.page='final'
         st.rerun()
 
 
 
 
-## page가 'solution'일때
+## page가 'final'일때
 else:
     model = st.session_state.model
     search_x = st.session_state.search_x
     search_y = st.session_state.search_y
     X = st.session_state.X
     y = st.session_state.y
-    with st.spinner('전체 데이터 최적화 진행 중입니다..(약 30분 소요 예정)'):
-        _, optimal_solutions_df = search(X, y, model, search_x,search_y)
+
+    # 🔥 최적화 결과가 이미 저장되어 있으면 search() 실행하지 않음
+    if "optimal_solutions_df" not in st.session_state:
+        with st.spinner('전체 데이터 최적화 진행 중입니다..(약 30분 소요 예정)'):
+            _, optimal_solutions_df = search(X, y, model, search_x, search_y)
+            st.session_state.optimal_solutions_df = optimal_solutions_df  # 🔥 결과 저장
+
+    optimal_solutions_df = st.session_state.optimal_solutions_df  # 🔥 저장된 값 사용
 
     @st.cache_data
     def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return df.to_csv().encode("utf-8")
 
     csv = convert_df(optimal_solutions_df)
