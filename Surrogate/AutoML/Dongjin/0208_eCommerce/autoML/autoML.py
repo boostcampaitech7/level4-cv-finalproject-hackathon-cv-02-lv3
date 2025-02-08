@@ -51,10 +51,9 @@ models = {'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
           'GradientBoostingRegressor': {'class': GradientBoostingRegressor,
                                         'params': {'n_estimators': 100, 'learning_rate': 0.1}},
           'KNeighborsRegressor': {'class': KNeighborsRegressor,
-                                  'params': {'n_neighbors': 5}}}
-
-        #   'XGBRegressor': {'class': XGBRegressor,
-        #                    'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
+                                  'params': {'n_neighbors': 5}},
+        'XGBRegressor': {'class': XGBRegressor,
+                         'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
 
 
 pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models}
