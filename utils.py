@@ -1,14 +1,9 @@
 import math
 import pandas as pd
-from sklearn.metrics import (
-    r2_score,
-    mean_absolute_error,
-    mean_squared_error,
-    median_absolute_error,
-    mean_squared_log_error,
-    explained_variance_score
-)
-
+from datetime import datetime
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+import os
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 def data_preparation(data_path, verbose=False):
     drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
@@ -20,7 +15,7 @@ def data_preparation(data_path, verbose=False):
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
 
-    index = 0.1 < df['BuildingArea'] # BuildingArea 0값 제거
+    index = 0.1 < df['BuildingArea'] # BuildingArea가 0인 값 제거
     df = df.loc[index]
 
     # 데이터셋 분리
@@ -53,14 +48,86 @@ def data_preparation(data_path, verbose=False):
 
 
 
-def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
-    dicts = {'R2': r2_score(y_true, y_pred),
+def evaluate_regression(X, y_true, y_pred, dataset_name="Dataset"):
+    n = len(y_pred)
+    k = X.shape[1]
+    r2 = r2_score(y_true, y_pred)
+    
+    if k+1 < n: # sample 수가 부족하면 adjusted r2 계산 X
+        adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - k - 1)
+    else:
+        adjusted_r2 = -100
+
+    dicts = {'R2': r2,
+             'adjusted_R2': adjusted_r2,
              'MAE': mean_absolute_error(y_true, y_pred),
              'RMSE': math.sqrt(mean_squared_error(y_true, y_pred))}
 
     print(f"\nEvaluation for {dataset_name}:")
     print(f"R2 Score: {dicts['R2']:.4f}")
+    print(f"Adjusted R2 Score: {dicts['adjusted_R2']:.4f}")
     print(f"Mean Absolute Error (MAE): {dicts['MAE']:.4f}")
     print(f"Root Mean Squared Error (RMSE): {dicts['RMSE']:.4f}")
+
+    return dicts
+
+class Log:
+    def __init__(self, logger_name=None):
+        now = datetime.now()
+        time_string = now.strftime("%y%m%d_%H%M%S")
+        py_dir_path = os.path.dirname(os.path.abspath(__file__))
+
+        if logger_name is None:
+            self.log_dir_path = os.path.join(py_dir_path, 'log')
+        else:
+            self.log_dir_path = os.path.join(py_dir_path, 'log', logger_name)
+        
+        self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
+        os.makedirs(self.log_dir_path, exist_ok=True)
+        
+
+    def log_dicts(self, dicts, message=""):
+        log = []
+        for k, v in dicts.items():
+            if isinstance(v, float):
+                log.append(f'{k}: {v:.4f}')
+            else:
+                log.append(f'{k}: {v}')
+        
+        log = ', '.join(log)
+        if len(message):
+            log = f'{message} - {log}'
+        self.log(log)
+    
+    def log(self, message):
+        """
+        log 기록
+
+        Args:
+            message (str): log 메세지
+        """
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_message = f"[{now}] {message}"
+        print(log_message) # 로그 출력 
+
+        # 로그 저장
+        with open(self.log_path, 'a') as file:
+            file.write(log_message + "\n") 
+            file.flush()
+
+def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
+    dicts = {
+        'Accuracy': accuracy_score(y_true, y_pred),
+        'Precision': precision_score(y_true, y_pred),
+        'Recall': recall_score(y_true, y_pred),      
+        'F1 Score': f1_score(y_true, y_pred),
+        'auc' : roc_auc_score(y_true, y_pred)
+    }
+    print(f"\nEvaluation for {dataset_name}:")
+    print(f"F1 Score: {dicts['F1 Score']:.4f}")
+    print(f"AUC: {dicts['auc']:.4f}")
+    print(f"Precision: {dicts['Precision']:.4f}")
+    print(f"Recall: {dicts['Recall']:.4f}")
+    print(f"Accuracy: {dicts['Accuracy']:.4f}")
 
     return dicts

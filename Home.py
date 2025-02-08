@@ -11,6 +11,7 @@ from search import search
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from imblearn.over_sampling import SMOTE
 
 
 @st.dialog("진행 불가")
@@ -47,7 +48,8 @@ def train(X, y, search_x, search_y):
     st.session_state.X_test = X_test
 
     with st.spinner('분석 및 최적화 진행 중입니다..(약 10분 소요 예정)'):
-        train_score,test_score,train_time,model=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train)
+        train_score,test_score,train_time,model=aisolution(X_train=X_train, X_test=X_test, y_test=y_test, y_train=y_train,
+                                                           task_type=st.session_state.type)
 
         # 50개의 데이터로 예시를 들어 준다.
         elapsed_time, optimal_solutions_df = search(X.head(50), y.head(50), model, search_x,search_y)
@@ -91,32 +93,13 @@ def remove_na(df, option, method):
     else:
         return df
 
-# # 페이지 레이아웃 설정
-# st.set_page_config(layout="wide", page_title="AI solution", page_icon="📊")
+def one_hot(df):
+    for i in df.columns:
+        if pd.api.types.is_string_dtype(df[i]) or pd.api.types.is_object_dtype(df[i]):
+            if len(df[i])!=len(df[i].unique()):
+                df = pd.get_dummies(df, columns=[i], drop_first=True)
 
-# # 상태를 저장할 page 초기화
-# if "page" not in st.session_state:
-#     st.session_state.page = False
-#     st.session_state.uploaded_file = None
-#     st.session_state.df = None  # 데이터프레임을 저장할 새로운 상태 변수
-
-
-# # 로그인 창처럼 구현된 파일 업로드 화면
-# if not st.session_state.page:
-#     st.title("Prescript AI solution")
-#     st.write("분석하고 싶은 CSV 파일을 제출하세요.")
-    
-#     # 파일 업로드 위젯
-#     uploaded_file = st.file_uploader("",type="csv")
-
-#     # 파일 업로드 후 로그인 상태로 전환
-#     if uploaded_file is not None:
-#         st.session_state.uploaded_file = uploaded_file
-#         st.session_state.page = "analysis"
-#         # 데이터프레임을 세션 상태에 저장
-#         st.session_state.df = pd.read_csv(uploaded_file)
-#         st.success("파일 업로드 성공! 분석 화면으로 이동합니다.")
-#         st.rerun()  # 화면 갱신
+    return df
 
 # 페이지 레이아웃 설정
 st.set_page_config(layout="wide", page_title="AI Solution", page_icon="📊")
@@ -180,8 +163,6 @@ if not st.session_state.page:
         st.session_state.page = "analysis"
         st.success("파일 업로드 성공! 분석 화면으로 이동합니다.")
         st.rerun()
-
-
 
 
 # page - 데이터 eda 화면
@@ -288,25 +269,31 @@ elif st.session_state.page=="analysis":
             # 데이터 시각화
             st.write("### Visualization")
 
-            # 레이아웃 나누기
-            col_1, col_2 = st.columns([1, 1] , border=True)  # 왼쪽 1: 오른쪽 1 비율 설정
-            # pie chart
-            with col_1:
-                st.write('missing value')
-                sns.set_style("whitegrid")  # Seaborn 스타일 설정
+            # 레이아웃 나누기 (비율 유지)
+            col_1, col_2 = st.columns(2)  
 
-                fig, ax = plt.subplots(figsize=(8, 4))
-                ax.pie(
-                    [missing_ratio, non_missing_ratio],
-                    labels=['missing', 'non_missing'],
-                    colors=['#FF0000', '#66b3ff'],
-                    autopct='%1.1f%%',
-                    startangle=90,
-                    wedgeprops={'edgecolor': 'black'}
+            # ✅ Pie Chart (Missing Values)
+            with col_1:
+                st.write('Missing Value Distribution')
+
+                missing_ratio = df[column].isna().sum()
+                non_missing_ratio = df[column].notna().sum()
+
+                pie_df = pd.DataFrame({
+                    'Category': ['Missing', 'Non-Missing'],
+                    'Count': [missing_ratio, non_missing_ratio]
+                })
+
+                fig_pie = px.pie(
+                    pie_df,
+                    names='Category',
+                    values='Count',
+                    color='Category',
+                    color_discrete_map={'Missing': '#FF0000', 'Non-Missing': '#66b3ff'},
+                    title="Missing Values"
                 )
-                plt.legend()
-                ax.axis('equal')  # 원형 유지
-                st.pyplot(fig)
+                
+                st.plotly_chart(fig_pie, use_container_width=True)
             
             # bar chart
             with col_2:
@@ -439,108 +426,205 @@ elif st.session_state.page=="solution":
     # output 속성 정하기
     # 범주형 변수 안되고 수치형 변수만 선택 가능하게 하기 
     st.subheader("1️⃣ output 속성을 골라주세요!")
-    st.write("(단, 수치형 변수만 가능)")
+    st.write("(단, 수치형 변수, 이진 변수 (Binary Variable)만 가능)")
+
+    # 수치형 변수: int 또는 float
+    numerical_cols = [x for x in df.columns if pd.api.types.is_integer_dtype(df[x]) or pd.api.types.is_float_dtype(df[x])]
+
+    # 이진 변수: 문자열/객체 타입이면서 고유값이 2개인 경우만 포함
+    binary_cols = [x for x in df.columns 
+                if (pd.api.types.is_string_dtype(df[x]) or pd.api.types.is_object_dtype(df[x]) or pd.api.types.is_categorical_dtype(df[x])) 
+                and df[x].nunique() == 2]
+
+    # 최종 리스트
+    selected_columns = numerical_cols + binary_cols
+
     option = st.selectbox(
-    "",
-    [x for x in df.columns if pd.api.types.is_integer_dtype(df[x]) or pd.api.types.is_float_dtype(df[x])],
+    "", selected_columns
     )
 
     # 레이 아웃 나누기
     col1, col2 , col3= st.columns(3, border=True)
+    
+    if option in numerical_cols:
+        st.session_state.type='regression'
+        # 이상치 설정
+        with col1:
+            st.write("* 이상치 설정")
+            # Boxplot 생성
+            fig, ax = plt.subplots(figsize=(8,2))
 
-    # 이상치 설정
-    with col1:
-        st.write("* 이상치 설정")
-        # Boxplot 생성
-        fig, ax = plt.subplots(figsize=(8,2))
+            # 가로형 Boxplot 생성
+            ax.boxplot(df[option].dropna(), vert=False, patch_artist=False, showmeans=False, boxprops=dict(color="black"),
+                    whiskerprops=dict(color="black"), capprops=dict(color="black"), flierprops=dict(marker="o", color="red"))
 
-        # 가로형 Boxplot 생성
-        ax.boxplot(df[option].dropna(), vert=False, patch_artist=False, showmeans=False, boxprops=dict(color="black"),
-                whiskerprops=dict(color="black"), capprops=dict(color="black"), flierprops=dict(marker="o", color="red"))
+            # 불필요한 배경 제거
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+            ax.spines['left'].set_visible(False)
+            ax.spines['bottom'].set_visible(False)
+            ax.yaxis.set_visible(False)  # y축 숨김
+            ax.xaxis.set_ticks_position('none')  # x축 눈금 숨김
 
-        # 불필요한 배경 제거
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['bottom'].set_visible(False)
-        ax.yaxis.set_visible(False)  # y축 숨김
-        ax.xaxis.set_ticks_position('none')  # x축 눈금 숨김
-
-        # Streamlit에 표시
-        st.pyplot(fig)
-
-
-        # 1사분위수(Q1)와 3사분위수(Q3) 계산
-        Q1 = df[option].dropna().quantile(0.25)
-        Q3 = df[option].dropna().quantile(0.75)
-        IQR = Q3 - Q1
-
-        # 이상치 기준 계산
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        method = None
-
-        if (df[option].dropna()>upper_bound).any() or (df[option].dropna()<lower_bound).any:
-            st.write("IQR 기준으로 이상치가 존재합니다! 어떻게 처리할까요?")
-            method = st.selectbox(
-            "",
-            ("제거하기", "제거하지 않고 사용하기"),
-            )
-
-            st.write("You selected:", method)
-
-        else:
-            st.write("IQR 기준으로 이상치는 없고, 추가적인 설정은 필요 없어 보입니다!")
+            # Streamlit에 표시
+            st.pyplot(fig)
 
 
-    # 결측치 설정
-    with col2:
-        cnt=len(df[option])
-        missing_count=df[option].isnull().sum()
-        missing_ratio = df[option].isnull().mean()
-        st.write("* 결측치 설정")
-        st.write(f"정상 데이터 수 : {cnt-missing_count}")
-        st.write(f'결측치 수 : {missing_count}')
-        st.write(f'결측치 비율 : {missing_ratio}')
-        st.write("")
-        st.write("")
+            # 1사분위수(Q1)와 3사분위수(Q3) 계산
+            Q1 = df[option].dropna().quantile(0.25)
+            Q3 = df[option].dropna().quantile(0.75)
+            IQR = Q3 - Q1
 
-        if missing_count:
-            st.write("어떻게 처리할까요?")
-            method2 = st.selectbox(
-            "",
-            ("관련 행 제거하기","평균으로 채우기","0으로 채우기"),
-            )
+            # 이상치 기준 계산
+            lower_bound = Q1 - 1.5 * IQR
+            upper_bound = Q3 + 1.5 * IQR
+            method = None
 
-            st.write("You selected:", method2)
+            if (df[option].dropna()>upper_bound).any() or (df[option].dropna()<lower_bound).any:
+                st.write("IQR 기준으로 이상치가 존재합니다! 어떻게 처리할까요?")
+                method = st.selectbox(
+                "",
+                ("제거하기", "제거하지 않고 사용하기"),
+                )
 
-        else:
-            method2 = None
-            st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
-         
-    # 범위 설정
-    with col3:
+                st.write("You selected:", method)
+
+            else:
+                st.write("IQR 기준으로 이상치는 없고, 추가적인 설정은 필요 없어 보입니다!")
 
 
-        purpose=["최소화하기","최대화하기","범위에 맞추기","목표값에 맞추기"]
-        method3 = st.radio("* 목표 설정",purpose)
-        search_y={}
-        if method3 == "범위에 맞추기":
-            st.write("* output 범위 설정")
-            values = st.slider("", min(df[option])-2*int(IQR), max(df[option])+2*int(IQR), (min(df[option]), max(df[option])))
-            search_y[option]={'목표' : method3, '범위 설정' : values}
+        # 결측치 설정
+        with col2:
+            cnt=len(df[option])
+            missing_count=df[option].isnull().sum()
+            missing_ratio = df[option].isnull().mean()
+            st.write("* 결측치 설정")
+            st.write(f"정상 데이터 수 : {cnt-missing_count}")
+            st.write(f'결측치 수 : {missing_count}')
+            st.write(f'결측치 비율 : {missing_ratio}')
+            st.write("")
+            st.write("")
 
-        elif method3 == "목표값에 맞추기":
-            st.write("* 원하는 output 목표값 설정")
-            number = st.number_input(
-            "Insert a number", value=None, placeholder="Type a number..."
-            )
-            st.write("The current number is ", number)
-            search_y[option]={'목표' : method3, '목표값' : number}
+            if missing_count:
+                st.write("어떻게 처리할까요?")
+                method2 = st.selectbox(
+                "",
+                ("관련 행 제거하기","평균으로 채우기","0으로 채우기"),
+                )
+
+                st.write("You selected:", method2)
+
+            else:
+                method2 = None
+                st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
+            
+        # 범위 설정
+        with col3:
+
+
+            purpose=["최소화하기","최대화하기","범위에 맞추기","목표값에 맞추기"]
+            method3 = st.radio("* 목표 설정",purpose)
+            search_y={}
+            if method3 == "범위에 맞추기":
+                st.write("* output 범위 설정")
+                values = st.slider("", min(df[option])-2*int(IQR), max(df[option])+2*int(IQR), (min(df[option]), max(df[option])))
+                search_y[option]={'목표' : method3, '범위 설정' : values}
+
+            elif method3 == "목표값에 맞추기":
+                st.write("* 원하는 output 목표값 설정")
+                number = st.number_input(
+                "Insert a number", value=None, placeholder="Type a number..."
+                )
+                st.write("The current number is ", number)
+                search_y[option]={'목표' : method3, '목표값' : number}
+            
+            else:
+                search_y[option]={'목표' : method3}
+
+    else:
+        st.session_state.type="classification"
+        with col1:
+            st.write("0과 1 지정하기")
+            st.write("1로 표시할 것을 정해주세요")
+            value1 = df[option].unique()[0]
+            value2 = df[option].unique()[1]
+            label1 = st.checkbox(df[option].unique()[0])
+            label2 = st.checkbox(df[option].unique()[1])
+            df1=None
+            if label1 and label2:
+                st.write("둘 중에 하나만 선택해주세요!!!")
+            
+            elif label1:
+                df1=df.copy()
+                df1.loc[df1[option]==value1,option]=1
+                df1.loc[df1[option]==value2,option]=0
+                df1[option]=df1[option].astype(int)  # object → int 변환
+
+            elif label2:
+                df1=df.copy()
+                df1.loc[df1[option]==value1,option]=0
+                df1.loc[df1[option]==value2,option]=1
+                df1[option]=df1[option].astype(int)  # object → int 변환
+            else:
+                st.write("")
+
+
+            # 불균형 감지
+            if df1 is not None:
+                st.session_state.sampling=None
+                class_counts = df1[option].value_counts()
+                imbalance_ratio = class_counts.min() / class_counts.max()
+                
+                if imbalance_ratio < 0.33:  # 1:3 비율 이하라면 불균형으로 판단
+                    st.write("분포가 불균형으로 감지되었습니다.")
+                    oversampling = st.checkbox("오버 샘플링을 시도하겠습니까?")
+                    st.write("(오버 샘플링이란 적은 데이터를 증강시키는 기법이다!)")
+                    st.session_state.sampling = oversampling
+
+                else:
+                    st.write("데이터가 균형되어 보입니다!")
+
+
+
+            
+        # 결측치 설정
+        with col2:
+            cnt=len(df[option])
+            missing_count=df[option].isnull().sum()
+            missing_ratio = df[option].isnull().mean()
+            st.write("* 결측치 설정")
+            st.write(f"정상 데이터 수 : {cnt-missing_count}")
+            st.write(f'결측치 수 : {missing_count}')
+            st.write(f'결측치 비율 : {missing_ratio}')
+            st.write("")
+            st.write("")
+
+            if missing_count:
+                st.write("어떻게 처리할까요?")
+                method2 = st.selectbox(
+                "",
+                ("관련 행 제거하기","평균으로 채우기","0으로 채우기"),
+                )
+
+                st.write("You selected:", method2)
+
+            else:
+                method2 = None
+                st.write("결측치가 없어서 따로 설정은 필요 없어 보입니다!")
         
-        else:
-            search_y[option]={'목표' : method3}
+        with col3:
+            search_y={}
+            st.write("목표 설정하기")
+            st.write("* 원하는 output 목표값 설정 (0 or 1)")
+            method3="목표값에 맞추기"
+            number = st.number_input(
+                "Insert a number", value=None, placeholder="Type a number..."
+                )
+            search_y[option]={'목표' : method3, '목표값' : number}
+            
 
+
+            
     
     st.divider()
 
@@ -548,9 +632,11 @@ elif st.session_state.page=="solution":
     # 수치형만 가능하게 할 것인가?
 
     st.subheader("2️⃣ control할 제어 속성을 골라주세요!")
+    st.write("(단, 수치형 변수만 가능)")
+
     option2 = st.multiselect(
     "",
-    [x for x in df.columns if x != option],
+    [x for x in df.columns if (x != option) & (pd.api.types.is_integer_dtype(df[x]) or pd.api.types.is_float_dtype(df[x]))],
     )
     tabs=None
     if option2:
@@ -560,32 +646,26 @@ elif st.session_state.page=="solution":
     if tabs:
         for ind,i in enumerate(tabs):
             with i:
-                if pd.api.types.is_integer_dtype(df[option2[ind]]) or pd.api.types.is_float_dtype(df[option2[ind]]):
-                    col1,col2,col3 = st.columns(3)
+                col1,col2,col3 = st.columns(3)
 
-                    with col1:
-                        purpose=["최소화하기", "최대화하기", "최적화하지 않기"]
-                        search_x[option2[ind]] = {"목표" : st.radio("목표 설정", purpose, key = option2[ind])}
-                        
+                with col1:
+                    purpose=["최소화하기", "최대화하기", "최적화하지 않기"]
+                    search_x[option2[ind]] = {"목표" : st.radio("목표 설정", purpose, key = option2[ind])}
+                    
 
-                    with col2:
-                        purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
-                        control_feature[option2[ind]]=[st.radio("결측치 설정", purpose2, key = option2[ind]+'1')]
-
-                    with col3:
-                        # 1사분위수(Q1)와 3사분위수(Q3) 계산
-                        Q1 = df[option2[ind]].dropna().quantile(0.25)
-                        Q3 = df[option2[ind]].dropna().quantile(0.75)
-                        IQR = Q3 - Q1
-
-                        values = st.slider("솔루션 최대 범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
-                                (min(df[option2[ind]]), max(df[option2[ind]])), key = option2[ind]+'2')
-                        search_x[option2[ind]]['범위 설정'] = values
-                        
-                
-                else:
+                with col2:
                     purpose2 = ["관련 행 제거하기","평균으로 채우기","0으로 채우기"]
-                    control_feature[option2[ind]] = [st.radio("결측치 설정", purpose2, key = option2[ind]+'1')]
+                    control_feature[option2[ind]]=[st.radio("결측치 설정", purpose2, key = option2[ind]+'1')]
+
+                with col3:
+                    # 1사분위수(Q1)와 3사분위수(Q3) 계산
+                    Q1 = df[option2[ind]].dropna().quantile(0.25)
+                    Q3 = df[option2[ind]].dropna().quantile(0.75)
+                    IQR = Q3 - Q1
+
+                    values = st.slider("솔루션 최대 범위 설정", min(df[option2[ind]])-2*int(IQR), max(df[option2[ind]])+2*int(IQR), 
+                            (min(df[option2[ind]]), max(df[option2[ind]])), key = option2[ind]+'2')
+                    search_x[option2[ind]]['범위 설정'] = values
                     
 
 
@@ -616,21 +696,32 @@ elif st.session_state.page=="solution":
 
     with col2:
         # 모델을 학습시키고 훈련시키는 과정으로 넘어가는 버튼 만들기
-        st.write(search_x)
-        st.write(search_y)
-        st.write(list(search_y.keys())[0])
 
         if st.button("진행하기"):
             if option and option2 and option3:
-
-                df=remove_outliers_iqr(df,option,method)
-                df=remove_na(df,option,method)
+                if option in binary_cols:
+                    df=df1
+                    df=remove_na(df,option,method2)
+                else:
+                    df=remove_outliers_iqr(df,option,method)
+                    df=remove_na(df,option,method2)
 
                 for i in control_feature.keys():
                     df=remove_na(df,i,control_feature[i]) 
                 
-                st.session_state.X=df[option2+option3]
-                st.session_state.y=df[option]
+                X= df[option2+option3]
+                X= one_hot(X)
+                y= df[option]
+
+                if option in binary_cols:
+                    # SMOTE 적용
+                    smote = SMOTE(random_state=42)  # random_state는 재현성을 위해 설정
+                    X_resampled, y_resampled = smote.fit_resample(X, y)
+                    X = pd.DataFrame(X_resampled, columns=X.columns)
+                    y = pd.Series(y_resampled, name=y.name)
+
+                st.session_state.X= X
+                st.session_state.y= y
                 st.session_state.search_x=search_x
                 st.session_state.search_y=search_y
 
@@ -690,12 +781,22 @@ else:
     with col2:
         st.subheader("모델 성능")
         col11,col22=st.columns((1,2))
-        with col11:
-            score=test_score['R2']*100
-            st.metric("모델 정확도(Adjusted R2 기준)", f'{score:.1f}%')
-        with col22:
-            df=pd.DataFrame({'Train 성능' : train_score,'Test 성능': test_score})
-            st.table(df)
+        if st.session_state.type == "regression":
+            with col11:
+                score=test_score['R2']*100
+                st.metric("모델 정확도(R2 기준)", f'{score:.1f}%')
+            with col22:
+                df=pd.DataFrame({'Train 성능' : train_score,'Test 성능': test_score})
+                st.table(df)
+        else:
+            st.write("")
+            with col11:
+                score=test_score['F1 Score']*100
+                st.metric("모델 정확도(F1 Score 기준)", f'{score:.1f}%')
+            with col22:
+                df=pd.DataFrame({'Train 성능' : train_score,'Test 성능': test_score})
+                st.table(df)
+
 
     st.divider()
 
