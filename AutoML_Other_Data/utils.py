@@ -8,28 +8,28 @@ from sklearn.metrics import (
     mean_squared_log_error,
     explained_variance_score
 )
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.model_selection import train_test_split
+
 
 
 def data_preparation(data_path, verbose=False):
-    # drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "OverTime", "JobRole", "EducationField", "Department"]
-    drop_tables = [
-    "BusinessTravel", "DailyRate", "Department", "DistanceFromHome", "Education", 
-    "EducationField", "EmployeeCount", "EmployeeNumber", "EnvironmentSatisfaction", 
-    "Gender", "HourlyRate", "JobInvolvement", "JobRole", "MaritalStatus", 
-    "MonthlyIncome", "MonthlyRate", "NumCompaniesWorked", "Over18", "OverTime", 
-    "PercentSalaryHike", "PerformanceRating", "RelationshipSatisfaction", 
-    "StandardHours", "StockOptionLevel", "TotalWorkingYears", "TrainingTimesLastYear", 
-    "YearsAtCompany", "YearsInCurrentRole", "YearsWithCurrManager"]
+    # drop_tables = [
+    # "BusinessTravel", "DailyRate", "Department", "DistanceFromHome", "Education", 
+    # "EducationField", "EmployeeCount", "EmployeeNumber", "EnvironmentSatisfaction", 
+    # "Gender", "HourlyRate", "JobInvolvement", "JobRole", "MaritalStatus", 
+    # "MonthlyIncome", "MonthlyRate", "NumCompaniesWorked", "Over18", "OverTime", 
+    # "PercentSalaryHike", "PerformanceRating", "RelationshipSatisfaction", 
+    # "StandardHours", "StockOptionLevel", "TotalWorkingYears", "TrainingTimesLastYear", 
+    # "YearsAtCompany", "YearsInCurrentRole", "YearsWithCurrManager"]
+    drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "StandardHours"]
+
 
     # df 불러오기 및 column 제거
     df = pd.read_csv(data_path)
-    
-    print(df.shape)
-    print(df.head(10))
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
-    
+
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
     train_data = train_data.drop(['Split'], axis=1)
@@ -38,8 +38,7 @@ def data_preparation(data_path, verbose=False):
     test_data = df[df['Split'] == 'Test']
     test_data = test_data.drop(['Split'], axis=1)
     test_data = pd.get_dummies(test_data, dtype='float')
-    
-    
+
     # 타겟 변수와 특성 분리
     y_train = train_data['Attrition']
     X_train = train_data.drop(['Attrition'], axis=1)
@@ -76,15 +75,16 @@ def evaluate_regression(y_true, y_pred, dataset_name="Dataset"):
 def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
     dicts = {
         'Accuracy': accuracy_score(y_true, y_pred),
-        'Precision': precision_score(y_true, y_pred, average='weighted'),  # 이진 분류의 경우
-        'Recall': recall_score(y_true, y_pred, average='weighted'),        # 이진 분류의 경우
-        'F1 Score': f1_score(y_true, y_pred, average='weighted')           # 이진 분류의 경우
+        'Precision': precision_score(y_true, y_pred),
+        'Recall': recall_score(y_true, y_pred),      
+        'F1 Score': f1_score(y_true, y_pred),
+        'auc' : roc_auc_score(y_true, y_pred)
     }
-
     print(f"\nEvaluation for {dataset_name}:")
-    print(f"Accuracy: {dicts['Accuracy']:.4f}")
+    print(f"F1 Score: {dicts['F1 Score']:.4f}")
+    print(f"AUC: {dicts['auc']:.4f}")
     print(f"Precision: {dicts['Precision']:.4f}")
     print(f"Recall: {dicts['Recall']:.4f}")
-    print(f"F1 Score: {dicts['F1 Score']:.4f}")
+    print(f"Accuracy: {dicts['Accuracy']:.4f}")
 
     return dicts

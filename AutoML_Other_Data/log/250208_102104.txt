@@ -1,0 +1,165 @@
+[2025-02-08 10:21:04] AutoML.__init__() - task_type: classification, n_population: 30, n_generation: 5, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-08 10:21:04] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 42, max_n_try: 1000, timeout: 30, task_type: classification
+[2025-02-08 10:21:10] 1 - best f1: 0.370
+[2025-02-08 10:21:10] 
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3663, accuracy:0.6624
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3614, accuracy:0.6573
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3614, accuracy:0.6573
+(PolynomialFeatures) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.3607, accuracy:0.6564
+(PolynomialFeatures) - (SelectKBest) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3604, accuracy:0.7050
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3590, accuracy:0.6573
+(passthrough) - (SelectKBest) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3441, accuracy:0.6590
+(RobustScaler) - (SelectKBest) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3441, accuracy:0.6590
+(PolynomialFeatures) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3341, accuracy:0.7406
+(RobustScaler) - (SelectKBest) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.3276, accuracy:0.6811
+(PolynomialFeatures) - (SelectKBest) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.3274, accuracy:0.6930
+(PolynomialFeatures) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3249, accuracy:0.6845
+(StandardScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3025, accuracy:0.7228
+(RobustScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3025, accuracy:0.7228
+(StandardScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3025, accuracy:0.7228
+(StandardScaler) - (SelectKBest) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3025, accuracy:0.7228
+(passthrough) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3025, accuracy:0.7228
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3012, accuracy:0.6701
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.2975, accuracy:0.6718
+(passthrough) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.2967, accuracy:0.6709
+(passthrough) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.2963, accuracy:0.6701
+(StandardScaler) - (passthrough) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.2942, accuracy:0.6709
+(RobustScaler) - (SelectKBest) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.2905, accuracy:0.7177
+(passthrough) - (passthrough) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.2902, accuracy:0.7211
+(StandardScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2888, accuracy:0.7270
+(RobustScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2847, accuracy:0.7219
+(passthrough) - (SelectKBest) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.2844, accuracy:0.7134
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2840, accuracy:0.7211
+(RobustScaler) - (passthrough) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.2666, accuracy:0.7151
+[2025-02-08 10:21:18] 2 - best f1: 0.370
+[2025-02-08 10:21:18] 
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 193, learning_rate: 0.1000) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 258, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 150, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.0737) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 61, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3663, accuracy:0.6624
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 78, class_weight: balanced) - f1:0.3647, accuracy:0.6632
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3638, accuracy:0.6649
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3614, accuracy:0.6573
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 100, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3614, accuracy:0.6573
+(PolynomialFeatures) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.3607, accuracy:0.6564
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 82, class_weight: balanced) - f1:0.3607, accuracy:0.6564
+(PolynomialFeatures) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.3607, accuracy:0.6564
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 247, class_weight: balanced) - f1:0.3607, accuracy:0.6564
+(PolynomialFeatures) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 11, n_estimators: 145, learning_rate: 0.1000) - f1:0.3585, accuracy:0.6505
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 1.6796, class_weight: balanced) - f1:0.3561, accuracy:0.6020
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 82, class_weight: balanced) - f1:0.3555, accuracy:0.6513
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 258, class_weight: balanced) - f1:0.2914, accuracy:0.7253
+(PolynomialFeatures) - (SelectPercentile) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1670, accuracy:0.7985
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 184, learning_rate: 0.0872, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 85, learning_rate: 0.1000, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(StandardScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 152, learning_rate: 0.1480, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 109, learning_rate: 0.1000, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 184, learning_rate: 0.0872, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+[2025-02-08 10:21:26] 3 - best f1: 0.370
+[2025-02-08 10:21:26] 
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 193, learning_rate: 0.1000) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 281, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 193, learning_rate: 0.1000) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 201, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 201, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 115, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 193, learning_rate: 0.1000) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 225, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 212, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 5, n_estimators: 199, learning_rate: 0.0919) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 148, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(PolynomialFeatures) - (SelectPercentile) - (XGBClassifier: n_estimators: 54, learning_rate: 0.1759, scale_pos_weight: 1) - f1:0.3614, accuracy:0.6573
+(passthrough) - (passthrough) - (GradientBoostingClassifier: max_depth: 4, n_estimators: 164, learning_rate: 0.1628) - f1:0.3032, accuracy:0.7287
+(passthrough) - (SelectKBest) - (RandomForestClassifier: n_estimators: 198, class_weight: balanced) - f1:0.2876, accuracy:0.7211
+(passthrough) - (SelectKBest) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.2854, accuracy:0.7185
+(RobustScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 198, class_weight: balanced) - f1:0.2835, accuracy:0.7236
+[2025-02-08 10:21:34] 4 - best f1: 0.370
+[2025-02-08 10:21:34] 
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 193, learning_rate: 0.1000) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 130, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.3907, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 131, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 1.9884, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.9014, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.3889, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 81, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 45, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 278, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 2.4554, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3561, accuracy:0.6020
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3561, accuracy:0.6020
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 1.3907, class_weight: balanced) - f1:0.3561, accuracy:0.6020
+(PolynomialFeatures) - (SelectKBest) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3499, accuracy:0.6514
+(PolynomialFeatures) - (SelectKBest) - (LogisticRegression: C: 0.9773, class_weight: balanced) - f1:0.3465, accuracy:0.6530
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3441, accuracy:0.6590
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3441, accuracy:0.6590
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.2948, accuracy:0.7219
+(RobustScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 163, class_weight: balanced) - f1:0.2926, accuracy:0.7236
+(RobustScaler) - (SelectKBest) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1000) - f1:0.2800, accuracy:0.7168
+(RobustScaler) - (SelectKBest) - (GradientBoostingClassifier: max_depth: 9, n_estimators: 100, learning_rate: 0.1000) - f1:0.2697, accuracy:0.7194
+[2025-02-08 10:21:44] 5 - best f1: 0.370
+[2025-02-08 10:21:44] 
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 193, learning_rate: 0.1000) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 188, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (XGBClassifier: n_estimators: 51, learning_rate: 0.1000, scale_pos_weight: 1) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 147, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(StandardScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 147, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 73, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 115, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 80, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 348, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 147, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 262, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 55, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 35, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 125, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(passthrough) - (SelectPercentile) - (RandomForestClassifier: n_estimators: 123, class_weight: balanced) - f1:0.3705, accuracy:0.6649
+(RobustScaler) - (SelectKBest) - (DecisionTreeClassifier: max_depth: 5, class_weight: balanced) - f1:0.3282, accuracy:0.6726
+(passthrough) - (SelectKBest) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.2952, accuracy:0.6684
+(passthrough) - (SelectKBest) - (RandomForestClassifier: n_estimators: 135, class_weight: balanced) - f1:0.2944, accuracy:0.7219
+(passthrough) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 80, class_weight: balanced) - f1:0.2908, accuracy:0.7211
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 522, class_weight: balanced) - f1:0.2898, accuracy:0.7245
+(passthrough) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2885, accuracy:0.7219
+(passthrough) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2882, accuracy:0.7177
+(passthrough) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 68, class_weight: balanced) - f1:0.2800, accuracy:0.7219
+(StandardScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 50, class_weight: balanced) - f1:0.2796, accuracy:0.7160
+(passthrough) - (VarianceThreshold) - (GradientBoostingClassifier: max_depth: 6, n_estimators: 100, learning_rate: 0.1805) - f1:0.2727, accuracy:0.7109
+[2025-02-08 10:21:44] Evaluation - Train - Accuracy: 0.6650, Precision: 0.2696, Recall: 0.6031, F1 Score: 0.3726
+[2025-02-08 10:21:44] Evaluation - Test - Accuracy: 0.6599, Precision: 0.2385, Recall: 0.6047, F1 Score: 0.3421
+[2025-02-08 10:21:44] AutoML init to training finished in: 39.2 s

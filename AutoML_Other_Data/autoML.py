@@ -7,8 +7,8 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.model_selection import train_test_split, KFold, StratifiedKFold
 from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, f1_score
 from sklearn.base import clone
@@ -55,12 +55,20 @@ models_regression = {
     'KNeighborsRegressor': {'class': KNeighborsRegressor, 'params': {'n_neighbors': 5}},
     'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
 
+# models_classification = {
+#     'DecisionTreeClassifier': {'class': DecisionTreeClassifier, 'params': {'max_depth': 6, 'class_weight':{0:0.5,1:2}}},
+#     'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100,'class_weight':{0:0.5,1:2}}},
+#     'GradientBoostingClassifier': {'class': GradientBoostingClassifier, 'params': {'max_depth': 6, 'n_estimators': 100, 'learning_rate': 0.1}},
+#     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0,'class_weight':{0:0.5,1:2}}},
+#     'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
+#     'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}}}
 models_classification = {
-    'DecisionTreeClassifier': {'class': DecisionTreeClassifier()},  # 추가
-    'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100, 'class_weight' : 'balanced'}},
-    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}},
-    'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0, 'class_weight' : 'balanced'}}}
-    
+    'DecisionTreeClassifier': {'class': DecisionTreeClassifier, 'params': {'max_depth': 6, 'class_weight': 'balanced'}},
+    'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100, 'class_weight': 'balanced'}},
+    'GradientBoostingClassifier': {'class': GradientBoostingClassifier, 'params': {'max_depth': 6, 'n_estimators': 100, 'learning_rate': 0.1}},
+    'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0, 'class_weight': 'balanced'}},
+    'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
+    'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}}}
     
 
 choose_random_key = lambda dictionary: random.choice(list(dictionary.keys()))
@@ -79,12 +87,8 @@ def evaluate_regression(y_true, y_pred):
     return dicts
 
 def evaluate_classification(y_true, y_pred):
-    # y_pred가 확률일 경우, 이진 클래스로 변환
-    if y_pred.ndim == 1:  # 이진 분류일 경우
-        y_pred = (y_pred >= 0.5).astype(int)  # 확률이 0.5 이상인 경우 1로, 그 외는 0으로 변환
-        
     accuracy = accuracy_score(y_true, y_pred)
-    f1 = f1_score(y_true, y_pred, average='weighted')
+    f1 = f1_score(y_true, y_pred)
     dicts = {'accuracy': accuracy, 'f1': f1}
     return dicts
 
@@ -533,28 +537,28 @@ class AutoML:
         if use_kfold: # k-fold validation으로 모델 평가
             kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
-            # smote = SMOTE(sampling_strategy='auto', random_state=42)
+            smote = SMOTE(sampling_strategy='auto', random_state=42)
 
             for train_index, valid_index in kf.split(X_train):
-                # X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
-                # X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
+                X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
+                X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
 
-                # # SMOTE 적용 (train set에만)
-                # X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
+                # SMOTE 적용 (train set에만)
+                X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
                 
-                # print("Before SMOTE:", Counter(y_train_fold))  
-                # print("After SMOTE:", Counter(y_train_resampled))
+                print("Before SMOTE:", Counter(y_train_fold))  
+                print("After SMOTE:", Counter(y_train_resampled))
 
-                # # 리스트에 추가
-                # self.X_trains.append(X_train_resampled)
-                # self.y_trains.append(y_train_resampled)
-                # self.X_valids.append(X_valid_fold)
-                # self.y_valids.append(y_valid_fold)
+                # 리스트에 추가
+                self.X_trains.append(X_train_resampled)
+                self.y_trains.append(y_train_resampled)
+                self.X_valids.append(X_valid_fold)
+                self.y_valids.append(y_valid_fold)
                 
-                self.X_trains.append(X_train.iloc[train_index, :])
-                self.X_valids.append(X_train.iloc[valid_index, :])
-                self.y_trains.append(y_train.iloc[train_index])
-                self.y_valids.append(y_train.iloc[valid_index])
+                # self.X_trains.append(X_train.iloc[train_index, :])
+                # self.X_valids.append(X_train.iloc[valid_index, :])
+                # self.y_trains.append(y_train.iloc[train_index])
+                # self.y_valids.append(y_train.iloc[valid_index])
 
  
         else: # single-fold validation으로 모델 평가
