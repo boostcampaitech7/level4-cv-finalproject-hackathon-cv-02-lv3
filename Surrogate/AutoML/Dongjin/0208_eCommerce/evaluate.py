@@ -31,7 +31,7 @@ def evaluate_autoML(X_train, y_train, X_test, y_test, n_generation, seed):
     autoML.log_dicts(train_score, 'Evaluation - Train')
     autoML.log_dicts(test_score, 'Evaluation - Test')
     scores['elapsed_time'] = elapsed_time
-    return scores
+    return scores, autoML
 
 def evaluate_auto_scikit(X_train, y_train, X_test, y_test, target_time, seed):
     import autosklearn.regression, shutil
@@ -61,7 +61,7 @@ def evaluate_auto_scikit(X_train, y_train, X_test, y_test, target_time, seed):
     elapsed_time = end - start
     scores['elapsed_time'] = elapsed_time
     print(f'Auto-scikitlearn init to training finished in: {elapsed_time:.1f} s')
-    return scores
+    return scores, autoML
 
 
 def evaluate_tpot(X_train, y_train, X_test, y_test, generations, seed):
@@ -85,4 +85,4 @@ def evaluate_tpot(X_train, y_train, X_test, y_test, generations, seed):
     elapsed_time = end - start
     scores['elapsed_time'] = elapsed_time
     print(f'TPOT init to training finished in: {elapsed_time:.1f} s')
-    return scores
+    return scores, autoML
