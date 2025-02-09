@@ -34,8 +34,8 @@ if __name__ == "__main__":
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
     func_dicts = {'autoML': {'func': evaluate_autoML, 'args': {'n_generation': 6}},
-                  'auto-scikitlearn': {'func': evaluate_auto_scikit, 'args': {'target_time': 450}}, # target_time': 400
-                  'tpot': {'func': evaluate_tpot, 'args': {'generations': 3}}} # generations': 1
+                  'auto-scikitlearn': {'func': evaluate_auto_scikit, 'args': {'target_time': 400}}, # target_time': 400
+                  'tpot': {'func': evaluate_tpot, 'args': {'generations': 6}}} # generations': 1
 
     func = func_dicts[mode]['func']
     args = func_dicts[mode]['args']
