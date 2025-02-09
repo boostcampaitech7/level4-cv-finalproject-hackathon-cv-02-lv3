@@ -1,0 +1,9 @@
+[2025-02-09 07:42:31] AutoML.__init__() - n_population: 5, n_generation: 30, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-09 07:42:31] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 3, max_n_try: 1000, timeout: 30
+[2025-02-09 07:42:42] 1 - best R2: 0.731
+[2025-02-09 07:42:42] 
+(passthrough) - (SelectKBest) - (XGBRegressor: n_estimators: 100, learning_rate: 0.1000, max_depth: 6) - 0.7314±0.0750
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - 0.7249±0.0651
+(StandardScaler) - (passthrough) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7139±0.0616
+(RobustScaler) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.2022±0.1086
+(RobustScaler) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.1103±0.1442
