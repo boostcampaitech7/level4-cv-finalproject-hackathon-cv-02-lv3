@@ -141,11 +141,6 @@ def search(X_train, y_train, model, search_x, search_y):
             allow_duplicate_points=True
         )
 
-        # 기존 X_simulation의 값을 초기 값으로 설정
-        optimizer.register(
-            params={i : row[i] for i in search_x.keys()}, 
-            target=target  # 초기 가격 값을 Bayesian Optimization에 등록  ## 이렇게 해도 되나?
-        )
 
         utility = UtilityFunction(kind="ei", xi=0.1)
         optimizer.maximize(init_points=10, n_iter=50, acquisition_function=utility) #acquisition_function=utility
