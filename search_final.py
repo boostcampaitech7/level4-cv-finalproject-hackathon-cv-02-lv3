@@ -1,13 +1,10 @@
 from bayes_opt import BayesianOptimization
 from bayes_opt.util import UtilityFunction
 import numpy as np
-import joblib
 import pandas as pd
-import argparse  # 실행 모드 선택을 위해 추가
 import time  # 실행 시간 측정을 위한 모듈
 from joblib import Parallel, delayed
-from shapely.geometry import Point, Polygon
-from sklearn.preprocessing import MinMaxScaler
+
 
 
 def calculate(row, priority_list, max_num, prediction, search_y, y):
@@ -16,19 +13,20 @@ def calculate(row, priority_list, max_num, prediction, search_y, y):
         if i in priority_list.keys():
             # priority_list
             if priority_list[i][1]=='최대화하기':
-                target+= (1/(priority_list[i][0]+1))**2 * row[i] # 우선순위에 따라서 target에 적게 반영되는것을 의도
+                target+= (1/(priority_list[i][0]))**2 * row[i] # 우선순위에 따라서 target에 적게 반영되는것을 의도
             else:
-                target-= (1/(priority_list[i][0]+1))**2 * row[i]
+                target-= (1/(priority_list[i][0]))**2 * row[i]
 
     if priority_list[y][1] == "최대화하기":
-        target+= (1/(priority_list[y][0]+1))**2 * prediction
+        target+= (1/(priority_list[y][0]))**2 * prediction
     elif priority_list[y][1] == "최소화하기":
-        target-= (1/(priority_list[y][0]+1))**2 * prediction
+        target-= (1/(priority_list[y][0]))**2 * prediction
         
     elif priority_list[y][1] == "목표값에 맞추기":
-        target-= (max_num-priority_list[y][0]+1)*10*abs(prediction - search_y[y]["목표값"])
+        target-= (1/(priority_list[y][0]))*abs(prediction - search_y[y]["목표값"])
     else:
-        target-= (max_num-priority_list[y][0]+1)*10*abs(search_y[y]['범위 설정'].sum()-2*prediction)
+        search_range = search_y[y]['범위 설정'][0] + search_y[y]['범위 설정'][1]
+        target-= (1/(priority_list[y][0]))*abs(search_range - 2*prediction)
     
     return target
 
@@ -87,7 +85,9 @@ def search(X_train, y_train, model, search_x, search_y):
                 else:
                     return - abs(search_y[y]['범위 설정'].sum()-2* prediction)
                 
+
         
+        # 0~1 정규화 아무런 변화가 없음
         else:
 
 
@@ -112,7 +112,7 @@ def search(X_train, y_train, model, search_x, search_y):
                         X_min, X_max = feature_ranges[key]
                         if (X_max - X_min) > 0:  # 분모가 0이 되는 경우 방지
                             X_scaled = (value - X_min) / (X_max - X_min) # X를 0~1로 정규화
-                            X_simulation_scaled[key] = X_scaled * (y_max - y_min) + y_min # y 범위로 변환
+                            X_simulation_scaled[key] = X_scaled 
                         else:
                             X_simulation_scaled[key] = value  # 변화가 없는 경우 그대로 사용
                         X_simulation[key] = value
@@ -120,11 +120,15 @@ def search(X_train, y_train, model, search_x, search_y):
                 # 데이터를 모델에 맞는 포맷으로 변환
                 input_df = pd.DataFrame([X_simulation])
                 prediction = model.predict(input_df)[0]  # 1개의 값 예측
-                
+
+                prediction = (prediction - y_min) / (y_max - y_min) # y를 0~1 정규화               
 
                 target = calculate(X_simulation_scaled, priority_list, max_num, prediction, search_y, y)
                 
                 return target
+            
+
+
             
 
         # Bayesian Optimization 실행
