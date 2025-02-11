@@ -64,7 +64,6 @@ models_classification = {
     'GradientBoostingClassifier': {'class': GradientBoostingClassifier, 'params': {'max_depth': 10, 'n_estimators': 100, 'learning_rate': 0.1}},
     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0, 'class_weight': 'balanced'}},
     'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
-    'BernoulliNB': {'class': BernoulliNB, 'params': {'alpha':0.01}},
     'SGDClassifier': {'class': SGDClassifier, 'params': {'class_weight': 'balanced', 'alpha': 0.001, 'power_t': 0.5}},
     'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 1.0, 'max_depth':3, 'scale_pos_weight': 1}}}
     
@@ -550,26 +549,8 @@ class AutoML:
         if use_kfold: # k-fold validation으로 모델 평가
             kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
-            # smote = SMOTE(sampling_strategy='auto', random_state=42)
 
             for train_index, valid_index in kf.split(X_train):
-                
-                # if smote_option:
-                #     X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
-                #     X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
-
-                #     # SMOTE 적용 (train set에만)
-                #     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
-                    
-                #     print("Before SMOTE:", Counter(y_train_fold))  
-                #     print("After SMOTE:", Counter(y_train_resampled))
-
-                #     # 리스트에 추가
-                #     self.X_trains.append(X_train_resampled)
-                #     self.y_trains.append(y_train_resampled)
-                #     self.X_valids.append(X_valid_fold)
-                #     self.y_valids.append(y_valid_fold)
-                # else:
                 self.X_trains.append(X_train.iloc[train_index, :])
                 self.X_valids.append(X_train.iloc[valid_index, :])
                 self.y_trains.append(y_train.iloc[train_index])
