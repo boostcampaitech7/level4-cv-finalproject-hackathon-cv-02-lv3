@@ -9,19 +9,10 @@ from sklearn.metrics import (
     explained_variance_score
 )
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
-from sklearn.model_selection import train_test_split
 
 
 
 def data_preparation(data_path, verbose=False):
-    # drop_tables = [
-    # "BusinessTravel", "DailyRate", "Department", "DistanceFromHome", "Education", 
-    # "EducationField", "EmployeeCount", "EmployeeNumber", "EnvironmentSatisfaction", 
-    # "Gender", "HourlyRate", "JobInvolvement", "JobRole", "MaritalStatus", 
-    # "MonthlyIncome", "MonthlyRate", "NumCompaniesWorked", "Over18", "OverTime", 
-    # "PercentSalaryHike", "PerformanceRating", "RelationshipSatisfaction", 
-    # "StandardHours", "StockOptionLevel", "TotalWorkingYears", "TrainingTimesLastYear", 
-    # "YearsAtCompany", "YearsInCurrentRole", "YearsWithCurrManager"]
     drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "StandardHours"]
 
 
@@ -76,7 +67,6 @@ def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
         'F1 Score_Weighted': f1_score(y_true, y_pred, average='weighted'),
         'auc' : roc_auc_score(y_true, y_pred),
         'Precision': precision_score(y_true, y_pred),
-        'Recall': recall_score(y_true, y_pred),      
         'Accuracy': accuracy_score(y_true, y_pred)
     }
     print(f"\nEvaluation for {dataset_name}:")
@@ -84,7 +74,6 @@ def evaluate_classification(y_true, y_pred, dataset_name="Dataset"):
     print(f"F1 Score_Weighted: {dicts['F1 Score_Weighted']:.4f}")
     print(f"AUC: {dicts['auc']:.4f}")
     print(f"Precision: {dicts['Precision']:.4f}")
-    print(f"Recall: {dicts['Recall']:.4f}")
     print(f"Accuracy: {dicts['Accuracy']:.4f}")
 
     return dicts

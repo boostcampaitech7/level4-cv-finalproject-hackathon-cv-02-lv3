@@ -16,7 +16,7 @@ def main(task_type='regression', n_population=30, n_generation=5, n_parent=5, pr
                     n_parent=n_parent, prob_mutations=prob_mutations,
                     use_joblib=use_joblib, n_jobs=n_jobs)
     autoML.fit(X_train, y_train, use_kfold=use_kfold,
-               kfold=kfold, timeout=timeout, seed=seed, task_type=task_type)
+               kfold=kfold, timeout=timeout, seed=seed)
     
     end = time.time()
 
@@ -32,6 +32,8 @@ def main(task_type='regression', n_population=30, n_generation=5, n_parent=5, pr
 
     autoML.log_dicts(train_score, 'Evaluation - Train')
     autoML.log_dicts(test_score, 'Evaluation - Test')
+    autoML.log_dicts(autoML.get_feature_importance(), 'Feature importance')
+
 
     elapsed_time = end-start
     autoML.log(f'AutoML init to training finished in: {elapsed_time:.1f} s')

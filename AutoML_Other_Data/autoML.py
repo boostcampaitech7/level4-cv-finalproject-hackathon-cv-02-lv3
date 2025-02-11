@@ -17,6 +17,7 @@ from xgboost import XGBRegressor, XGBClassifier
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.model_selection import RandomizedSearchCV
 from imblearn.over_sampling import SMOTE
+from sklearn.inspection import permutation_importance
 import random
 from datetime import datetime
 import math
@@ -56,14 +57,6 @@ models_regression = {
     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0}},
     'KNeighborsRegressor': {'class': KNeighborsRegressor, 'params': {'n_neighbors': 5}},
     'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}}
-
-# models_classification = {
-#     'DecisionTreeClassifier': {'class': DecisionTreeClassifier, 'params': {'max_depth': 6, 'class_weight':{0:0.5,1:2}}},
-#     'RandomForestClassifier': {'class': RandomForestClassifier, 'params': {'n_estimators': 100,'class_weight':{0:0.5,1:2}}},
-#     'GradientBoostingClassifier': {'class': GradientBoostingClassifier, 'params': {'max_depth': 6, 'n_estimators': 100, 'learning_rate': 0.1}},
-#     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0,'class_weight':{0:0.5,1:2}}},
-#     'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
-#     'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'scale_pos_weight': 1}}}
 
 models_classification = {
     'DecisionTreeClassifier': {'class': DecisionTreeClassifier, 'params': {'max_depth': 6, 'class_weight': 'balanced'}},
@@ -475,6 +468,21 @@ class AutoML:
         y_pred = self.best_structure['pipeline'].predict(X)
         return y_pred
 
+    def get_feature_importance(self):
+        feature_names = self.X_trains[0].columns
+        model = self.best_structure['pipeline']['models']
+
+        try:
+            feature_importances = model.feature_importances_
+        except:
+            result = permutation_importance(model, self.X_valids[0], self.y_valids[0], n_repeats=10)
+            feature_importances = result.importances_mean 
+
+        importance_dict = {name: importance for name, importance in zip(feature_names, feature_importances)}
+        sorted_importances = dict(sorted(importance_dict.items(), key=lambda x: x[1], reverse=True))
+
+        return sorted_importances
+
     def report_structure(self, structure):
         arr = []
         keys = list(self.pipeline_components.keys())
@@ -517,7 +525,7 @@ class AutoML:
         self.log(log)
 
 
-    def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30, task_type='regression'):
+    def fit(self, X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42, max_n_try=1000, timeout=30):
         """
         유전 알고리즘을 이용한 최적 모델 탐색
 
@@ -531,10 +539,9 @@ class AutoML:
             max_n_try (int, optional): 최대 새 구조 생성 시도횟수. 기본값 1000.
             timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30.
         """
-        self.task_type = task_type
         
         dicts = {'use_kfold': use_kfold, 'kfold': kfold, 'valid_size': valid_size,
-                 'seed': seed, 'max_n_try': max_n_try, 'timeout': timeout, 'task_type': task_type}
+                 'seed': seed, 'max_n_try': max_n_try, 'timeout': timeout, 'task_type': self.task_type}
 
         random.seed(seed)
         np.random.seed(seed)
@@ -543,28 +550,31 @@ class AutoML:
         if use_kfold: # k-fold validation으로 모델 평가
             kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
-            smote = SMOTE(sampling_strategy='auto', random_state=42)
+            # smote = SMOTE(sampling_strategy='auto', random_state=42)
 
             for train_index, valid_index in kf.split(X_train):
-                X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
-                X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
-
-                # SMOTE 적용 (train set에만)
-                X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
                 
-                print("Before SMOTE:", Counter(y_train_fold))  
-                print("After SMOTE:", Counter(y_train_resampled))
+                # if smote_option:
+                #     X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
+                #     X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
 
-                # 리스트에 추가
-                self.X_trains.append(X_train_resampled)
-                self.y_trains.append(y_train_resampled)
-                self.X_valids.append(X_valid_fold)
-                self.y_valids.append(y_valid_fold)
+                #     # SMOTE 적용 (train set에만)
+                #     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
+                    
+                #     print("Before SMOTE:", Counter(y_train_fold))  
+                #     print("After SMOTE:", Counter(y_train_resampled))
+
+                #     # 리스트에 추가
+                #     self.X_trains.append(X_train_resampled)
+                #     self.y_trains.append(y_train_resampled)
+                #     self.X_valids.append(X_valid_fold)
+                #     self.y_valids.append(y_valid_fold)
+                # else:
+                self.X_trains.append(X_train.iloc[train_index, :])
+                self.X_valids.append(X_train.iloc[valid_index, :])
+                self.y_trains.append(y_train.iloc[train_index])
+                self.y_valids.append(y_train.iloc[valid_index])
                 
-                # self.X_trains.append(X_train.iloc[train_index, :])
-                # self.X_valids.append(X_train.iloc[valid_index, :])
-                # self.y_trains.append(y_train.iloc[train_index])
-                # self.y_valids.append(y_train.iloc[valid_index])
 
  
         else: # single-fold validation으로 모델 평가

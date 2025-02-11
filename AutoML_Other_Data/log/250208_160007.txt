@@ -1,0 +1,165 @@
+[2025-02-08 16:00:07] AutoML.__init__() - task_type: classification, n_population: 30, n_generation: 5, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-08 16:00:07] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 42, max_n_try: 1000, timeout: 30, task_type: classification
+[2025-02-08 16:00:21] 1 - best f1: 0.493
+[2025-02-08 16:00:21] 
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4922, accuracy:0.7746
+(StandardScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0100) - f1:0.4566, accuracy:0.8112
+(RobustScaler) - (passthrough) - (BernoulliNB: alpha: 0.0100) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0100) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (SelectKBest) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4463, accuracy:0.7177
+(passthrough) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 1.0000, max_depth: 3, scale_pos_weight: 1) - f1:0.4419, accuracy:0.8435
+(PolynomialFeatures) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4377, accuracy:0.7441
+(PolynomialFeatures) - (passthrough) - (BernoulliNB: alpha: 0.0100) - f1:0.4292, accuracy:0.7143
+(RobustScaler) - (SelectKBest) - (BernoulliNB: alpha: 0.0100) - f1:0.4207, accuracy:0.8214
+(RobustScaler) - (SelectKBest) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3911, accuracy:0.7058
+(RobustScaler) - (SelectPercentile) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3865, accuracy:0.7168
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingClassifier: max_depth: 10, n_estimators: 100, learning_rate: 0.1000) - f1:0.3815, accuracy:0.8257
+(passthrough) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.3764, accuracy:0.6318
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3647, accuracy:0.7194
+(StandardScaler) - (SelectKBest) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.3630, accuracy:0.6615
+(passthrough) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3599, accuracy:0.7177
+(PolynomialFeatures) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3568, accuracy:0.7305
+(passthrough) - (SelectKBest) - (BernoulliNB: alpha: 0.0100) - f1:0.3269, accuracy:0.8257
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 10, n_estimators: 100, learning_rate: 0.1000) - f1:0.3105, accuracy:0.7968
+(RobustScaler) - (SelectPercentile) - (GradientBoostingClassifier: max_depth: 10, n_estimators: 100, learning_rate: 0.1000) - f1:0.3081, accuracy:0.7934
+(StandardScaler) - (SelectKBest) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.2896, accuracy:0.8274
+(StandardScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2883, accuracy:0.8367
+(passthrough) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.1790, accuracy:0.8469
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.1720, accuracy:0.8478
+(RobustScaler) - (VarianceThreshold) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.1711, accuracy:0.8486
+(passthrough) - (passthrough) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1570, accuracy:0.8180
+(PolynomialFeatures) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.1524, accuracy:0.8223
+(passthrough) - (SelectKBest) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.1355, accuracy:0.5582
+[2025-02-08 16:00:26] 2 - best f1: 0.507
+[2025-02-08 16:00:26] 
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.5072, accuracy:0.7637
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0724, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4922, accuracy:0.7746
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.3510, class_weight: balanced) - f1:0.4921, accuracy:0.7636
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0020, power_t: 0.5000) - f1:0.4899, accuracy:0.7576
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4816, accuracy:0.7424
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0006, power_t: 0.5677) - f1:0.4634, accuracy:0.7432
+(StandardScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0100) - f1:0.4566, accuracy:0.8112
+(StandardScaler) - (passthrough) - (BernoulliNB: alpha: 0.0053) - f1:0.4566, accuracy:0.8112
+(StandardScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0086) - f1:0.4566, accuracy:0.8112
+(RobustScaler) - (passthrough) - (BernoulliNB: alpha: 0.0100) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0146) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0100) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (passthrough) - (BernoulliNB: alpha: 0.0186) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0086) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0100) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 0.5145, max_depth: 5, scale_pos_weight: 1) - f1:0.4466, accuracy:0.8588
+(RobustScaler) - (SelectKBest) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4104, accuracy:0.7066
+(RobustScaler) - (SelectKBest) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5673) - f1:0.4102, accuracy:0.6709
+(RobustScaler) - (passthrough) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3579, accuracy:0.7160
+(PolynomialFeatures) - (passthrough) - (LogisticRegression: C: 1.1729, class_weight: balanced) - f1:0.3365, accuracy:0.6446
+(RobustScaler) - (SelectKBest) - (RandomForestClassifier: n_estimators: 100, class_weight: balanced) - f1:0.2877, accuracy:0.8410
+(PolynomialFeatures) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0020, power_t: 0.9246) - f1:0.2840, accuracy:0.3172
+(RobustScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 1.0000, max_depth: 5, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(RobustScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 175, learning_rate: 1.0000, max_depth: 5, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(PolynomialFeatures) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 1.0367, max_depth: 5, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(PolynomialFeatures) - (VarianceThreshold) - (XGBClassifier: n_estimators: 169, learning_rate: 1.1595, max_depth: 9, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+(StandardScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 172, learning_rate: 0.9578, max_depth: 3, scale_pos_weight: 0) - f1:0.0000, accuracy:0.8350
+[2025-02-08 16:00:40] 3 - best f1: 0.507
+[2025-02-08 16:00:40] 
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.5072, accuracy:0.7637
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 0.5934, class_weight: balanced) - f1:0.4964, accuracy:0.7679
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0724, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.0724, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4922, accuracy:0.7746
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.5109, class_weight: balanced) - f1:0.4921, accuracy:0.7636
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.6864, class_weight: balanced) - f1:0.4921, accuracy:0.7636
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.4769, accuracy:0.7475
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0108) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0128) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (passthrough) - (BernoulliNB: alpha: 0.0113) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0092) - f1:0.4532, accuracy:0.8019
+(RobustScaler) - (SelectKBest) - (SGDClassifier: class_weight: balanced, alpha: 0.0013, power_t: 0.8872) - f1:0.4471, accuracy:0.7373
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0724, class_weight: balanced) - f1:0.4314, accuracy:0.7007
+(RobustScaler) - (SelectKBest) - (BernoulliNB: alpha: 0.0108) - f1:0.4207, accuracy:0.8214
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingClassifier: max_depth: 8, n_estimators: 157, learning_rate: 0.1004) - f1:0.3674, accuracy:0.8487
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingClassifier: max_depth: 10, n_estimators: 100, learning_rate: 0.1000) - f1:0.3606, accuracy:0.8155
+(passthrough) - (VarianceThreshold) - (LogisticRegression: C: 1.0724, class_weight: balanced) - f1:0.3550, accuracy:0.6394
+(PolynomialFeatures) - (VarianceThreshold) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3370, accuracy:0.7211
+(StandardScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.2466, accuracy:0.8444
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(PolynomialFeatures) - (passthrough) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1380, accuracy:0.8206
+[2025-02-08 16:00:41] 4 - best f1: 0.525
+[2025-02-08 16:00:41] 
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.6765) - f1:0.5246, accuracy:0.8121
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.5072, accuracy:0.7637
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0016, power_t: 0.4251) - f1:0.5014, accuracy:0.7695
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.6765) - f1:0.4992, accuracy:0.7534
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.2745) - f1:0.4975, accuracy:0.7679
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 0.5934, class_weight: balanced) - f1:0.4964, accuracy:0.7679
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 0.6094, class_weight: balanced) - f1:0.4964, accuracy:0.7679
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 0.5934, class_weight: balanced) - f1:0.4964, accuracy:0.7679
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.0724, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (passthrough) - (LogisticRegression: C: 1.0165, class_weight: balanced) - f1:0.4929, accuracy:0.7645
+(RobustScaler) - (VarianceThreshold) - (LogisticRegression: C: 1.6984, class_weight: balanced) - f1:0.4921, accuracy:0.7636
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.5264) - f1:0.4906, accuracy:0.7517
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.3614) - f1:0.4793, accuracy:0.7501
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.7737) - f1:0.4783, accuracy:0.7186
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0021, power_t: 0.2916) - f1:0.4744, accuracy:0.7449
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0021, power_t: 0.6765) - f1:0.4710, accuracy:0.7441
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0021, power_t: 0.2745) - f1:0.4677, accuracy:0.7389
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0021, power_t: 0.5691) - f1:0.4672, accuracy:0.7517
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.7268) - f1:0.4538, accuracy:0.7372
+(RobustScaler) - (VarianceThreshold) - (BernoulliNB: alpha: 0.0100) - f1:0.4532, accuracy:0.8019
+(StandardScaler) - (passthrough) - (XGBClassifier: n_estimators: 100, learning_rate: 1.0000, max_depth: 3, scale_pos_weight: 1) - f1:0.4419, accuracy:0.8435
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4345, accuracy:0.7041
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4338, accuracy:0.7015
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.9178, class_weight: balanced) - f1:0.4329, accuracy:0.7024
+(RobustScaler) - (SelectPercentile) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.2745) - f1:0.4289, accuracy:0.6837
+(PolynomialFeatures) - (passthrough) - (LogisticRegression: C: 0.5771, class_weight: balanced) - f1:0.3314, accuracy:0.6454
+(StandardScaler) - (passthrough) - (RandomForestClassifier: n_estimators: 67, class_weight: balanced) - f1:0.1609, accuracy:0.8469
+(PolynomialFeatures) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0018, power_t: 0.3990) - f1:0.1493, accuracy:0.6678
+[2025-02-08 16:00:50] 5 - best f1: 0.526
+[2025-02-08 16:00:50] 
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.3187) - f1:0.5259, accuracy:0.7824
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.6765) - f1:0.5246, accuracy:0.8121
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.5000) - f1:0.5072, accuracy:0.7637
+(RobustScaler) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0016, power_t: 0.4251) - f1:0.5014, accuracy:0.7695
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.5736) - f1:0.4997, accuracy:0.7807
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.6765) - f1:0.4992, accuracy:0.7534
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0015, power_t: 0.2745) - f1:0.4975, accuracy:0.7679
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.9704) - f1:0.4806, accuracy:0.7509
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0027, power_t: 0.4762) - f1:0.4753, accuracy:0.7381
+(RobustScaler) - (VarianceThreshold) - (SGDClassifier: class_weight: balanced, alpha: 0.0010, power_t: 0.7758) - f1:0.4586, accuracy:0.7339
+(StandardScaler) - (passthrough) - (BernoulliNB: alpha: 0.0100) - f1:0.4566, accuracy:0.8112
+(RobustScaler) - (SelectKBest) - (LogisticRegression: C: 1.1805, class_weight: balanced) - f1:0.4464, accuracy:0.7177
+(RobustScaler) - (VarianceThreshold) - (XGBClassifier: n_estimators: 100, learning_rate: 1.0703, max_depth: 3, scale_pos_weight: 1) - f1:0.4455, accuracy:0.8452
+(RobustScaler) - (SelectPercentile) - (SGDClassifier: class_weight: balanced, alpha: 0.0030, power_t: 0.2392) - f1:0.4368, accuracy:0.7313
+(StandardScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4345, accuracy:0.7041
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4338, accuracy:0.7015
+(RobustScaler) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4338, accuracy:0.7015
+(passthrough) - (SelectPercentile) - (LogisticRegression: C: 1.0000, class_weight: balanced) - f1:0.4330, accuracy:0.7007
+(RobustScaler) - (SelectPercentile) - (SGDClassifier: class_weight: balanced, alpha: 0.0014, power_t: 0.8243) - f1:0.4302, accuracy:0.7101
+(RobustScaler) - (SelectPercentile) - (SGDClassifier: class_weight: balanced, alpha: 0.0019, power_t: 0.2050) - f1:0.4149, accuracy:0.7331
+(RobustScaler) - (SelectPercentile) - (SGDClassifier: class_weight: balanced, alpha: 0.0019, power_t: 0.2050) - f1:0.4007, accuracy:0.6548
+(passthrough) - (passthrough) - (LogisticRegression: C: 0.8308, class_weight: balanced) - f1:0.3763, accuracy:0.6403
+(StandardScaler) - (VarianceThreshold) - (GradientBoostingClassifier: max_depth: 14, n_estimators: 100, learning_rate: 0.1992) - f1:0.3539, accuracy:0.7959
+(PolynomialFeatures) - (passthrough) - (DecisionTreeClassifier: max_depth: 6, class_weight: balanced) - f1:0.3449, accuracy:0.7211
+(PolynomialFeatures) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0023, power_t: 0.6765) - f1:0.2814, accuracy:0.2865
+(RobustScaler) - (SelectKBest) - (KNeighborsClassifier: n_neighbors: 7) - f1:0.2770, accuracy:0.8350
+(StandardScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.2466, accuracy:0.8444
+(PolynomialFeatures) - (passthrough) - (SGDClassifier: class_weight: balanced, alpha: 0.0024, power_t: 1.3424) - f1:0.1704, accuracy:0.6018
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+(RobustScaler) - (VarianceThreshold) - (KNeighborsClassifier: n_neighbors: 5) - f1:0.1685, accuracy:0.8418
+[2025-02-08 16:00:50] Evaluation - Train - F1 Score: 0.5841, F1 Score_Weighted: 0.8488, auc: 0.7761, Precision: 0.5116, Accuracy: 0.8401
+[2025-02-08 16:00:50] Evaluation - Test - F1 Score: 0.5600, F1 Score_Weighted: 0.8587, auc: 0.7678, Precision: 0.4912, Accuracy: 0.8503
+[2025-02-08 16:00:50] AutoML init to training finished in: 42.6 s

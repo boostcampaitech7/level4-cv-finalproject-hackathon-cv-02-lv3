@@ -44,7 +44,6 @@ pipeline_optimizer.fit(X_train, y_train)
 print("test score : ", pipeline_optimizer.score(X_test, y_test)) # 0.7821675437298992
 # 0.727601223014917 - f1_macro
 # 0.5348837209302325 - f1
-# 0.6222222222222222 - f1
 # 0.861947558602798 - ROC AUC
 # 0.7906976744186046 - recall 
 # 0.8938052143934497 - f1_weignted
