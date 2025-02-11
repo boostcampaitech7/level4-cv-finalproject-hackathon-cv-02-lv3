@@ -1,5 +1,5 @@
 import pandas as pd
-from autoML import AutoML
+from automl import AutoML
 import os
 from utils import evaluate_regression, data_preparation, evaluate_classification
 import time
@@ -7,7 +7,7 @@ import cloudpickle
 
 def main(task_type='regression', n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2, 0.5], use_joblib=True, n_jobs=-1, use_kfold=True, kfold=5, timeout=30, seed=42):
     py_dir_path = os.path.dirname(os.path.abspath(__file__)) # 현재 파이썬 스크립트 디렉토리
-    data_path = os.path.join(py_dir_path, 'data/IBM_employee_attrition_encoding_fin.csv') 
+    data_path = os.path.join(py_dir_path, 'melb_split.csv') 
     X_train, y_train, X_test, y_test = data_preparation(data_path) # 데이터 준비
 
     start = time.time()
@@ -44,8 +44,8 @@ def main(task_type='regression', n_population=30, n_generation=5, n_parent=5, pr
     # print(f"Model saved in '{os.path.join(py_dir_path, 'autoML_attrition.pkl')}'.")
 
 if __name__ == '__main__':
-    # main()
-    main(task_type='classification')
+    main()
+    # main(task_type='classification')
     # main(use_joblib=False)
     # main(use_kfold=False)
     # main(task_type='classification', prob_mutations=[0.2, -1]) # hyperparameter mutation X

@@ -13,26 +13,37 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 
 def data_preparation(data_path, verbose=False):
-    drop_tables = ["EmployeeCount", "EmployeeNumber", "Over18", "StandardHours"]
-
+    drop_tables = ['Suburb', 'Address', 'Rooms', 'Method', 'SellerG', 'Date', 'Distance', 'Postcode',
+               'Bedroom2', 'Bathroom', 'Car', 'Landsize', 'YearBuilt', 'CouncilArea',
+               'Regionname', 'Propertycount']
 
     # df 불러오기 및 column 제거
     df = pd.read_csv(data_path)
+    
+    print(df.shape)
+    print(df.head(10))
     df = df.drop(drop_tables, axis=1)
     df = df.dropna(axis=0)
 
+    index = 0.1 < df['BuildingArea'] # BuildingArea 0값 제거
+    df = df.loc[index]
+
+    print(df.shape)
+    print(df.head(10))
     # 데이터셋 분리
     train_data = df[df['Split'] == 'Train']
     train_data = train_data.drop(['Split'], axis=1)
+    train_data = pd.get_dummies(train_data, dtype='float')
 
     test_data = df[df['Split'] == 'Test']
     test_data = test_data.drop(['Split'], axis=1)
+    test_data = pd.get_dummies(test_data, dtype='float')
 
     # 타겟 변수와 특성 분리
-    y_train = train_data['Attrition']
-    X_train = train_data.drop(['Attrition'], axis=1)
-    y_test = test_data['Attrition']
-    X_test = test_data.drop(['Attrition'], axis=1)
+    y_train = train_data['Price']
+    X_train = train_data.drop(['Price'], axis=1)
+    y_test = test_data['Price']
+    X_test = test_data.drop(['Price'], axis=1)
 
     if verbose:
         # 결과 확인

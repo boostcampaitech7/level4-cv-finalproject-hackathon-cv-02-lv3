@@ -1,3 +1,5 @@
+# 본 코드는 TPOT (Evaluation of a Tree-based Pipeline Optimization Tool
+# for Automating Data Science, GECCO '16)에서 아이디어를 얻어 구현했습니다.
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures, FunctionTransformer
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
@@ -5,6 +7,7 @@ from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.model_selection import KFold, train_test_split
+from sklearn.inspection import permutation_importance
 from xgboost import XGBRegressor, XGBClassifier
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.exceptions import ConvergenceWarning
@@ -180,6 +183,21 @@ class AutoML:
             file.write(log_message + "\n") 
             file.flush()
             
+    def get_feature_importance(self):
+        feature_names = self.X_trains[0].columns
+        model = self.best_structure['pipeline']['models']
+
+        try:
+            feature_importances = model.feature_importances_
+        except:
+            result = permutation_importance(model, self.X_valids[0], self.y_valids[0], n_repeats=10)
+            feature_importances = result.importances_mean 
+
+        importance_dict = {name: importance for name, importance in zip(feature_names, feature_importances)}
+        sorted_importances = dict(sorted(importance_dict.items(), key=lambda x: x[1], reverse=True))
+
+        return sorted_importances
+            
     def _log_structures(self):
         """
         현재 structure의 요약 정보를 로그에 기록하는 함수.
@@ -193,7 +211,7 @@ class AutoML:
         log = []
         self.structures = sort(self.structures, self.task_type)
         for _, structure in enumerate(self.structures):
-            log.append(generate_structure_summary(structure))
+            log.append(generate_structure_summary(self, structure))
         
         log = '\n' + '\n'.join(log)
         self.log(log)
@@ -210,7 +228,7 @@ class AutoML:
         self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
         os.makedirs(self.log_dir_path, exist_ok=True)
     
-    def _split_data(X_train, y_train, use_kfold=True, kfold=5, valid_size=0.2, seed=42):
+    def _split_data(self, X_train, y_train, use_kfold, kfold, valid_size, seed):
         """
         데이터를 k-fold 또는 단일 validation 세트로 분할하는 함수
 
@@ -259,9 +277,9 @@ class AutoML:
         self.best_structure = self.structures[0]
         self.best_score = self.best_structure['valid_metric']['f1'] if self.task_type == 'classification' else self.best_structure['valid_metric']['r2']
         self.log(f"{generation+1} - best {'F1' if self.task_type == 'classification' else 'R2'}: {self.best_score:.3f}")
-        self._log_structures(self)
+        self._log_structures()
     
-    def _generate_random_structures(n, task_type):
+    def _generate_random_structures(self, n, task_type):
         """
         n개의 임의의 structure 생성
 

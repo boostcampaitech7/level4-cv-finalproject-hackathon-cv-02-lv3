@@ -119,12 +119,12 @@ def fit_structures(self, timeout=30):
 
     if self.use_joblib:
         self.structures = Parallel(n_jobs=self.n_jobs)(
-                            delayed(self.fit_structure)(structure, timeout, i)
+                            delayed(fit_structure)(self, structure, timeout, i)
                             for i, structure in enumerate(self.structures)
                             )
         
     else:
-        self.structures = [fit_structure(structure, timeout, i) for i, structure in enumerate(self.structures)]
+        self.structures = [fit_structure(self, structure, timeout, i) for i, structure in enumerate(self.structures)]
 
 
 def fit_structure(self, structure, timeout=30, order=0):
@@ -180,15 +180,16 @@ def fit_structure(self, structure, timeout=30, order=0):
     finally:
         signal.alarm(0) # alarm 초기화
         
-    if self.task_type == 'regression':
-        valid_r2 = structure['valid_metric']['r2']
-        valid_r2_std = structure['valid_metric']['r2_std']
-        print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}") # 결과 출력
-    else:
+    if self.task_type == 'classification':
         valid_f1 = structure['valid_metric']['f1']
         valid_accuracy = structure['valid_metric']['accuracy']
-        print(f"Structure-{order} - valid_f1: {valid_f1:.4f}") # 결과 출력
-        print(f"Structure-{order} - valid_accuracy: {valid_accuracy:.4f}") # 결과 출력
+        print(f"Structure-{order} - valid_f1: {valid_f1:.4f}")
+        print(f"Structure-{order} - valid_accuracy: {valid_accuracy:.4f}")
+    else:
+        valid_r2 = structure['valid_metric']['r2']
+        valid_r2_std = structure['valid_metric']['r2_std']
+        print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}")
+        
     return structure
 
 def sort(structures, task_type):
