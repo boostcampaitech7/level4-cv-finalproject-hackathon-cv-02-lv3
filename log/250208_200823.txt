@@ -1,2 +1,0 @@
-[2025-02-08 20:08:23] AutoML.__init__() - task_type: regression, n_population: 30, n_generation: 5, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
-[2025-02-08 20:08:23] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 42, max_n_try: 1000, timeout: 30, task_type: regression

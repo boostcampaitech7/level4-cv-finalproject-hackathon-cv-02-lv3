@@ -43,7 +43,7 @@ def calculate(row, priority_list, max_num, initial_y, search_y, y):
 def search(X_train, y_train, model, search_x, search_y):
 
     start_time = time.time()  # ⏱️ 최적화 시작 시간 기록
-
+    search_x_keys = sorted(list(search_x.keys()))  # 🔥 search_x의 순서 고정
     y = list(search_y.keys())[0]
     if "순위" not in search_y[y].keys():
         priority_list = { y : search_y[y]["목표"]}
@@ -53,7 +53,7 @@ def search(X_train, y_train, model, search_x, search_y):
 
     range_dict = {}
 
-    for i in search_x.keys():
+    for i in search_x_keys:
         if search_x[i]["목표"]=="최적화하지 않기":
             pass
         else:    
@@ -143,7 +143,7 @@ def search(X_train, y_train, model, search_x, search_y):
 
         # 기존 X_simulation의 값을 초기 값으로 설정
         optimizer.register(
-            params={i : row[i] for i in search_x.keys()}, 
+            params={i : row[i] for i in search_x_keys}, 
             target=target  # ✅ 초기 가격 값을 Bayesian Optimization에 등록  ## 이렇게 해도 되나?
         )
 
@@ -165,7 +165,7 @@ def search(X_train, y_train, model, search_x, search_y):
         # ✅ 모델 예측
         y_pred = model.predict(best_x_df)[0]
 
-        dict1 = {i: best_solution[i] for i in search_x.keys()}
+        dict1 = {i: best_solution[i] for i in search_x_keys}
         dict2 = {
             'index': index,
             'target': optimizer.max['target'],  # 기존 최적화된 target 값

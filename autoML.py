@@ -44,10 +44,7 @@ preprocessors = {'StandardScaler': {'class': StandardScaler()},
                  'PolynomialFeatures': {'class': PolynomialFeatures()},
                  'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
-feature_selections = {'SelectKBest': {'class': SelectKBest(score_func=f_regression)}, 
-                      #'SelectPercentile': {'class': SelectPercentile(score_func=f_regression,percentile=1)},
-                      'VarianceThreshold': {'class': VarianceThreshold()},
-                      'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
+feature_selections = {'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
 
 models_regression = {

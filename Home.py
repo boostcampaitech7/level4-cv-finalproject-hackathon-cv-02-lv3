@@ -28,6 +28,7 @@ def prior(option, opt):
     options = [option]+opt
     selection = st.pills("Directions", options, selection_mode="multi")
     st.markdown(f"Your selected options:  \n {[f'{i+1}순위 : {j}'for i,j in enumerate(selection)]}.")
+    
 
     if st.button("submit"):
         for i,j in enumerate(options):
@@ -42,6 +43,7 @@ def prior(option, opt):
 @st.dialog('solution 진행 중')
 def train(X, y, search_x, search_y):
 
+    search_x = {key: search_x[key] for key in sorted(search_x.keys())}
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     st.session_state.X_train = X_train
@@ -857,15 +859,16 @@ elif st.session_state.page=="result":
     # Streamlit UI 추가 (사용자가 Feature 선택)
     search_x = st.session_state.search_x
     search_y = st.session_state.search_y
-    tabs = st.tabs(list(search_x.keys()))
 
+    search_x_keys = sorted(list(search_x.keys()))  # 고정된 순서 유지
+    tabs = st.tabs(search_x_keys)
 
     for ind, tab in enumerate(tabs):
         with tab:
             col1, col2 = st.columns([2,1])
             with col1:
                 # PDP 값 및 오차 계산
-                x_vals, y_vals, error = partial_dependence_with_error(model, X_test, list(search_x.keys())[ind])
+                x_vals, y_vals, error = partial_dependence_with_error(model, X_test, search_x_keys[ind])
 
                 # 리스트를 NumPy 배열로 변환
                 y_vals = np.array(y_vals)
@@ -899,13 +902,13 @@ elif st.session_state.page=="result":
                     y=y_vals, 
                     mode='lines', 
                     line=dict(color='yellow', width=2),  # ✅ PDP 라인 색상 밝게 변경 (노란색)
-                    name=f"PDP - {list(search_x.keys())[ind]}"
+                    name=f"PDP - {search_x_keys[ind]}"
                 ))
 
                 # ✅ 레이아웃 설정
                 fig.update_layout(
-                    title=f"PDP - {list(search_x.keys())[ind]}",
-                    xaxis_title=list(search_x.keys())[ind],
+                    title=f"PDP - {search_x_keys[ind]}",
+                    xaxis_title=search_x_keys[ind],
                     yaxis_title=f"Predicted {list(search_y.keys())[0]}",
                     template="plotly_white"
                 )
@@ -960,7 +963,7 @@ elif st.session_state.page=="result":
     st.write(f"**{original_col}의 변화율:** {percentage_change:.2f}%")
 
     # 📌 X 값에 대해 반복
-    for i in search_x.keys():
+    for i in sorted(search_x.keys()):
         solution_col = f"solution_{i}"
         
         chart_data = pd.DataFrame(
@@ -1036,13 +1039,52 @@ else:
     X = st.session_state.X
     y = st.session_state.y
 
+    search_x_keys = sorted(list(search_x.keys()))  # 🔥 search_x의 순서 고정
+
     # 🔥 최적화 결과가 이미 저장되어 있으면 search() 실행하지 않음
     if "optimal_solutions_df" not in st.session_state:
         with st.spinner('전체 데이터 최적화 진행 중입니다..(약 30분 소요 예정)'):
-            _, optimal_solutions_df = search(X, y, model, search_x, search_y)
+            _, optimal_solutions_df = search(X.head(200), y.head(200), model, search_x, search_y)
             st.session_state.optimal_solutions_df = optimal_solutions_df  # 🔥 결과 저장
 
     optimal_solutions_df = st.session_state.optimal_solutions_df  # 🔥 저장된 값 사용
+
+        # 최적화 결과 시각화 (옵션)
+    st.subheader("📈 최적화 결과 요약")
+
+
+    def add_margin(y_min, y_max, margin_ratio=0.1):
+        margin = (y_max - y_min) * margin_ratio
+        return y_min - margin, y_max + margin
+
+    original_col = list(search_y.keys())[0]
+    solution_col = f"solution_{original_col}"
+
+    chart_data = pd.concat([optimal_solutions_df[['y']].rename(columns={'y': solution_col}), y.head(200)], axis=1)
+    original_mean = chart_data[original_col].mean()
+    optimized_mean = chart_data[solution_col].mean()
+    percentage_change = ((optimized_mean - original_mean) / abs(original_mean)) * 100
+
+    y_min, y_max = add_margin(chart_data.min().min(), chart_data.max().max())
+
+    fig = px.line(chart_data, labels={'index': 'Index', 'value': original_col}, title=f"Optimized vs Original {original_col}")
+    fig.update_yaxes(range=[y_min, y_max])
+    st.plotly_chart(fig)
+    st.write(f"**{original_col}의 변화율:** {percentage_change:.2f}%")
+
+    for i in search_x_keys:
+        solution_col = f"solution_{i}"
+        chart_data = pd.concat([optimal_solutions_df[[i]].rename(columns={i: solution_col}), X[i].head(200)], axis=1)
+        original_mean = chart_data[i].mean()
+        optimized_mean = chart_data[solution_col].mean()
+        percentage_change = ((optimized_mean - original_mean) / abs(original_mean)) * 100
+
+        y_min, y_max = add_margin(chart_data.min().min(), chart_data.max().max())
+
+        fig = px.line(chart_data, labels={'index': 'Index', 'value': i}, title=f"Optimized vs Original {i}")
+        fig.update_yaxes(range=[y_min, y_max])
+        st.plotly_chart(fig)
+        st.write(f"**{i}의 변화율:** {percentage_change:.2f}%")
 
     @st.cache_data
     def convert_df(df):
