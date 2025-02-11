@@ -54,7 +54,6 @@ def search(X_train, y_train, model, search_x, search_y):
             priority_list[i]=[search_x[i]["순위"], search_x[i]['목표']]
         
         range_dict[i]=search_x[i]["범위 설정"]
-    import IPython; IPython.embed(colors='Linux');exit(1);
 
 
     # single + multi 합치기 목표

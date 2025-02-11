@@ -24,14 +24,8 @@ def train(X, y, search_x, search_y):
     
     if "train_score" not in st.session_state:
         with st.spinner('🔄 모델 훈련 및 최적화 진행 중입니다...(약 10분 소요 예정)'):
-            # if st.session_state.sampling is not None:
-            #     # SMOTE 적용
-            #     smote = SMOTE(random_state=42)  # random_state는 재현성을 위해 설정
-            #     X_resampled, y_resampled = smote.fit_resample(X, y)
-            #     X = pd.DataFrame(X_resampled, columns=X.columns)
-            #     y = pd.Series(y_resampled, name=y.name)
-                
-            # else:
+
+            search_x = {key: search_x[key] for key in sorted(search_x.keys())}
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
             st.session_state.X_train = X_train
@@ -120,20 +114,22 @@ if st.session_state.previous_selections:
     st.subheader("각 변수와 output간의 관계")
     model = st.session_state.model
     X_test = st.session_state.X_test
-    tabs = st.tabs(list(search_x.keys()))
+
+    search_x_keys = sorted(list(search_x.keys()))  # 고정된 순서 유지
+    tabs = st.tabs(search_x_keys)
 
     for ind, tab in enumerate(tabs):
         with tab:
             col1, col2 = st.columns([2, 1])
             with col1:
-                x_vals, y_vals, error = partial_dependence_with_error(model, X_test, list(search_x.keys())[ind])
+                x_vals, y_vals, error = partial_dependence_with_error(model, X_test, search_x_keys[ind])
                 y_vals, errors = np.array(y_vals), np.array(error)
 
                 fig = go.Figure()
                 fig.add_trace(go.Scatter(x=x_vals, y=y_vals + errors, mode='lines', line=dict(color='rgba(255, 255, 255, 0)'), name="Upper Bound"))
                 fig.add_trace(go.Scatter(x=x_vals, y=y_vals - errors, mode='lines', fill='tonexty', line=dict(color='rgba(255, 255, 255, 0)'), fillcolor='rgba(255, 165, 0, 0.5)', name="Lower Bound"))
                 fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='lines', line=dict(color='yellow', width=2), name=f"PDP - {list(search_x.keys())[ind]}"))
-                fig.update_layout(title=f"PDP - {list(search_x.keys())[ind]}", xaxis_title=list(search_x.keys())[ind], yaxis_title=f"Predicted {list(search_y.keys())[0]}", template="plotly_white")
+                fig.update_layout(title=f"PDP - {search_x_keys[ind]}", xaxis_title=search_x_keys[ind], yaxis_title=f"Predicted {list(search_y.keys())[0]}", template="plotly_white")
 
                 st.plotly_chart(fig)
 
@@ -168,7 +164,7 @@ if st.session_state.previous_selections:
     st.plotly_chart(fig)
     st.write(f"**{original_col}의 변화율:** {percentage_change:.2f}%")
 
-    for i in search_x.keys():
+    for i in sorted(search_x.keys()):
         solution_col = f"solution_{i}"
         chart_data = pd.concat([df2[[i]].rename(columns={i: solution_col}), X[i].head(50)], axis=1)
         original_mean = chart_data[i].mean()

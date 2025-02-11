@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from utils.data_utils import remove_outliers_iqr, remove_na, one_hot
+from imblearn.over_sampling import SMOTE
 
 # 페이지 설정
 st.set_page_config(
@@ -282,7 +283,7 @@ if df is not None:
     st.subheader("2️⃣ control할 제어 속성을 골라주세요!")
     st.write("(단, 수치형 변수만 가능)")
 
-    # 이전 선택 값 불러오기
+    # 이전 선택 값 불러오기 
     default_selection = previous_selections.get('control_selection', [])
     
     option2 = st.multiselect(
@@ -326,9 +327,6 @@ if df is not None:
                         IQR = Q3 - Q1
                         min_val = min(df[option2[ind]]) - 2 * int(IQR)
                         max_val = max(df[option2[ind]]) + 2 * int(IQR)
-
-                    for i in control_feature.keys():
-                        df = remove_na(df, i, control_feature[i])
 
                     values = st.slider(
                         "솔루션 최대 범위 설정", 
@@ -413,16 +411,13 @@ if df is not None:
                 X = one_hot(X)
                 y = df[option]
 
-                # if option in binary_cols:
-                #     if st.session_state.sampling:
-                #         # SMOTE 적용
-                #         smote = SMOTE(random_state=42)  # random_state는 재현성을 위해 설정
-                #         X_resampled, y_resampled = smote.fit_resample(X, y)
-                #         X = pd.DataFrame(X_resampled, columns=X.columns)
-                #         y = pd.Series(y_resampled, name=y.name)
-                st.session_state.method = method  # 이상치 처리 방법 저장
-                st.session_state.method2 = method2  # 결측치 처리 방법 저장
-                st.session_state.method3 = method3  # 목표 설정 방법 저장
+                if option in binary_cols:
+                    if st.session_state.sampling is not None:
+                        # SMOTE 적용
+                        smote = SMOTE(random_state=42)  # random_state는 재현성을 위해 설정
+                        X_resampled, y_resampled = smote.fit_resample(X, y)
+                        X = pd.DataFrame(X_resampled, columns=X.columns)
+                        y = pd.Series(y_resampled, name=y.name)
                 
                 st.session_state.X = X
                 st.session_state.y = y
@@ -430,9 +425,6 @@ if df is not None:
                 st.session_state.search_y = search_y
                 st.session_state.control_feature = control_feature  # 제어 속성 저장
                 st.session_state.env_feature = env_feature  # 환경 속성 저장
-                
-                # 제어 속성 및 환경 속성도 추가했다면 여기에 저장
-                st.session_state.search_x = search_x if 'search_x' in locals() else {}
 
                 opt = []
                 for i, j in search_x.items():
