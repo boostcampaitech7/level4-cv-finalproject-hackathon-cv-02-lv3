@@ -26,7 +26,7 @@ import statistics
 from collections import defaultdict
 from copy import deepcopy
 import warnings
-from typing import Dict, Sequence
+from typing import Dict, Sequence, Any, List, Tuple
 
 
 # feature_selection, ConvergenceWarning warning 무시
@@ -113,56 +113,59 @@ def evaluate_classification(y_true: Sequence[int], y_pred: Sequence[int]) -> Dic
     return metrics
 
 
-def build_pipeline(structure):
+def build_pipeline(structure: dict) -> Pipeline:
     """
-    ML 계산을 위한 scikit pipeline 생성
+    ML 계산을 위한 scikit-learn Pipeline 생성
 
     Args:
-        structure (dict): pipeline을 생성하기 위한 구조체
+        structure (dict): pipeline을 생성을 위한 구조체.
 
     Returns:
         Pipeline: structure로 생성한 Pipeline
     """
     
     _pipeline = []
-    for k, v in structure.items():
-        cl = v['class']
-        if 'params' in v: # params 값이 v에 있으면 instance 생성
-            _pipeline.append((k, clone(cl(**v['params']))))
-        else:
-            _pipeline.append((k, clone(cl))) # instance 복사
-                                     
+    for step, config in structure.items():
+        if 'params' in config:
+            clas = config['class']
+            params = config['params']
+            _pipeline.append((step, clone(clas(**params)))) # params를 인자로 인스턴스 생성 
+        else: 
+            instance = config['class']
+            _pipeline.append((step, clone(instance))) # 생성되었던 인스턴스 복사
+
     return Pipeline(_pipeline)
 
 
-def get_random_structures(n, task_type):
+def get_random_structures(n: int, task_type: str) -> list:
     """
     n개의 임의의 structure 생성
 
     Args:
         n (int): 임의로 생성할 structure 개수
+        task_type (str): 'regression' 혹은 'classification'
 
     Returns:
         random_structures (list): 임의로 생성한 structure
     """
-
     random_structures = []
     
     for _ in range(n):
         if task_type == 'regression':
             random_structure = deepcopy({'preprocessors': preprocessors,
-                                     'feature_selections': feature_selections,
-                                     'models': models_regression})
-        else:
+                                         'feature_selections': feature_selections,
+                                         'models': models_regression})
+            
+        elif task_type == 'classification':
             random_structure = deepcopy({'preprocessors': preprocessors,
-                                     'feature_selections': feature_selections,
-                                     'models': models_classification})
+                                         'feature_selections': feature_selections,
+                                         'models': models_classification})
         
-        for category, options in random_structure.items():
-            class_name = choose_random_key(options)
-            random_structure[category] = options[class_name]
-            if isinstance(random_structure[category], dict):
-                random_structure[category]['class_name'] = class_name
+        for step, operators in random_structure.items():
+            operator_name = choose_random_key(operators)
+            random_structure[step] = operators[operator_name]
+            if isinstance(random_structure[step], dict):
+                random_structure[step]['class_name'] = operator_name
         
         random_structure['pipeline'] = build_pipeline(random_structure)
         random_structures.append(random_structure)
@@ -170,37 +173,37 @@ def get_random_structures(n, task_type):
     return random_structures
 
 
-def fit_pipeline(pipeline, X_train, y_train):
-    pipeline.fit(X_train, y_train)    
-
-
-def sort(structures, task_type):
+def sort_structures(structures: List, task_type: str) -> List:
     """
     structures를 평가지표를 기준으로 정렬
 
     Args:
-        structures (list): 정렬되지 않은 구조
+        structures (List): 정렬되지 않은 structure 리스트.
+        task_type (str): 'regression'이면 'valid_metric'의 r2 기준,
+                         'classification'이면 'valid_metric'의 'f1' 기준으로 정렬.
 
     Returns:
-        structures (list): ['valid_metric']['r2']를 기준으로 정렬
+        structures (List): 평가지표 기준으로 정렬된 structure 리스트.
     """
     if task_type == 'regression':
-        # 회귀 문제에서는 'r2'를 기준으로 정렬
-        return sorted(structures, key=lambda x: x['valid_metric']['r2'], reverse=True)
+        key_metric = 'r2'
     elif task_type == 'classification':
-        # 분류 문제에서는 'f1'를 기준으로 정렬
-        return sorted(structures, key=lambda x: x['valid_metric']['f1'], reverse=True)
+        key_metric = 'f1'
 
-def is_same_structure(structure1, structure2, pipeline_components):
+    return sorted(structures, key=lambda x: x['valid_metric'][key_metric], reverse=True)
+
+
+def is_same_structure(structure1: Dict, structure2: Dict, pipeline_components: Dict):
     """
     structure1과 structure2가 동일한지 확인
 
     Args:
-        structure1 (dict): 구조1
-        structure2 (dict): 구조2
+        structure1 (Dict): 첫 번째 구조체
+        structure2 (Dict): 두 번째 구조체
+        pipeline_components (Dict): 비교에 사용될 pipeline 구성 요소
 
     Returns:
-        Bool: 동일하면 True, 다르면 False 반환
+        Bool: 모든 구조가 동일하면 True, 그렇지 않으면 False 반환
     """
     keys = list(pipeline_components.keys())
     for k in keys:
@@ -209,16 +212,17 @@ def is_same_structure(structure1, structure2, pipeline_components):
     return True
 
 
-def is_in_structures(structure, structures, pipeline_components):
+def is_in_structures(structure: Dict, structures:List[Dict], pipeline_components: Dict) -> bool:
     """
-    structures 내 동일한 structure가 있는지 확인
+    structure와 동일한 구조체가 structures 내에 존재하는지 확인 
 
     Args:
-        structure (dict): 구조
-        structures (list): 구조 집합
+        structure (Dict): 비교 대상 구조체
+        structures (List): 구조체들의 리스트
+        pipeline_components (Dict): 비교에 사용될 pipeline 구성 요소
 
     Returns:
-        Bool: 동일하면 True, 다르면 False 반환
+        Bool: 동일한 구조체가 하나라도 있으면 True, 없으면 False 반환
     """
     for s in structures:
         if is_same_structure(structure, s, pipeline_components):
@@ -226,58 +230,65 @@ def is_in_structures(structure, structures, pipeline_components):
     return False
 
 
-def crossover(structure1, structure2, pipeline_components):
+def crossover(structure1: Dict, structure2: Dict, pipeline_components: Dict) -> Dict:
     """
     유전적 교차를 이용한 새로운 구조 생성
+    각 pipeline 구성요소에 대해 50% 확률로 두 부모 구조 중 하나의 값을 선택
 
     Args:
-        structure1 (dict): 부모 구조1
-        structure2 (dict): 부모 구조2
+        structure1 (Dict): 부모 구조 1
+        structure2 (Dict): 부모 구조 2
+        pipeline_components (Dict): 교차할 pipeline 구성 요소들을 나타내는 딕셔너리
+
 
     Returns:
-        structure (dict): 유전적 교차로 생성한 구조
+        structure (Dict): 유전적 교차로 생성한 구조
     """
-    prob = 0.5
-    new_structure = {}
-    keys = list(pipeline_components.keys())
-
-    for k in keys:
-        rand = random.random()
-        if rand < prob:
-            new_structure[k] = structure1[k]
-        else:
-            new_structure[k] = structure2[k]
-    
+    new_structure = {
+        k: structure1[k] if random.random() < 0.5 else structure2[k]
+        for k in pipeline_components
+    }
     return deepcopy(new_structure)
 
 
-def mutation(pipeline_components, structure, prob_mutations, hyperparam_bound=[0.5, 2.0]):
+def mutation(pipeline_components: Dict,
+             structure: Dict,
+             prob_mutations: List,
+             hyperparam_bound: Tuple[float, float] = (0.5, 2.0)
+             ) -> Dict:
     """
     돌연변이 구조 생성
 
+    각 piepline 구성요소에 대해,
+    - 구조 변이: prob_mutations[0] 확률로 해당 구성요소를 다른 옵션으로 교체
+    - 하이퍼 파라미터 변이: prob_mutations[1] 확률로 숫자형 하이퍼파라미터 값을 변형
+
     Args:
-        structure (dict): 입력 구조
-        prob_mutations (List): 각 요소의 변이확률 (첫 번째: 구조변이, 두 번째: hyperparameter 변이)
+        pipeline_components (Dict): pipeline 구성 요소들
+        structure (Dict): 입력 구조
+        prob_mutations (List):
+            [구조 변이 확률, 하이퍼 파라미터 변이 확률]
+        hyperparams_bound (Tuple[float, float], optional):
+            하이퍼 파라미터 변이 시 곱해질 계수의 범위. Default to (0.5, 2.0).
 
     Returns:
-        structure (dict): 돌연변이 구조
+        structure (Dict): 돌연변이가 적용된 구조체
     """
-    keys = list(pipeline_components.keys())
+
     
-    # 구조 변이
-    for k in keys:
-        rand = random.random()
-        if rand < prob_mutations[0]: 
+    # 구조 변이: 각 구성 요소에 대해 확률(prob_mutations[0])에 따라 다른 옵션으로 교체
+    for k in pipeline_components:
+        if random.random() < prob_mutations[0]: 
             element = choose_random_key(pipeline_components[k])
+            # 현재 구성 요소의 'class_name'과 선택된 옵션이 다른 경우에만 교체
             if structure[k]['class_name'] != element:
                 structure[k] = deepcopy(pipeline_components[k][element])
                 structure[k]['class_name'] = element
 
-    # 하이퍼 파라미터 변이
+    # 하이퍼 파라미터 변이: 각 구성 요소의 파라미터에 대해 확률(prob_mutations[1])에 따라 값 변형
     for k, v in structure.items():
-        if 'params' not in v: # 파라미터가 없으면 continue
+        if 'params' not in v: # 하이퍼 파라미터가 없으면 continue
             continue
-
         params = v['params']
 
         for param_name, param_value in params.items():
@@ -290,15 +301,17 @@ def mutation(pipeline_components, structure, prob_mutations, hyperparam_bound=[0
             # param_value가 숫자일 때만 곱셈을 수행
             if isinstance(param_value, (int, float)):
                 rand = random.uniform(hyperparam_bound[0], hyperparam_bound[1])
-                params[param_name] = origin_type(rand * param_value)
+                params[param_name] = origin_type(rand * param_value) # 원래 type으로 casting
             else:
                 # 그 외의 경우에는 변이 X
                 print(f"Skipping parameter {param_name} with value type {origin_type}.")
             
     return structure
 
-def average_metrics(metrics):
+
+def average_metrics(metrics: List[Dict[str, float]]) -> Dict[str, float]:
     """
+    여러 번 측정에서 얻은 메트릭 딕셔너리들의 리스트로 
     각 메트릭의 평균과 표준 편차를 계산
 
     Parameters:
@@ -539,7 +552,7 @@ class AutoML:
 
     def report(self):
         log = []
-        self.structures = sort(self.structures, self.task_type)
+        self.structures = sort_structures(self.structures, self.task_type)
         for i, structure in enumerate(self.structures):
             log.append(self.report_structure(structure))
         
@@ -572,26 +585,8 @@ class AutoML:
         if use_kfold: # k-fold validation으로 모델 평가
             kf = KFold(n_splits=kfold, shuffle=True, random_state=seed)
             self.X_trains, self.X_valids, self.y_trains, self.y_valids = [], [], [], [] # 초기화
-            # smote = SMOTE(sampling_strategy='auto', random_state=42)
 
             for train_index, valid_index in kf.split(X_train):
-                
-                # if smote_option:
-                #     X_train_fold, y_train_fold = X_train.iloc[train_index, :], y_train.iloc[train_index]
-                #     X_valid_fold, y_valid_fold = X_train.iloc[valid_index, :], y_train.iloc[valid_index]
-
-                #     # SMOTE 적용 (train set에만)
-                #     X_train_resampled, y_train_resampled = smote.fit_resample(X_train_fold, y_train_fold)
-                    
-                #     print("Before SMOTE:", Counter(y_train_fold))  
-                #     print("After SMOTE:", Counter(y_train_resampled))
-
-                #     # 리스트에 추가
-                #     self.X_trains.append(X_train_resampled)
-                #     self.y_trains.append(y_train_resampled)
-                #     self.X_valids.append(X_valid_fold)
-                #     self.y_valids.append(y_valid_fold)
-                # else:
                 self.X_trains.append(X_train.iloc[train_index, :])
                 self.X_valids.append(X_train.iloc[valid_index, :])
                 self.y_trains.append(y_train.iloc[train_index])
@@ -613,8 +608,8 @@ class AutoML:
 
         for generation in range(self.n_generation):
             self.fit_structures(timeout) # 형질 별 피팅 및 점수 계산
-            self.structures = sort(self.structures, self.task_type) # 점수 높은 순으로 정렬
-            self.best_structure = self.structures[0]
+            self.structures = sort_structures(self.structures, self.task_type) # 점수 높은 순으로 정렬
+            self.best_structure = self.structures[0] # 최적 구조 선택
             if self.task_type == 'regression':
                 self.best_score = self.best_structure['valid_metric']['r2']
             else:
