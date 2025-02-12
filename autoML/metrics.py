@@ -1,4 +1,7 @@
-from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, f1_score, mean_absolute_error
+from sklearn.metrics import (r2_score, mean_squared_error, accuracy_score, 
+                             f1_score, mean_absolute_error, precision_recall_curve, 
+                             auc)
+
 from collections import defaultdict
 import statistics
 import math
@@ -39,12 +42,13 @@ def evaluate_classification(y_true, y_pred):
         y_pred: 예측된 값
 
     Returns:
-        dict: F1 점수아 정확도를 포함하는 딕셔너리
+        dict: F1 점수, 정확도, PR-AUC를 포함하는 딕셔너리
     """
-    
+    precision, recall, thresholds = precision_recall_curve(y_true, y_pred)
+    pr_auc = auc(recall, precision)
     f1 = f1_score(y_true, y_pred)
     accuracy = accuracy_score(y_true, y_pred)
-    dicts = {'f1': f1, 'accuracy': accuracy}
+    dicts = {'f1': f1, 'accuracy': accuracy, 'pr_auc': pr_auc}
     return dicts
 
 def compute_metrics_statistics(metrics):
