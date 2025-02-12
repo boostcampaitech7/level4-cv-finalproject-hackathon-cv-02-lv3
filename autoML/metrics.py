@@ -1,23 +1,33 @@
-from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, f1_score
+from sklearn.metrics import r2_score, mean_squared_error, accuracy_score, f1_score, mean_absolute_error
 from collections import defaultdict
 import statistics
 import math
 
-def evaluate_regression(y_true, y_pred):
+
+def evaluate_regression(X, y_true, y_pred, verbose=False):
     """
-    회귀 문제의 성능을 평가하는 함수로, R2 점수와 RMSE를 계산
+    회귀 문제의 성능을 평가하는 함수로, r2, adjusted_r2, MAE, RMSE를 계산
 
     Args:
         y_true: 실제 값
         y_pred: 예측된 값
 
     Returns:
-        dict: R2 점수와 RMSE를 포함하는 딕셔너리
+        dict: r2, adjusted_r2, MAE, RMSE를 포함하는 딕셔너리
     """
-    
+    n = len(y_pred)
+    k = X.shape[1]
     r2 = r2_score(y_true, y_pred)
-    RMSE = math.sqrt(mean_squared_error(y_true, y_pred))    
-    dicts = {'r2': r2, 'RMSE': RMSE}
+    
+    if k+1 < n: # sample 수가 부족하면 adjusted r2 계산 X
+        adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - k - 1)
+    else:
+        adjusted_r2 = -100
+
+    dicts = {'r2': r2,
+             'adjusted_r2': adjusted_r2,
+             'MAE': mean_absolute_error(y_true, y_pred),
+             'RMSE': math.sqrt(mean_squared_error(y_true, y_pred))}
     return dicts
 
 def evaluate_classification(y_true, y_pred):
