@@ -1,6 +1,8 @@
 # 본 코드는 TPOT (Evaluation of a Tree-based Pipeline Optimization Tool
-# for Automating Data Science, GECCO '16)에서 아이디어를 얻어 구현했습니다.
+# for Automating Data Science, GECCO '16)에서 아이디어를 얻어 구현했습니다
+
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
+from pipeline_utils import crossover, mutation, build_pipeline, sort, is_in_structures, TimeoutException, timeout_handler
 from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures, FunctionTransformer
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
@@ -8,18 +10,20 @@ from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.inspection import permutation_importance
-from xgboost import XGBRegressor, XGBClassifier
-from sklearn.model_selection import KFold, train_test_split
 from sklearn.exceptions import ConvergenceWarning
-from pipeline_utils import crossover, mutation, build_pipeline, fit_structures, sort, is_in_structures, generate_structure_summary
+from sklearn.base import clone
+from xgboost import XGBRegressor, XGBClassifier
+from metrics import evaluate_regression, evaluate_classification, compute_metrics_statistics
+from joblib import Parallel, delayed
 from datetime import datetime
 from copy import deepcopy
 import numpy as np
 import warnings
+import signal
 import random
 import os
 
-warnings.filterwarnings("ignore",message="k=10 is greater than n_features=6. All the features will be returned.")
+warnings.filterwarnings("ignore", message="k=10 is greater than n_features=6. All the features will be returned.")
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 choose_random_key = lambda dictionary: random.choice(list(dictionary.keys()))
@@ -29,14 +33,14 @@ preprocessors = {
     'RobustScaler': {'class': RobustScaler()},
     'PolynomialFeatures': {'class': PolynomialFeatures()},
     'passthrough': {'class': FunctionTransformer(func=lambda X: X)}
-    }
+}
 
 feature_selections = {
     'SelectKBest': {'class': SelectKBest(score_func=f_regression)},
     'SelectPercentile': {'class': SelectPercentile(score_func=f_regression)},
     'VarianceThreshold': {'class': VarianceThreshold()},
     'passthrough': {'class': FunctionTransformer(func=lambda X: X)}
-    }
+}
 
 models_regression = {
     'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
@@ -45,7 +49,7 @@ models_regression = {
     'LogisticRegression': {'class': LogisticRegression, 'params': {'C': 1.0}},
     'KNeighborsRegressor': {'class': KNeighborsRegressor, 'params': {'n_neighbors': 5}},
     'XGBRegressor': {'class': XGBRegressor, 'params': {'n_estimators': 100, 'learning_rate': 0.1, 'max_depth': 6}}
-    }
+}
 
 models_classification = {
     'DecisionTreeClassifier': {'class': DecisionTreeClassifier, 'params': {'max_depth': 6, 'class_weight': 'balanced'}},
@@ -55,7 +59,7 @@ models_classification = {
     'KNeighborsClassifier': {'class': KNeighborsClassifier, 'params': {'n_neighbors': 5}},
     'SGDClassifier': {'class': SGDClassifier, 'params': {'class_weight': 'balanced', 'alpha': 0.001, 'power_t': 0.5}},
     'XGBClassifier': {'class': XGBClassifier, 'params': {'n_estimators': 100, 'learning_rate': 1.0, 'max_depth':3, 'scale_pos_weight': 1}}
-    }
+}
 
 class AutoML:
     """
@@ -72,7 +76,7 @@ class AutoML:
         self.n_jobs = n_jobs
         self.n_child = n_population - n_parent
         
-        if self.task_type == "classification":
+        if self.task_type == 'classification':
             self.pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models_classification}
         else:
             self.pipeline_components = {'preprocessors': preprocessors, 'feature_selections': feature_selections, 'models': models_regression}
@@ -143,7 +147,7 @@ class AutoML:
         Returns:
             y_pred (DataFrame): 예측된 y값
         """
-        print("predict:", self.best_structure['pipeline'])
+        
         y_pred = self.best_structure['pipeline'].predict(X)
         return y_pred
 
@@ -155,6 +159,7 @@ class AutoML:
             dicts (dict): 로그에 기록할 딕셔너리
             message (str, optional): 로그 메시지의 앞부분에 추가할 메시지. 기본값은 빈 문자열.
         """
+        
         log = []
         for k, v in dicts.items():
             if isinstance(v, float):
@@ -174,6 +179,7 @@ class AutoML:
         Args:
             message (str): 기록할 로그 메시지
         """
+        
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         log_message = f"[{now}] {message}"
         print(log_message)
@@ -208,10 +214,11 @@ class AutoML:
         Returns:
             None
         """
+        
         log = []
         self.structures = sort(self.structures, self.task_type)
         for _, structure in enumerate(self.structures):
-            log.append(generate_structure_summary(self, structure))
+            log.append(self._generate_structure_summary(structure))
         
         log = '\n' + '\n'.join(log)
         self.log(log)
@@ -221,12 +228,139 @@ class AutoML:
         로그 디렉토리 및 로그 파일 경로를 생성하는 메서드        
         로그 파일은 실행 시각을 기준으로 파일명을 생성하여 저장된다.
         """
+        
         now = datetime.now()
         time_string = now.strftime("%y%m%d_%H%M%S")
         py_dir_path = os.path.dirname(os.path.abspath(__file__))
         self.log_dir_path = os.path.join(py_dir_path, 'log')
         self.log_path = os.path.join(self.log_dir_path, f"{time_string}.txt")
         os.makedirs(self.log_dir_path, exist_ok=True)
+        
+    def _fit_structures(self, timeout=30):
+        """
+        self.structures에 fitting 및 evaluation 수행
+
+        Args:
+            timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30초.
+        """
+
+        if self.use_joblib:
+            self.structures = Parallel(n_jobs=self.n_jobs)(
+                                delayed(self._fit_structure)(structure, timeout, i)
+                                for i, structure in enumerate(self.structures)
+                                )
+            
+        else:
+            self.structures = [self._fit_structure(self, structure, timeout, i) for i, structure in enumerate(self.structures)]
+            
+    def _fit_structure(self, structure, timeout=30, order=0):
+        """
+        입력 structure에 fitting 및 evaluation 수행
+
+        Args:
+            structure (dict): 입력 구조
+            timeout (int, optional): Pipeline 별 최대 실행시간. 기본값 30초.
+        """
+        
+        if 'valid_metric' in structure: # fitting 결과가 있으면 skip
+            return structure
+        
+        # valid_metric 초기화
+        structure['valid_metric'] = {'accuracy': -100, 'f1': -100} if self.task_type == 'classification' else {'r2': -100, 'r2_std': -100}
+
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(timeout)  # timeout 초 후에 알람 발생
+        pipeline = structure['pipeline']
+        train_metrics = []
+        valid_metrics = []
+
+        try:
+            for i in range(len(self.X_trains)):
+                pipeline_clone = clone(pipeline)
+                X_train, y_train = self.X_trains[i], self.y_trains[i]
+                X_valid, y_valid = self.X_valids[i], self.y_valids[i]
+
+                pipeline_clone.fit(X_train, y_train)
+                y_train_pred = pipeline_clone.predict(X_train)
+                y_valid_pred = pipeline_clone.predict(X_valid)
+
+                if self.task_type == 'classification':
+                    train_metric = evaluate_classification(y_train, y_train_pred)
+                    valid_metric = evaluate_classification(y_valid, y_valid_pred)
+                else:
+                    train_metric = evaluate_regression(y_train, y_train_pred)
+                    valid_metric = evaluate_regression(y_valid, y_valid_pred)
+                    
+                train_metrics.append(train_metric)
+                valid_metrics.append(valid_metric)
+
+            structure['pipeline'] = pipeline_clone
+            structure['train_metric'] = compute_metrics_statistics(train_metrics)
+            structure['valid_metric'] = compute_metrics_statistics(valid_metrics)
+            structure['train_metrics'] = train_metrics
+            structure['valid_metrics'] = valid_metrics
+
+        except TimeoutException as e:
+            print(e)
+
+        finally:
+            signal.alarm(0) # alarm 초기화
+            
+        if self.task_type == 'classification':
+            valid_f1 = structure['valid_metric']['f1']
+            valid_accuracy = structure['valid_metric']['accuracy']
+            print(f"Structure-{order} - valid_f1: {valid_f1:.4f}")
+            print(f"Structure-{order} - valid_accuracy: {valid_accuracy:.4f}")
+        else:
+            valid_r2 = structure['valid_metric']['r2']
+            valid_r2_std = structure['valid_metric']['r2_std']
+            print(f"Structure-{order} - valid r2: {valid_r2:.4f}±{valid_r2_std:.4f}")
+            
+        return structure
+            
+    def _generate_structure_summary(self, structure):
+        """
+        주어진 구조체에 대한 요약 정보를 생성하여 반환하는 함수
+
+        Args:
+            structure (dict): 구조체 정보 딕셔너리, 각 구성 요소와 그에 대한 파라미터 및 메트릭 포함
+
+        Returns:
+            str: 구조체의 요약 정보를 포함하는 문자열
+        """
+        
+        structure_summary = [] # 요약된 정보를 저장할 리스트
+        keys = list(self.pipeline_components.keys())
+        
+        # 파이프라인에 대한 정보를 요약
+        for k in keys:
+            class_info = structure[k]
+            if isinstance(class_info, str):
+                s = class_info
+            else:
+                class_name = class_info['class_name']
+                if 'params' in class_info:
+                    params = ', '.join([f'{k}: {v}' if not isinstance(v, float) else f'{k}: {v:.4f}'
+                                        for k, v in class_info['params'].items()])
+                    s = f"({class_name}: {params})"
+                else:
+                    s = f"({class_name})"  
+
+            structure_summary.append(s)
+
+        # valid_metric이 존재하는 경우, 해당 메트릭 정보를 추가
+        if 'valid_metric' in structure:
+            if self.task_type == 'classification':
+                f1 = structure['valid_metric']['f1']
+                accuracy = structure['valid_metric']['accuracy']
+                structure_summary.append(f'f1:{f1:.4f}, accuracy:{accuracy:.4f}')
+            else:
+                r2 = structure['valid_metric']['r2']
+                r2_std = structure['valid_metric']['r2_std']
+                structure_summary.append(f'{r2:.4f}±{r2_std:.4f}')
+
+        s = ' - '.join(structure_summary)
+        return s
     
     def _split_data(self, X_train, y_train, use_kfold, kfold, valid_size, seed):
         """
@@ -246,6 +380,7 @@ class AutoML:
             y_trains (list): 분할된 y_train 데이터 리스트
             y_valids (list): 분할된 y_valid 데이터 리스트
         """
+        
         X_trains, X_valids, y_trains, y_valids = [], [], [], []
 
         if use_kfold:   # k-fold validation으로 모델 평가
@@ -272,7 +407,8 @@ class AutoML:
             generation (int): 현재 세대 번호
             timeout (int): 각 pipeline 별 최대 실행 시간
         """
-        fit_structures(self, timeout)
+        
+        self._fit_structures(timeout)
         self.structures = sort(self.structures, self.task_type)
         self.best_structure = self.structures[0]
         self.best_score = self.best_structure['valid_metric']['f1'] if self.task_type == 'classification' else self.best_structure['valid_metric']['r2']
@@ -291,10 +427,10 @@ class AutoML:
         """
         
         # task_type에 맞는 모델 카테고리 선택
-        if task_type == 'regression':
-            model_options = models_regression
-        else:
+        if task_type == 'classification':
             model_options = models_classification
+        else:
+            model_options = models_regression
 
         random_structures = []
         
@@ -329,6 +465,7 @@ class AutoML:
         Args:
             max_n_try (int): 새 구조를 생성할 최대 시도 횟수
         """
+        
         del self.structures[self.n_parent:] # 점수가 낮은 형질 제거
             
         n_success = 0

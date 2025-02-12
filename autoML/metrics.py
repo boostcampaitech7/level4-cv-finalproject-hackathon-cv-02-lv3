@@ -14,6 +14,7 @@ def evaluate_regression(y_true, y_pred):
     Returns:
         dict: R2 점수와 RMSE를 포함하는 딕셔너리
     """
+    
     r2 = r2_score(y_true, y_pred)
     RMSE = math.sqrt(mean_squared_error(y_true, y_pred))    
     dicts = {'r2': r2, 'RMSE': RMSE}
@@ -30,6 +31,7 @@ def evaluate_classification(y_true, y_pred):
     Returns:
         dict: F1 점수아 정확도를 포함하는 딕셔너리
     """
+    
     f1 = f1_score(y_true, y_pred)
     accuracy = accuracy_score(y_true, y_pred)
     dicts = {'f1': f1, 'accuracy': accuracy}
@@ -47,6 +49,7 @@ def compute_metrics_statistics(metrics):
         Dict[str, float]: 각 메트릭의 평균과 표준 편차를 포함하는 딕셔너리.
                           메트릭 이름으로 평균 값이, '메트릭_std' 이름으로 표준 편차를 저장.
     """
+    
     # 모든 메트릭 딕셔너리를 순회하며 값을 그룹화
     grouped_metrics = defaultdict(list)
     for metric in metrics:
