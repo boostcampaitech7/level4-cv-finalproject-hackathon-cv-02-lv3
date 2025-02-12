@@ -288,8 +288,8 @@ class AutoML:
                     train_metric = evaluate_classification(y_train, y_train_pred)
                     valid_metric = evaluate_classification(y_valid, y_valid_pred)
                 else:
-                    train_metric = evaluate_regression(y_train, y_train_pred)
-                    valid_metric = evaluate_regression(y_valid, y_valid_pred)
+                    train_metric = evaluate_regression(X_train, y_train, y_train_pred)
+                    valid_metric = evaluate_regression(X_valid, y_valid, y_valid_pred)
                     
                 train_metrics.append(train_metric)
                 valid_metrics.append(valid_metric)
