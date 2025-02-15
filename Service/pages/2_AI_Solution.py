@@ -53,8 +53,7 @@ def prior(option, opt):
         options,
         default=valid_previous_priority
     )
-    #selection = st.pills("Directions", options, selection_mode="multi")
-    #selection = st.multiselect("우선순위를 정해주세요!", options,default=previous_selections.get('priority_selection', []))
+
     st.markdown(f"Your selected options:  \n {[f'{i+1}순위 : {j}'for i,j in enumerate(selection)]}.")
 
     if st.button("submit"):

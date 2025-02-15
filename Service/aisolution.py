@@ -1,7 +1,7 @@
 import pandas as pd
-from autoML import AutoML
+from autoML.autoML import AutoML
 import os
-from utils.utils import evaluate_regression, data_preparation, evaluate_classification
+from autoML.metrics import evaluate_regression, evaluate_classification
 import time
 
 
@@ -24,13 +24,13 @@ def aisolution(n_population=30, n_generation=5, n_parent=5, prob_mutations=[0.2,
     y_train_pred = autoML.predict(X_train)
 
     if task_type == 'regression':
-        train_score = evaluate_regression(y_train, y_train_pred, 'train') 
-        test_score = evaluate_regression(y_test, y_test_pred, 'test')
+        train_score = evaluate_regression(X_train,y_train, y_train_pred) 
+        test_score = evaluate_regression(X_test, y_test, y_test_pred)
     else:
         # y_test_pred = (y_test_pred >= 0.5).astype(int)
         # y_train_pred = (y_train_pred >= 0.5).astype(int)
-        train_score = evaluate_classification(y_train, y_train_pred, 'train') 
-        test_score = evaluate_classification(y_test, y_test_pred, 'test')        
+        train_score = evaluate_classification(y_train, y_train_pred) 
+        test_score = evaluate_classification(y_test, y_test_pred)        
 
     autoML.log_dicts(train_score, 'Evaluation - Train')
     autoML.log_dicts(test_score, 'Evaluation - Test')

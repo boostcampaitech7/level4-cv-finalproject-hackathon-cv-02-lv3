@@ -11,7 +11,7 @@ from Service.utils.data_utils import partial_dependence_with_error
 from sklearn.model_selection import train_test_split
 from aisolution import aisolution
 from Search.search import search
-from imblearn.over_sampling import SMOTE
+
 # 페이지 설정
 st.set_page_config(
     page_title="LuckyVicky AI Solution",
@@ -99,14 +99,14 @@ if st.session_state.previous_selections:
         col11, col22 = st.columns((1, 2))
         if st.session_state.type == "regression":
             with col11:
-                score = test_score['R2'] * 100
+                score = test_score['r2'] * 100
                 st.metric("모델 정확도(R2 기준)", f'{score:.1f}%')
             with col22:
                 df = pd.DataFrame({'Train 성능': train_score, 'Test 성능': test_score})
                 st.table(df)
         else:
             with col11:
-                score = test_score['F1 Score'] * 100
+                score = test_score['f1'] * 100
                 st.metric("모델 정확도(F1 Score 기준)", f'{score:.1f}%')
             with col22:
                 df = pd.DataFrame({'Train 성능': train_score, 'Test 성능': test_score})

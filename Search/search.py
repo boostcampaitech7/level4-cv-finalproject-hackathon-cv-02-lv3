@@ -12,6 +12,8 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 def calculate(row, priority_list, max_num, prediction, search_y, y):
+    print("search_y : ", search_y)
+    print("max_num : " , max_num)
     target = 0 
     for i in row.index:
         if i in priority_list.keys():
@@ -31,6 +33,9 @@ def calculate(row, priority_list, max_num, prediction, search_y, y):
     else:
         search_range = search_y[y]['범위 설정'][0] + search_y[y]['범위 설정'][1]
         target-= (1/(priority_list[y][0]))*abs(search_range - 2*prediction)
+
+    print("priority_list : ", priority_list)
+    print("target  : ", target)
     
     return target
 
@@ -39,6 +44,9 @@ def calculate(row, priority_list, max_num, prediction, search_y, y):
 
 
 def search(X_train, y_train, model, search_x, search_y):
+    print("**search_x : ", search_x)
+    print("**search_y : ", search_y)
+
     start_time = time.time()  # 최적화 시작 시간 기록
     y = list(search_y.keys())[0]
     if "순위" not in search_y[y].keys():
@@ -47,13 +55,16 @@ def search(X_train, y_train, model, search_x, search_y):
     else:
         priority_list = { y : [search_y[y]["순위"], search_y[y]["목표"]]}
     range_dict = {}
-    for i in search_x.keys():
+    search_x_keys = sorted(list(search_x.keys()))  # 고정된 순서 유지
+    for i in search_x_keys:
         if search_x[i]["목표"]=="최적화하지 않기":
             pass
         else:    
             priority_list[i]=[search_x[i]["순위"], search_x[i]['목표']]
         
         range_dict[i]=search_x[i]["범위 설정"]
+    print("**priority_list : ", priority_list)
+
 
 
     # single + multi 합치기 목표
@@ -129,6 +140,8 @@ def search(X_train, y_train, model, search_x, search_y):
 
             
             max_num = max(map(lambda x: x[0], priority_list.values()))
+            print("***max_num : ", max_num)
+            print("row_priority_list : " , priority_list)
             target = calculate(row, priority_list, max_num, initial_y, search_y, y)
             
             def objective_function(**kwargs):
@@ -153,6 +166,7 @@ def search(X_train, y_train, model, search_x, search_y):
                 prediction = (prediction - y_min) / (y_max - y_min) # y를 0~1 정규화               
 
                 target = calculate(X_simulation_scaled, priority_list, max_num, prediction, search_y, y)
+                print("**target2 : ", target)
                 
                 return target
 
@@ -220,6 +234,7 @@ def search(X_train, y_train, model, search_x, search_y):
         optimizer.maximize(init_points=10, n_iter=50, acquisition_function=utility) #acquisition_function=utility
         # 최적의 결과 저장
         best_solution = optimizer.max['params']
+        print("best solution : ", best_solution)
         # 원본 데이터(row) 기반으로 새로운 DataFrame 생성 (최적화하지 않은 변수 포함)
         best_x_df = row.copy()  # 기존 row의 모든 feature 포함
         for key, value in best_solution.items():
@@ -229,12 +244,15 @@ def search(X_train, y_train, model, search_x, search_y):
         best_x_df = best_x_df.reindex(columns=X_train.columns, fill_value=0)  # 누락된 feature는 0으로 채움
         # 모델 예측
         y_pred = model.predict(best_x_df)[0]
-        dict1 = {i: best_solution[i] for i in search_x.keys()}
+        dict1 = {i: best_solution[i] for i in search_x_keys}
         dict2 = {
             'index': index,
             'target': optimizer.max['target'],  # 기존 최적화된 target 값
             'y': y_pred  # 모델이 최적 x 값에서 예측한 y 값 추가
         }
+
+        print("dict1 : ", dict1)
+        print("dict2 : ", dict2)
         return {**dict1,**dict2}
     
     
