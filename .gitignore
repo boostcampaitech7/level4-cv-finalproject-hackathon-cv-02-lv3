@@ -1,3 +1,7 @@
-tmp/
-*.log
-__pycache__/
+*.pyc
+*.pkl
+*.tar.gz
+*.parquet
+data_origin/
+*.zip
+data
