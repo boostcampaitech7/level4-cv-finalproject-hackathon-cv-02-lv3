@@ -1,3 +1,7 @@
+# import sys
+# import os
+# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -282,23 +286,27 @@ if df is not None:
 
     st.subheader("2️⃣ control할 제어 속성을 골라주세요!")
     st.write("(단, 수치형 변수만 가능)")
-
-    # 이전 선택 값 불러오기 
-    default_selection = previous_selections.get('control_selection', [])
     
     option2 = st.multiselect(
     "",
     [x for x in df.columns if (x != option) & (pd.api.types.is_integer_dtype(df[x]) or pd.api.types.is_float_dtype(df[x]))],
     )
-            
+    
     if option2:
         st.session_state.previous_selections['control_selection'] = option2
         
     tabs=None
     if option2:
         tabs = st.tabs(option2)
-    control_feature={}  
+    #control_feature={}  
+    
+    # 제어 속성을 저장할 변수 초기화
+    if 'control_feature' not in st.session_state:
+        st.session_state.control_feature = {}
+
+    control_feature = st.session_state.control_feature  # 기존 값 유지
     search_x={}
+    
     if tabs:
         for ind,i in enumerate(tabs):
             with i:
@@ -335,7 +343,11 @@ if df is not None:
                         key=option2[ind]+'2'
                     )
                     search_x[option2[ind]]['범위 설정'] = values
-                
+   
+    # 설정한 제어 속성을 세션 상태에 저장
+    st.session_state.control_feature = control_feature
+    st.session_state.search_x = search_x
+            
     st.divider()
 
 

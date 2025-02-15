@@ -1,11 +1,15 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
+
 import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from utils.data_utils import partial_dependence_with_error
+from Service.utils.data_utils import partial_dependence_with_error
 from sklearn.model_selection import train_test_split
-from Surrogate.aisolution import aisolution
+from aisolution import aisolution
 from Search.search import search
 from imblearn.over_sampling import SMOTE
 # 페이지 설정
