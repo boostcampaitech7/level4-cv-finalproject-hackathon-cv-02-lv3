@@ -9,7 +9,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from Service.utils.data_utils import partial_dependence_with_error
 from sklearn.model_selection import train_test_split
-from aisolution import aisolution
+from Surrogate.aisolution import aisolution
 from Search.search import search
 
 # 페이지 설정

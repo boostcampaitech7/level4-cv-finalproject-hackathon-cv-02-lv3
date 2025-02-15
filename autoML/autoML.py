@@ -35,13 +35,6 @@ preprocessors = {
     'passthrough': {'class': FunctionTransformer(func=lambda X: X)}
 }
 
-# feature_selections = {
-#     'SelectKBest': {'class': SelectKBest(score_func=f_regression)},
-#     'SelectPercentile': {'class': SelectPercentile(score_func=f_regression)},
-#     'VarianceThreshold': {'class': VarianceThreshold()},
-#     'passthrough': {'class': FunctionTransformer(func=lambda X: X)}
-# }
-
 feature_selections = {'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
 models_regression = {
