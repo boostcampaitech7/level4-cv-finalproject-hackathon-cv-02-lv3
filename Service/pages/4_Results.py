@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from search import search  # 🔥 search 함수 import 추가
+from Search.search import search  # 🔥 search 함수 import 추가
 
 # 페이지 설정
 st.set_page_config(

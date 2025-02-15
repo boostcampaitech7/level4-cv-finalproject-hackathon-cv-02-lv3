@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from regplot import partial_dependence_with_error
+from utils.data_utils import partial_dependence_with_error
 from sklearn.model_selection import train_test_split
-from aisolution import aisolution
-from search import search
+from Surrogate.aisolution import aisolution
+from Search.search import search
 from imblearn.over_sampling import SMOTE
 # 페이지 설정
 st.set_page_config(
