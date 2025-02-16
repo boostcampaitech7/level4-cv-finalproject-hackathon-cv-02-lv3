@@ -4,9 +4,40 @@ import numpy as np
 import pandas as pd
 import argparse  
 import time 
+import joblib
 from joblib import Parallel, delayed
+from shapely.geometry import Point, Polygon
+import alphashape
 import random
 from Search.custom_bayes import CustomBayesianOptimization
+
+
+def make_polygon(X_train):
+    
+    lat_lon_unique = X_train[['Lattitude', 'Longtitude']].drop_duplicates().values  # 위도, 경도의 유니크한 조합 가져오기
+    
+    alpha_value = 9                                                                 # 값이 작을수록 더 세밀한 다각형이 됨
+    concave_hull = alphashape.alphashape(lat_lon_unique, alpha_value)
+
+    concave_hull_coords = list(concave_hull.exterior.coords)
+    concave_hull_coords = [(lon, lat) for lon, lat in concave_hull_coords]
+
+    return concave_hull_coords
+
+
+def sample_within_concave_hull(X_train):
+    """Concave Hull 내부에서 랜덤한 위도·경도 값을 샘플링하는 함수"""
+
+    hull_coords = make_polygon(X_train)                                             # Concave Hull 좌표 리스트 반환
+    polygon = Polygon(hull_coords)                                                  # Polygon 객체로 변환
+    
+    while True:
+        rand_lon = random.uniform(polygon.bounds[1], polygon.bounds[3])
+        rand_lat = random.uniform(polygon.bounds[0], polygon.bounds[2])
+        rand_building = random.uniform(X_train['BuildingArea'].min(), X_train['BuildingArea'].max())
+        if polygon.contains(Point(rand_lat, rand_lon)):
+            return {"Longtitude": rand_lon, "Lattitude": rand_lat, "BuildingArea" : rand_building}
+
 
 def calculate(row, pl, prediction, search_y, y):
     target = 0 
@@ -34,7 +65,7 @@ def calculate(row, pl, prediction, search_y, y):
 def optimize_row(index, row, X_train, y_train, model, search_x, search_y):
         """주어진 행(row)에 대해 최적화를 수행하는 함수"""
         
-        idx_loc = y_train.index.get_loc(index)                                      # index는 Pandas의 실제 DataFrame 인덱스이므로, y_train에서 위치를 찾을 때 .index.get_loc() 사용
+        idx_loc = y_train.index.get_loc(index)                                      # 'index'는 Pandas의 실제 DataFrame 인덱스이므로, `y_train`에서 위치를 찾을 때 `.index.get_loc()` 사용
         initial_y = y_train.iloc[idx_loc]  
         y = list(search_y.keys())[0]
 
@@ -111,7 +142,7 @@ def optimize_row(index, row, X_train, y_train, model, search_x, search_y):
                 target = calculate(X_simulation_scaled, pl, prediction, search_y, y)
                 
                 return target
-                
+
 
         
         optimizer = CustomBayesianOptimization(                                     # Bayesian Optimization 실행
@@ -123,14 +154,37 @@ def optimize_row(index, row, X_train, y_train, model, search_x, search_y):
             allow_duplicate_points=True
         )
 
+        
+        for _ in range(20):                                                         # Concave Hull 내부에서만 초기 탐색 샘플 설정
+            sample = sample_within_concave_hull(X_train)
+            optimizer.probe(params=sample, lazy=True)
+
         #candidate_acq = ["ei", "ucb", "poi"]                                       # acquisition_function 랜덤 설정
         #selected_acq = random.choice(candidate_acq)
 
         #utility = UtilityFunction(kind="ei", xi=0.1)
-        optimizer.maximize(init_points=10, n_iter=50)                               # acquisition_function=utility
+        optimizer.maximize(init_points=0, n_iter=50)                                # acquisition_function=utility
         
         best_solution = optimizer.max['params']                                     # 최적의 결과 저장
+        best_point = Point(best_solution["Lattitude"], best_solution["Longtitude"])
 
+        
+        hull_coords = make_polygon(X_train)                                         # Concave Hull Polygon 생성
+        concave_hull_poly = Polygon(hull_coords)
+
+        
+        retry_count = 0                                                             # 최적해가 Concave Hull 외부라면 강제 재탐색 수행
+        while not concave_hull_poly.contains(best_point) and (best_solution not in make_polygon(X_train)) and retry_count < 3:
+            print(f"최적해가 Concave Hull 외부입니다. {retry_count+1}번째 재탐색 중...")
+            sample = sample_within_concave_hull(X_train)
+            optimizer.probe(params=sample, lazy=True)
+            optimizer.maximize(init_points=0, n_iter=5) #acquisition_function=utility
+            best_solution = optimizer.max['params']
+            best_point = Point(best_solution["Lattitude"], best_solution["Longtitude"])
+            retry_count += 1
+        
+        if not concave_hull_poly.contains(best_point):
+            return None                                                             # Concave Hull 내부 값이 없으면 무시
         
         best_x_df = row.copy()                                                      # 원본 데이터(row) 기반으로 새로운 DataFrame 생성 (최적화하지 않은 변수 포함)                                                      # 기존 row의 모든 feature 포함
         for key, value in best_solution.items():
@@ -160,10 +214,11 @@ def search(X_train, y_train, model, search_x, search_y):
     """
     
     
-    optimal_solutions = Parallel(n_jobs=-1, backend="loky")(                        # 병렬 처리 실행 (n_jobs=-1: 모든 CPU 코어 사용)
+    optimal_solutions = Parallel(n_jobs=1, backend="loky")(                         # 병렬 처리 실행 (n_jobs=-1: 모든 CPU 코어 사용)
         delayed(optimize_row)(index, row, X_train, y_train, model, search_x, search_y) for index, row in X_train.iterrows()
     )
-    optimal_solutions = [sol for sol in optimal_solutions]
+    
+    optimal_solutions = [sol for sol in optimal_solutions if sol is not None]       # None 값 제거
     
     optimal_solutions_df = pd.DataFrame(optimal_solutions)                          # 최적 결과를 CSV 파일로 저장
 
