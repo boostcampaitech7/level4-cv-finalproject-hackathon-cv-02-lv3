@@ -91,7 +91,7 @@ pip install -r requirements.txt
 
 Streamlit을 활용하여 UI를 제공하며, 사용자는 CSV 파일을 업로드하여 데이터를 분석하고 최적의 AI 솔루션을 탐색할 수 있습니다.
 
-아래 Service Architecture를 통해 전체적인 프로세스를 확인할 수 있습니다.
+아래 **Service Architecture**를 통해 전체적인 프로세스를 확인할 수 있습니다.
 ![Service Architecture](assets/img5.png)
 
 ```
@@ -105,7 +105,7 @@ streamlit run Service/Home.py
 
 ---
 
-## 5️⃣ Memebers
+## 6️⃣ Memebers
 
 <div align='center'>
   <h3>LuckyVicky🍀</h3>
@@ -127,7 +127,7 @@ streamlit run Service/Home.py
       <td align="center">서정연</td>
     </tr>
     <tr>
-      <td align="center">Search 모델 실험, 웹 구현</td>
+      <td align="center">팀장, Search 모델 실험, 웹 구현</td>
       <td align="center">AutoML 구현, 벤치마크 데이터셋 분석</td>
       <td align="center">Search 모델 구현, 목적함수 개발</td>
       <td align="center">Search 모델 구현, 목적함수 개발</td>
