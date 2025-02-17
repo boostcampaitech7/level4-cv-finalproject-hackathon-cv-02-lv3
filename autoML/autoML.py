@@ -2,7 +2,7 @@
 # for Automating Data Science, GECCO '16)에서 아이디어를 얻어 구현했습니다
 
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, RandomForestClassifier, GradientBoostingClassifier
-from pipeline_utils import crossover, mutation, build_pipeline, sort, is_in_structures, TimeoutException, timeout_handler
+from autoML.pipeline_utils import crossover, mutation, build_pipeline, sort, is_in_structures, TimeoutException, timeout_handler
 from sklearn.preprocessing import StandardScaler, RobustScaler, PolynomialFeatures, FunctionTransformer
 from sklearn.feature_selection import SelectKBest, SelectPercentile, VarianceThreshold, f_regression
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
@@ -13,7 +13,7 @@ from sklearn.inspection import permutation_importance
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.base import clone
 from xgboost import XGBRegressor, XGBClassifier
-from metrics import evaluate_regression, evaluate_classification, compute_metrics_statistics
+from autoML.metrics import evaluate_regression, evaluate_classification, compute_metrics_statistics
 from joblib import Parallel, delayed
 from datetime import datetime
 from copy import deepcopy
@@ -35,12 +35,7 @@ preprocessors = {
     'passthrough': {'class': FunctionTransformer(func=lambda X: X)}
 }
 
-feature_selections = {
-    'SelectKBest': {'class': SelectKBest(score_func=f_regression)},
-    'SelectPercentile': {'class': SelectPercentile(score_func=f_regression)},
-    'VarianceThreshold': {'class': VarianceThreshold()},
-    'passthrough': {'class': FunctionTransformer(func=lambda X: X)}
-}
+feature_selections = {'passthrough': {'class': FunctionTransformer(func=lambda X: X)}}
 
 models_regression = {
     'DecisionTreeRegressor': {'class': DecisionTreeRegressor()},
