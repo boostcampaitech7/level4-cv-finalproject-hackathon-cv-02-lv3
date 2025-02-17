@@ -1,0 +1,6 @@
+﻿Dataset,Metric,Ours,Auto-sklearn,TPOT,Placement (ours)
+Concrete,R2,0.9368,0.9167,0.9322,1
+Melbourne,R2,0.7631,0.7804,0.7559,2
+DVM-CAR,R2,0.8424,0.8809,0.8118,2
+IBM-HR,PR-AUC,0.4665,0.5720,0.4725,3
+eCommerce,RMSE,15.63,9.84,13.04,3
