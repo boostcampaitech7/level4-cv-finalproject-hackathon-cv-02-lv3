@@ -1,30 +1,56 @@
 ![AutoML을 활용한 Prescriptive AI 솔루션 개발](assets/img0.png)
 
 ## 1️⃣ Introduction
-본 프로젝트는 **AutoML**과 **Prescriptive AI**를 활용하여 고객이 제공한 데이터를 분석하고, 최적의 추천 값을 제안하는 AI 솔루션을 개발합니다.
+**AutoML**과 **Prescriptive AI**를 활용하여 고객이 제공한 데이터를 분석하고, 최적의 추천 값을 제안하는 AI 솔루션을 개발하였습니다.
 
 ### 1.1 Key Objectives
 ![AI solution](assets/img1.png)
 
-- **Automated Decision Optimization** (자동화된 의사결정 최적화)  
+- **자동화된 의사결정 최적화**
   AutoML을 활용하여 최적의 모델을 자동 학습하고 데이터 분석을 효율적으로 수행합니다.  
 
-- **Cost Reduction & Productivity Improvement** (비용 절감 및 생산성 향상)  
+- **비용 절감 및 생산성 향상**
   분석 시간 단축 및 파이프라인 자동화를 통해 운영 비용을 절감하고 효율성을 높입니다.  
 
-- **Industry-Wide Application** (다양한 산업 적용 가능)  
+- **다양한 산업 적용 가능**
   헬스케어, 금융, 제조 등 다양한 산업에 적용할 수 있는 유연한 AI 솔루션을 제공합니다.  
 
 ---
 
 ## 2️⃣ Service Architecture
-본 프로젝트에서는 **유전 알고리즘 기반 AutoML 라이브러리**를 구축하여 가장 예측력이 높은 **Surrogate Model**을 찾고,  
-**Bayesian Optimization**을 활용하여 고객의 목적에 맞는 최적의 의사결정을 도출하였습니다.  
-
+본 프로젝트에서는 **유전 알고리즘 기반 AutoML 라이브러리**를 구축하여 가장 예측력이 높은 **Surrogate Model**을 찾고, **Bayesian Optimization**을 활용하여 고객의 목적에 맞는 최적의 의사결정을 도출하였습니다.  
 전체 서비스는 **Streamlit**을 통해 구현하였습니다.
 
-### AI Solution Architecture
+### 2.1 AI Solution Architecture
 ![AI Solutio architecture](assets/img2.png)
+
+### 2.2 Project Structure
+
+```
+level4-cv-finalproject-hackathon-cv-02-lv3
+│  ├─ Service
+│  │  ├─ Home.py
+│  │  ├─ pages
+│  │  │  ├─ 1_Data_Analysis.py
+│  │  │  ├─ 2_AI_Solution.py
+│  │  │  ├─ 3_Model_Training.py
+│  │  │  ├─ 4_Results.py
+│  │  ├─ utils
+│  │  │  ├─ data_utils.py
+│  ├─ Search
+│  │  ├─ search.py
+│  │  ├─ custom_bayes.py
+│  │  ├─ search_concave.py
+│  ├─ Surrogate
+│  │  ├─ aisolution.py
+│  ├─ autoML
+│  │  ├─ autoML.py
+│  │  ├─ metrics.py
+│  │  ├─ pipeline_utils.py
+│  ├─ assets
+│  ├─ README.md
+│  ├─ requirements.txt
+```
 
 ---
 
