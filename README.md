@@ -112,11 +112,11 @@ streamlit run Service/Home.py
   <h3>LuckyVicky🍀</h3>
   <table width="98%">
     <tr>
+      <td align="center" valign="top" width="15%"><a href="https://github.com/Soojeoong"><img src="https://avatars.githubusercontent.com/u/100748928?v=4"></a></td>
       <td align="center" valign="top" width="15%"><a href="https://github.com/jinlee24"><img src="https://avatars.githubusercontent.com/u/137850412?v=4"></a></td>
       <td align="center" valign="top" width="15%"><a href="https://github.com/stop0729"><img src="https://avatars.githubusercontent.com/u/78136790?v=4"></a></td>
       <td align="center" valign="top" width="15%"><a href="https://github.com/yjs616"><img src="https://avatars.githubusercontent.com/u/107312651?v=4"></a></td>
       <td align="center" valign="top" width="15%"><a href="https://github.com/sng-tory"><img src="https://avatars.githubusercontent.com/u/176906855?v=4"></a></td>
-      <td align="center" valign="top" width="15%"><a href="https://github.com/Soojeoong"><img src="https://avatars.githubusercontent.com/u/100748928?v=4"></a></td>
       <td align="center" valign="top" width="15%"><a href="https://github.com/cyndii20"><img src="https://avatars.githubusercontent.com/u/90389093?v=4"></a></td>
     </tr>
     <tr>
@@ -138,5 +138,5 @@ streamlit run Service/Home.py
   </table>
 </div>
 
-<p align='center'>© 2024 LuckyVicky Team.</p>
-<p align='center'>Supported by Naver BoostCamp AI Tech.</p>
+<p align='center'>© 2025 LuckyVicky Team.</p>
+<p align='center'>Supported by Naver BoostCamp AI Tech 7th.</p>
