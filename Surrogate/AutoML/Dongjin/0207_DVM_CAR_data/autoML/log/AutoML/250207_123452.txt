@@ -1,0 +1,199 @@
+[2025-02-07 12:34:52] AutoML.__init__() - n_population: 30, n_generation: 6, n_parent: 5, prob_mutations: [0.2, 0.5], use_joblib: True, n_jobs: -1
+[2025-02-07 12:34:52] AutoML.fit() - use_kfold: True, kfold: 5, valid_size: 0.2000, seed: 1, max_n_try: 1000, timeout: 30
+[2025-02-07 12:35:54] 1 - best R2: 0.886
+[2025-02-07 12:35:54] 
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8863±0.0263
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8695±0.0523
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8667±0.0280
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8576±0.0401
+(RobustScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8437±0.0471
+(StandardScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8341±0.0204
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7973±0.0565
+(RobustScaler) - (passthrough) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7939±0.0563
+(passthrough) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7925±0.0571
+(StandardScaler) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7904±0.0546
+(passthrough) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7879±0.0550
+(StandardScaler) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.7508±0.0566
+(StandardScaler) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.7508±0.0566
+(RobustScaler) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.7314±0.0644
+(RobustScaler) - (SelectKBest) - (RandomForestRegressor: n_estimators: 100) - 0.6374±0.0933
+(StandardScaler) - (SelectKBest) - (DecisionTreeRegressor) - 0.6061±0.1638
+(RobustScaler) - (SelectKBest) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.5804±0.1296
+(passthrough) - (SelectKBest) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.5798±0.1287
+(passthrough) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.0482±0.1572
+(passthrough) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.0482±0.1572
+(PolynomialFeatures) - (SelectKBest) - (KNeighborsRegressor: n_neighbors: 5) - -0.3211±0.4499
+(PolynomialFeatures) - (SelectKBest) - (KNeighborsRegressor: n_neighbors: 5) - -0.3211±0.4499
+(StandardScaler) - (passthrough) - (KNeighborsRegressor: n_neighbors: 5) - -0.3753±0.7523
+(StandardScaler) - (VarianceThreshold) - (KNeighborsRegressor: n_neighbors: 5) - -0.3753±0.7523
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (DecisionTreeRegressor) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - -100.0000±-100.0000
+(StandardScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+[2025-02-07 12:36:29] 2 - best R2: 0.901
+[2025-02-07 12:36:29] 
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.9006±0.0227
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8980±0.0224
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8953±0.0248
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8863±0.0263
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8844±0.0247
+(RobustScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8756±0.0426
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8695±0.0467
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8695±0.0523
+(RobustScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8684±0.0400
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8680±0.0417
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8680±0.0502
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8675±0.0435
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8667±0.0280
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8593±0.0432
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8576±0.0291
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8576±0.0401
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8560±0.0545
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8533±0.0430
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8531±0.0250
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8527±0.0294
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8472±0.0404
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8460±0.0469
+(StandardScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8455±0.0524
+(RobustScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8439±0.0218
+(RobustScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8437±0.0471
+(passthrough) - (SelectPercentile) - (DecisionTreeRegressor) - 0.8433±0.0547
+(passthrough) - (passthrough) - (DecisionTreeRegressor) - 0.8415±0.0388
+(RobustScaler) - (SelectPercentile) - (DecisionTreeRegressor) - 0.8246±0.0311
+(RobustScaler) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8222±0.0209
+(passthrough) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 6) - 0.0222±0.1259
+[2025-02-07 12:38:09] 3 - best R2: 0.901
+[2025-02-07 12:38:09] 
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.9006±0.0227
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8980±0.0224
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 79) - 0.8970±0.0268
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8953±0.0248
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8941±0.0199
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8900±0.0251
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 131) - 0.8884±0.0231
+(passthrough) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8863±0.0263
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 100) - 0.8844±0.0247
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8572±0.0364
+(StandardScaler) - (passthrough) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1255) - 0.8207±0.0525
+(passthrough) - (VarianceThreshold) - (KNeighborsRegressor: n_neighbors: 5) - 0.0971±0.1485
+(StandardScaler) - (passthrough) - (KNeighborsRegressor: n_neighbors: 5) - -0.3753±0.7523
+(StandardScaler) - (passthrough) - (KNeighborsRegressor: n_neighbors: 9) - -1.2016±1.2057
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 91) - -100.0000±-100.0000
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 101) - -100.0000±-100.0000
+(PolynomialFeatures) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 80) - -100.0000±-100.0000
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 196) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (KNeighborsRegressor: n_neighbors: 5) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (KNeighborsRegressor: n_neighbors: 5) - -100.0000±-100.0000
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 91) - -100.0000±-100.0000
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 196) - -100.0000±-100.0000
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 100) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 262) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 131) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (RandomForestRegressor: n_estimators: 80) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 131) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 131) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (RandomForestRegressor: n_estimators: 80) - -100.0000±-100.0000
+[2025-02-07 12:39:38] 4 - best R2: 0.901
+[2025-02-07 12:39:38] 
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.9006±0.0227
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8989±0.0255
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8980±0.0224
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - 0.8975±0.0188
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8974±0.0212
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 79) - 0.8970±0.0268
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 80) - 0.8967±0.0237
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8965±0.0184
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - 0.8963±0.0153
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8960±0.0212
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8953±0.0248
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8941±0.0199
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - 0.8933±0.0241
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 60) - 0.8933±0.0147
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 58) - 0.8922±0.0220
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8728±0.0384
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8555±0.0544
+(RobustScaler) - (passthrough) - (DecisionTreeRegressor) - 0.8465±0.0453
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingRegressor: n_estimators: 186, learning_rate: 0.1000) - 0.8457±0.0370
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingRegressor: n_estimators: 120, learning_rate: 0.1265) - 0.8379±0.0485
+(passthrough) - (VarianceThreshold) - (DecisionTreeRegressor) - 0.8328±0.0244
+(RobustScaler) - (VarianceThreshold) - (GradientBoostingRegressor: n_estimators: 55, learning_rate: 0.1599) - 0.7861±0.0694
+(passthrough) - (VarianceThreshold) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.0591) - 0.7308±0.0839
+(PolynomialFeatures) - (SelectKBest) - (GradientBoostingRegressor: n_estimators: 97, learning_rate: 0.1623) - 0.2672±0.2533
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 75) - -100.0000±-100.0000
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 75) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 153) - -100.0000±-100.0000
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 112) - -100.0000±-100.0000
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 75) - -100.0000±-100.0000
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 118) - -100.0000±-100.0000
+[2025-02-07 12:41:09] 5 - best R2: 0.902
+[2025-02-07 12:41:09] 
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.9019±0.0254
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.9006±0.0227
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 80) - 0.8994±0.0232
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - 0.8992±0.0213
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.8992±0.0263
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8989±0.0255
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8980±0.0224
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - 0.8975±0.0188
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8974±0.0212
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 80) - 0.8964±0.0196
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 64) - 0.8951±0.0243
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 65) - 0.8947±0.0227
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 61) - 0.8940±0.0293
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.8936±0.0221
+(StandardScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 51) - 0.8931±0.0291
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 55) - 0.8889±0.0297
+(RobustScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 112) - 0.8871±0.0299
+(passthrough) - (SelectPercentile) - (DecisionTreeRegressor) - 0.8293±0.0641
+(RobustScaler) - (SelectPercentile) - (DecisionTreeRegressor) - 0.8257±0.0488
+(passthrough) - (SelectKBest) - (RandomForestRegressor: n_estimators: 86) - 0.6353±0.1042
+(PolynomialFeatures) - (SelectKBest) - (RandomForestRegressor: n_estimators: 65) - 0.2632±0.2507
+(PolynomialFeatures) - (SelectKBest) - (RandomForestRegressor: n_estimators: 55) - 0.2628±0.2501
+(PolynomialFeatures) - (SelectKBest) - (RandomForestRegressor: n_estimators: 55) - 0.2616±0.2498
+(PolynomialFeatures) - (SelectKBest) - (RandomForestRegressor: n_estimators: 55) - 0.2607±0.2501
+(passthrough) - (VarianceThreshold) - (KNeighborsRegressor: n_neighbors: 5) - 0.0971±0.1485
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - -100.0000±-100.0000
+(PolynomialFeatures) - (VarianceThreshold) - (GradientBoostingRegressor: n_estimators: 166, learning_rate: 0.1474) - -100.0000±-100.0000
+(PolynomialFeatures) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - -100.0000±-100.0000
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 130) - -100.0000±-100.0000
+(PolynomialFeatures) - (passthrough) - (RandomForestRegressor: n_estimators: 161) - -100.0000±-100.0000
+[2025-02-07 12:42:45] 6 - best R2: 0.902
+[2025-02-07 12:42:45] 
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.9019±0.0254
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.9006±0.0227
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 80) - 0.8994±0.0232
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 65) - 0.8992±0.0213
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 55) - 0.8992±0.0263
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 79) - 0.8989±0.0215
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 79) - 0.8981±0.0210
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 79) - 0.8961±0.0220
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.8949±0.0209
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 79) - 0.8948±0.0208
+(StandardScaler) - (SelectPercentile) - (RandomForestRegressor: n_estimators: 80) - 0.8862±0.0250
+(RobustScaler) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.2839) - 0.8603±0.0453
+(passthrough) - (passthrough) - (GradientBoostingRegressor: n_estimators: 158, learning_rate: 0.1191) - 0.8546±0.0453
+(passthrough) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1701) - 0.8294±0.0540
+(passthrough) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1604) - 0.8246±0.0496
+(RobustScaler) - (passthrough) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.1000) - 0.7970±0.0572
+(passthrough) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 100, learning_rate: 0.0868) - 0.7702±0.0715
+(passthrough) - (SelectPercentile) - (KNeighborsRegressor: n_neighbors: 5) - 0.0482±0.1572
+(RobustScaler) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 108) - -100.0000±-100.0000
+(passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 151) - -100.0000±-100.0000
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 151) - -100.0000±-100.0000
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 131) - -100.0000±-100.0000
+(PolynomialFeatures) - (SelectPercentile) - (GradientBoostingRegressor: n_estimators: 146, learning_rate: 0.2872) - -100.0000±-100.0000
+(RobustScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 97) - -100.0000±-100.0000
+(StandardScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 189) - -100.0000±-100.0000
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 112) - -100.0000±-100.0000
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 112) - -100.0000±-100.0000
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 115) - -100.0000±-100.0000
+(StandardScaler) - (passthrough) - (RandomForestRegressor: n_estimators: 189) - -100.0000±-100.0000
+(passthrough) - (passthrough) - (RandomForestRegressor: n_estimators: 298) - -100.0000±-100.0000
+[2025-02-07 12:42:45] Best structure
+[2025-02-07 12:42:45] (passthrough) - (VarianceThreshold) - (RandomForestRegressor: n_estimators: 80) - 0.9019±0.0254
+[2025-02-07 12:42:45] AutoML init to training finished in: 472.6 s
+[2025-02-07 12:42:45] Evaluation - Train - R2: 0.9710, adjusted_R2: 0.9594, MAE: 16781556.5773, RMSE: 35157942.9766
+[2025-02-07 12:42:45] Evaluation - Test - R2: 0.8268, adjusted_R2: -100, MAE: 38232132.3341, RMSE: 91808718.5321
