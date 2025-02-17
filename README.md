@@ -81,7 +81,7 @@ level4-cv-finalproject-hackathon-cv-02-lv3
 
 ## 4️⃣ How to Run
 
-### 4.1 필요한 라이브러리 설치
+### 4.1 Install Required Libraries
 
 ```
 pip install -r requirements.txt
@@ -94,6 +94,7 @@ Streamlit을 활용하여 UI를 제공하며, 사용자는 CSV 파일을 업로�
 아래 **Service Architecture**를 통해 전체적인 프로세스를 확인할 수 있습니다.
 ![Service Architecture](assets/img5.png)
 
+**How to Run:**
 ```
 streamlit run Service/Home.py
 ```
@@ -137,3 +138,5 @@ streamlit run Service/Home.py
   </table>
 </div>
 
+<p align='center'>© 2024 LuckyVicky Team.</p>
+<p align='center'>Supported by Naver BoostCamp AI Tech.</p>
